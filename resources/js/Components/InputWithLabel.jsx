@@ -8,6 +8,7 @@ export default function InputWithLabel({
     name,
     value,
     onChange,
+    error,
     placeholder,
     isTextArea = false,
     type,
@@ -35,6 +36,7 @@ export default function InputWithLabel({
                     className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
             )}
+           {error && ( <p className="text-red-500">{error}</p>)}
         </div>
     );
 }

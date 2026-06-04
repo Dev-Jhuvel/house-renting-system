@@ -10,6 +10,7 @@ class House extends Model
 {
     use HasUuidAndSoftDeletes, HasActivityLog;
     protected $fillable = [
+        'user_id',
         'name',
         'address',
         'description',
@@ -18,6 +19,12 @@ class House extends Model
         'water_rate',
         'electric_rate',
         'status'
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     public function owner(){
