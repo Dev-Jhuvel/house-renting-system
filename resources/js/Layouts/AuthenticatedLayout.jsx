@@ -16,12 +16,18 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/Components/ui/sidebar";
+import { Toaster } from "@/Components/ui/toaster";
 import { Link, usePage } from "@inertiajs/react";
 import { House, HousePlus, LayoutDashboard } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast"
+
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const { flash } = usePage().props
+    const { toast } = useToast()
+
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -30,6 +36,11 @@ export default function AuthenticatedLayout({ header, children }) {
         { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard },
         { routeLink: "houses.index", label: "Manage House", icon: HousePlus },
     ];
+
+    useEffect(() => {
+        if (flash?.success) toast.success(flash.success)
+        if (flash?.error) toast.error(flash.error)
+    }, [flash])
 
     return (
         <div className="min-h-screen">
@@ -53,7 +64,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <SidebarGroup>
                             <SidebarGroupContent>
                                 <SidebarMenu>
-                                    <SidebarMenuItem className="space-y-1"> 
+                                    <SidebarMenuItem className="space-y-1">
                                         {links &&
                                             links.map(
                                                 (
@@ -122,7 +133,10 @@ export default function AuthenticatedLayout({ header, children }) {
                     </SidebarFooter>
                 </Sidebar>
                 <SidebarTrigger />
-                <main className="w-[96%]">{children}</main>
+                <main className="w-full h-screen">
+                    {children}
+                    <Toaster />
+                </main>
             </SidebarProvider>
         </div>
     );

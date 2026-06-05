@@ -1,14 +1,3 @@
-import InputWithLabel from "@/Components/InputWithLabel";
-import { Badge } from "@/Components/ui/badge";
-import { Button } from "@/Components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/Components/ui/card";
 import {
     Dialog,
     DialogClose,
@@ -19,121 +8,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/Components/ui/dialog";
-import { Form } from "@/Components/ui/form";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
-import { useForm } from "@inertiajs/react";
+import InputWithLabel from "./InputWithLabel";
+import { Button } from "./ui/button";
 
-import { ArrowRight, MapPin, PlusCircleIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-
-export default function HousePage({ houses }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: "",
-        address: "",
-        description: "",
-        city: "",
-        max_floor: 1,
-        water_rate: 0,
-        electric_rate: 0,
-    });
-
-    const [open, setOpen] = useState(false);
-
-    function handleSubmit(e) {
-        e.preventDefault();
-        post(route("houses.store"), {
-            onSuccess: () => {
-                reset();
-                setOpen(false);
-            },
-        });
-    }
-
-    function handleChange(e) {
-        const { name, type, value } = e.target;
-        setData((prev) => ({
-            ...prev,
-            [name]: type === "number" ? parseFloat(value) || 0 : value,
-        }));
-    }
-
-    return (
-        <div className="w-full h-screen bg-gray-200 p-4">
-            <div className="flex">
-                <div className="flex-grow">
-                    <h1 className="text-2xl">My Properties</h1>
-                    <p>Manage owners houses</p>
-                </div>
-                <div className="flex items-end px-4">
-                    <Button size="sm">View All</Button>
-                </div>
-            </div>
-            <div className="w-full border h-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-4 px-3 h-full overflow-scroll">
-                    {houses &&
-                        houses.map((house, key) => (
-                            <HouseCard house={house} key={key} />
-                        ))}
-                    <NewHouseDialog
-                        className="grid-g"
-                        setOpen={setOpen}
-                        open={open}
-                        form={data}
-                        errors={errors}
-                        handleSubmit={handleSubmit}
-                        handleChange={handleChange}
-                        processing={processing}
-                    />
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function AddHouseButton() {
-    return (
-        <Card className="mx-auto w-full h-full max-w-sm pt-0 shadow-md">
-            <CardContent className="flex flex-col items-center justify-center h-full">
-                <PlusCircleIcon />
-                <p className="text-xsm/10 text-center">
-                    Expand your portfolio with a new property
-                </p>
-            </CardContent>
-        </Card>
-    );
-}
-
-function HouseCard({ house }) {
-    const activeHouse = house.status === 'active';
-    return (
-        <Card className="relative mx-auto w-full max-w-sm pt-0 shadow-md">
-            <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-            <img
-                src="https://images.pexels.com/photos/18078684/pexels-photo-18078684.jpeg"
-                alt="Event cover"
-                className={`relative z-20 aspect-video w-full object-cover brightness-60 dark:brightness-40 ${activeHouse ? '' : 'grayscale'}`}
-            />
-            <CardHeader>
-                <div className="flex justify-end">
-                    <Badge variant="outline" className={`${activeHouse ? 'bg-red-300' : 'bg-gray-300'}`}>{house.status.toUpperCase()}</Badge>
-                </div>
-                <CardTitle>{house.name}</CardTitle>
-                <CardDescription className="flex items-center">
-                    {" "}
-                    <MapPin className="size-4" /> {house.address}
-                </CardDescription>
-            </CardHeader>
-            <CardFooter>
-                <Button className="w-full">
-                    Manage Property <ArrowRight />{" "}
-                </Button>
-            </CardFooter>
-        </Card>
-    );
-}
-
-function NewHouseDialog({
+export default function HouseDialog({
     form,
     handleSubmit,
     handleChange,
@@ -141,11 +19,14 @@ function NewHouseDialog({
     open,
     setOpen,
     errors,
+    method,
+    children
 }) {
+    const process = method === 'Create' ? 'Creating...' : 'Updating...';
     return (
-        <Dialog open={open} setOpen={setOpen}>
-            <DialogTrigger onClick={()=> setOpen(true)}>
-                <AddHouseButton  />
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger onClick={() => setOpen(true)}>
+                {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[550px]">
                 <form onSubmit={handleSubmit}>
@@ -231,13 +112,13 @@ function NewHouseDialog({
                         </div>
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild onClick={()=> setOpen(false)}>
+                        <DialogClose asChild onClick={() => setOpen(false)}>
                             <Button type="button" variant="secondary">
                                 Close
                             </Button>
                         </DialogClose>
                         <Button type="submit" disabled={processing}>
-                            {processing ? "Creating..." : "Create"}
+                            {processing ? process : method}
                         </Button>
                     </DialogFooter>
                 </form>
