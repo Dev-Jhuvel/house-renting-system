@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class Bill extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog;
+    use HasUuids, HasActivityLog;
     protected $fillable = [
         'type',
         'title',

@@ -26,18 +26,20 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { useForm, Link } from "@inertiajs/react";
 
-import { ArrowRight, MapPin, PlusCircleIcon } from "lucide-react";
+import { ArrowRight, MapPin, PlusCircleIcon, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function HouseIndex({ houses }) {
-    const { data, setData, patch, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         address: "",
         description: "",
         city: "",
         max_floor: 1,
+        max_room: 1,
         water_rate: 0,
         electric_rate: 0,
+        status: "active",
     });
 
     const [open, setOpen] = useState(false);
@@ -65,18 +67,9 @@ export default function HouseIndex({ houses }) {
             <div className="flex mb-4">
                 <div className="flex-grow">
                     <h1 className="text-2xl">My Properties</h1>
-                    <p>Manage owners properties</p>
+                    <p>Manage your properties, floors, rooms</p>
                 </div>
                 <div className="flex items-end px-4">
-                    <Button size="sm">View All</Button>
-                </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-4 px-3 overflow-scroll pb-5 h-full">
-                    {houses &&
-                        houses.map((house) => (
-                            <HouseCard house={house} key={house.id} />
-                        ))}
                     <HouseDialog
                         setOpen={setOpen}
                         open={open}
@@ -87,8 +80,22 @@ export default function HouseIndex({ houses }) {
                         processing={processing}
                         method="Create"
                     >
-                        <AddCard message="Expand your portfolio with a new property" />
+                        <Button className="px-3 py-1 flex items-center">
+                            <PlusIcon
+                                className="hover:text-primary"
+                                size={32}
+                            />
+                            Add House
+                        </Button>
                     </HouseDialog>
+                </div>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-4 px-3 overflow-scroll pb-5 h-full">
+                    {houses &&
+                        houses.map((house) => (
+                            <HouseCard house={house} key={house.id} />
+                        ))}
                 </div>
             </div>
         </div>
@@ -97,30 +104,44 @@ export default function HouseIndex({ houses }) {
 
 function HouseCard({ house }) {
     const activeHouse = house.status === "active";
+    const max_floor =
+        house.max_floor + (house.max_floor > 1 ? " Floors" : " Floor");
+    const badgeInfos = [max_floor, house.city];
     return (
-        <Card className="relative mx-auto w-full max-w-sm pt-0 shadow-md">
+        <Card className="relative mx-auto w-full max-w-sm pt-0 shadow-md flex flex-col">
             <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
+            <Badge
+                variant="outline"
+                className={`absolute z-30 right-5 top-5 rounded-sm ${activeHouse ? "bg-green-300" : "bg-gray-300"}`}
+            >
+                {house.status.toUpperCase()}
+            </Badge>
             <img
                 src="https://images.pexels.com/photos/18078684/pexels-photo-18078684.jpeg"
                 alt="Event cover"
                 className={`relative z-20 aspect-video w-full object-cover brightness-60 dark:brightness-40 ${activeHouse ? "" : "grayscale"}`}
             />
-            <CardHeader>
-                <div className="flex justify-end">
-                    <Badge
-                        variant="outline"
-                        className={`${activeHouse ? "bg-green-300" : "bg-gray-300"}`}
-                    >
-                        {house.status.toUpperCase()}
-                    </Badge>
-                </div>
-                <CardTitle>{house.name}</CardTitle>
-                <CardDescription className="flex items-center">
-                    <MapPin className="size-4" /> {house.address}
+            <CardHeader className="flex-grow pt-2">
+                <div className="flex justify-end"></div>
+                <CardTitle className="text-xl/7 truncate">
+                    {house.name}
+                </CardTitle>
+                <CardDescription className="flex flex-col">
+                    <p className="truncate">
+                        <MapPin className="size-4 inline-block" />
+                        {house.address}
+                    </p>
                 </CardDescription>
+                <div className="my-2 space-x-2">
+                    {badgeInfos.map((info) => (
+                        <Badge key={info} variant="outline" className="bg-gray-500 text-white">
+                            {info}
+                        </Badge>
+                    ))}
+                </div>
             </CardHeader>
             <CardFooter>
-                <Link href={route("houses.show", house.id)}>
+                <Link className="w-full" href={route("houses.show", house.id)}>
                     <Button className="w-full">
                         Manage Property <ArrowRight />
                     </Button>

@@ -16,36 +16,42 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/Components/ui/sidebar";
-import { Toaster } from "@/Components/ui/toaster";
+import { Toaster } from "@/Components/ui/sonner";
 import { Link, usePage } from "@inertiajs/react";
-import { House, HousePlus, LayoutDashboard } from "lucide-react";
+import { Banknote, House, HousePlus, Layers2, LayoutDashboard, NotepadText, Settings, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast"
-
+import { toast } from "sonner";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
-    const { flash } = usePage().props
-    const { toast } = useToast()
-
+    const { flash } = usePage().props;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
     const links = [
         { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-        { routeLink: "houses.index", label: "Manage House", icon: HousePlus },
+        { routeLink: "houses.index", label: "House", icon: HousePlus },
+        { routeLink: "houses.index", label: "Floors and Room", icon: Layers2 },
+        { routeLink: "tenants.index", label: "Tenants", icon: Users },
+        { routeLink: "bookings.index", label: "Booking", icon: NotepadText },
+        { routeLink: "bills.index", label: "Bills & Payment", icon: Banknote },
+        { routeLink: "houses.index", label: "Settings", icon: Settings },
     ];
 
     useEffect(() => {
-        if (flash?.success) toast.success(flash.success)
-        if (flash?.error) toast.error(flash.error)
-    }, [flash])
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     return (
         <div className="min-h-screen">
             <SidebarProvider>
-                <Sidebar>
+                <Sidebar size="">
                     <SidebarHeader>
                         <SidebarMenu>
                             <SidebarMenuItem>
@@ -87,7 +93,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                 )}
                                                             >
                                                                 <Icon className="size-5" />
-                                                                <span className="ml-2 font-semibold">
+                                                                <span className="font-semibold">
                                                                     {label}
                                                                 </span>
                                                             </NavLink>
@@ -135,7 +141,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <SidebarTrigger />
                 <main className="w-full h-screen">
                     {children}
-                    <Toaster />
+                    <Toaster richColors />
                 </main>
             </SidebarProvider>
         </div>

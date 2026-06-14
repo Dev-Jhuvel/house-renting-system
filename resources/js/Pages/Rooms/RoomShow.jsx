@@ -1,6 +1,7 @@
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
 
+
 import { Form } from "@/Components/ui/form";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
@@ -25,23 +26,24 @@ import {
     MapPin,
     PlusCircleIcon,
     PlusIcon,
+    SquareDashedBottom,
+    Users,
     Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import HouseDialog from "@/Components/HouseDialog";
 import InputWithLabel from "@/Components/InputWithLabel";
 import DeleteAlert from "@/Components/DeleteAlert";
 import RoomDialog from "@/Components/RoomDialog";
 import RoomSection from "../Rooms/RoomSection";
 
-export default function HouseShow({ house }) {
-    const { data, setData, patch, processing, errors } = useForm(house);
+export default function RoomShow({ room }) {
+    const { data, setData, patch, processing, errors } = useForm(room);
 
     const [open, setOpen] = useState(false);
 
     function handleSubmit(e) {
         e.preventDefault();
-        patch(route("houses.update", data), {
+        patch(route("rooms.update", data), {
             onSuccess: () => {
                 setOpen(false);
             },
@@ -56,30 +58,26 @@ export default function HouseShow({ house }) {
         }));
     }
 
-    function handleDelete(houseId) {
-        router.delete(route("houses.destroy", houseId));
+    function handleDelete(roomId) {
+        router.delete(route("rooms.destroy", roomId));
     }
-    const activeHouse = house.status === "active";
-    const max_floor = house.max_floor + house.max_floor > 1 ? " floors" : " floor";
-    const houseDetails = [
-        { detail: house.address, icon: MapPin },
-        { detail: house.water_rate, icon: Droplets },
-        { detail: max_floor, icon: Layers2},
-        { detail: house.city, icon: Building2 },
-        { detail: house.electric_rate + "kwh", icon: Zap },
-        { detail: `${house.occupied_count}/${house.max_room}` , icon: DoorClosed },
-    ];
+    const maintenanceRoom = room.status === "maintenance";
+    const roomDetails = [
+        {detail: room.floor, icon: Layers2},
+        {detail: room.type, icon: SquareDashedBottom},
+        {detail: room.capacity, icon: Users},
+    ]
     return (
         <div className="overflow-y-auto">
             <div className="w-full h-[200px] overflow-hidden">
                 <img
-                    src="https://images.pexels.com/photos/18078684/pexels-photo-18078684.jpeg"
+                    src="https://images.pexels.com/photos/279810/pexels-photo-279810.jpeg"
                     alt="Event cover"
-                    className={`relative z-20 inset-0 w-full h-full object-cover brightness-60 dark:brightness-40 ${activeHouse ? "" : "grayscale"}`}
+                    className={`relative z-20 inset-0 w-full h-full object-cover brightness-60 dark:brightness-40 ${!maintenanceRoom ? "" : "grayscale"}`}
                 />
             </div>
             <div className="py-2 px-4 space-y-2">
-                <Link href={route("houses.index")}>
+                <Link href={route("houses.show", room.house_id)}>
                     <Button className="my-2">
                         <ArrowLeft /> Back to Portfolio
                     </Button>
@@ -89,14 +87,14 @@ export default function HouseShow({ house }) {
                         <div className="flex justify-between items-center mb-2">
                             <div className="flex justify-between items-center gap-3">
                                 <h1 className="text-4xl font-semibold">
-                                    {house.name}
+                                    Room {room.room_number}
                                 </h1>
                                 <span>
                                     <Badge
                                     variant="outline"
-                                    className={`z-30 rounded-sm ${activeHouse ? "bg-green-300" : "bg-gray-300"}`}
+                                    className={`z-30 rounded-sm ${!maintenanceRoom ? "bg-green-300" : "bg-gray-300"}`}
                                 >
-                                    {house.status.toUpperCase()}
+                                    {room.status.toUpperCase()}
                                 </Badge>
                                 </span>
                             </div>
@@ -114,7 +112,7 @@ export default function HouseShow({ house }) {
                                         Actions
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <HouseDialog
+                                    <RoomDialog
                                         setOpen={setOpen}
                                         open={open}
                                         form={data}
@@ -127,38 +125,38 @@ export default function HouseShow({ house }) {
                                         <DropdownMenuItem
                                             onSelect={(e) => e.preventDefault()}
                                         >
-                                            Edit Property
+                                            Edit Room
                                         </DropdownMenuItem>
-                                    </HouseDialog>
+                                    </RoomDialog>
                                     <DeleteAlert
                                         handleDelete={() =>
-                                            handleDelete(house.id)
+                                            handleDelete(room.id)
                                         }
-                                        message="Are you sure to Delete this property?"
+                                        message="Are you sure to Delete this room?"
                                     >
                                         <DropdownMenuItem
-                                            disabled={house.rooms_count > 0}
+                                        
+                                            disabled={room.status === "occupied"}
                                             onSelect={(e) => e.preventDefault()}
                                         >
-                                            Delete Property
+                                            Delete Room
                                         </DropdownMenuItem>
                                     </DeleteAlert>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
                         <div className="grid grid-cols-3 gap-y-1">
-                            {houseDetails.map(({ detail, icon }) => {
+                            { roomDetails.map(({detail, icon}) =>{
                                 const Icon = icon;
                                 return (
-                                    <p className="flex items-center text-lg text-gray-700 gap-1" key={detail}>
+                                    <p className="flex items-center text-lg text-gray-700 gap-1">
                                         <Icon className="size-5" /> {detail}
                                     </p>
-                                );
+                                )
                             })}
                         </div>
                     </div>
                 </div>
-                <RoomSection rooms={house.rooms} house={house}  />
             </div>
         </div>
     );

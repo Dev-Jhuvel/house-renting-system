@@ -16,6 +16,7 @@ class House extends Model
         'description',
         'city',
         'max_floor',
+        'max_room',
         'water_rate',
         'electric_rate',
         'status'

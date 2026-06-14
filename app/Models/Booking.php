@@ -10,6 +10,8 @@ class Booking extends Model
 {
     use HasUuidAndSoftDeletes, HasActivityLog;
     protected $fillable = [
+        'tenant_id',
+        'room_id',
         'move_in_date',
         'move_out_date',
         'deposit_amount',
@@ -19,11 +21,11 @@ class Booking extends Model
     ];
 
     public function tenant(){
-        return $this->belongTo(Tenant::class);
+        return $this->belongsTo(Tenant::class);
     }
 
     public function room(){
-        return $this->belongTo(Room::class);
+        return $this->belongsTo(Room::class);
     }
 
     public function bills(){

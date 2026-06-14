@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('city')->nullable();
             $table->integer('max_floor')->default(1);
+            $table->integer('max_room')->default(1);
             $table->decimal('water_rate', 8, 4)->default(0);
             $table->decimal('electric_rate', 8, 4)->default(0);
             $table->enum('status', ['active', 'inactive'])->default('active');

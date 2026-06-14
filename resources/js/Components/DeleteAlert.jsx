@@ -10,7 +10,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function DeleteAlert({children, handleDelete}) {
+export default function DeleteAlert({children, message, handleDelete}) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -19,7 +19,7 @@ export default function DeleteAlert({children, handleDelete}) {
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        Are you sure to Delete this property?
+                        {message}
                     </AlertDialogTitle>
                     {/* <AlertDialogDescription>
                         This action cannot be undone. This will permanently

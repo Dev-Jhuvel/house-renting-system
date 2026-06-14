@@ -10,18 +10,18 @@ class Room extends Model
 {
     use HasUuidAndSoftDeletes, HasActivityLog;
     protected $fillable = [
+        'house_id',
         'room_number',
         'floor',
-        'room_type',
-        'single',
+        'type',
         'monthly_rent',
         'capacity',
         'status',
         'description'
     ];
 
-    public function tenants(){
-        return $this->hasMany(Tenant::class);
+    public function booking(){
+        return $this->belongsTo(Tenant::class);
     }
 
     public function house(){

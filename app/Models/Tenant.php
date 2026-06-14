@@ -10,12 +10,13 @@ class Tenant extends Model
 {
     use HasUuidAndSoftDeletes, HasActivityLog;
     protected $fillable = [
+        'user_id',
+        'booking_id',
         'phone',
         'address',
         'emergency_contact',
         'id_type',
         'id_number',
-        'is_head',
         'status'
     ];
 
@@ -23,7 +24,7 @@ class Tenant extends Model
         return $this->belongsTo(User::class);
     }
     
-    public function room(){
-        return $this->hasOne(Room::class);
+    public function booking(){
+        return $this->hasOne(Booking::class);
     }
 }

@@ -10,6 +10,8 @@ import {
 } from "@/Components/ui/dialog";
 import InputWithLabel from "./InputWithLabel";
 import { Button } from "./ui/button";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 export default function HouseDialog({
     form,
@@ -20,12 +22,12 @@ export default function HouseDialog({
     setOpen,
     errors,
     method,
-    children
+    children,
 }) {
-    const process = method === 'Create' ? 'Creating...' : 'Updating...';
+    const process = method === "Create" ? "Creating..." : "Updating...";
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger onClick={() => setOpen(true)}>
+            <DialogTrigger asChild onClick={() => setOpen(true)}>
                 {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[550px]">
@@ -43,7 +45,7 @@ export default function HouseDialog({
                                 onChange={handleChange}
                                 error={errors.name}
                                 placeholder="New York"
-                                className="col-span-5"
+                                className="col-span-4"
                             />
                             <InputWithLabel
                                 label="Max Floor"
@@ -52,6 +54,17 @@ export default function HouseDialog({
                                 name="max_floor"
                                 type="number"
                                 error={errors.max_floor}
+                                onChange={handleChange}
+                                placeholder="3"
+                                className="col-span-2"
+                            />
+                            <InputWithLabel
+                                label="Max Room"
+                                id="max_room"
+                                value={form.max_room}
+                                name="max_room"
+                                type="number"
+                                error={errors.max_room}
                                 onChange={handleChange}
                                 placeholder="3"
                                 className="col-span-2"
@@ -109,6 +122,23 @@ export default function HouseDialog({
                                 placeholder="0.00"
                                 className="col-span-3"
                             />
+                            <div>
+                                <Label>Status</Label>
+                                <div className="flex items-center justify-center h-10">
+                                    <Switch
+                                        checked={form.status === 'active'}
+                                        onCheckedChange={(checked) => handleChange({
+                                            target:{
+                                                name: 'status',
+                                                type: 'text',
+                                                value: checked ? "active" : "inactive"
+                                            }
+                                        })}
+                                        // disabled
+                                        aria-readonly
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>
