@@ -3,6 +3,7 @@
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\HouseController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TenantController;
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('bills', BillController::class);
 
     Route::patch('bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('booking.updateStatus');
+
+    Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
+    Route::delete('bills/{bill}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bills.payments.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

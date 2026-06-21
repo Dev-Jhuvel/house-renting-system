@@ -8,11 +8,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/Components/ui/dialog";
-import InputWithLabel from "./InputWithLabel";
-import { Button } from "./ui/button";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
-import InputSelect from "./InputSelect";
+import InputWithLabel from "../InputWithLabel";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
+import InputSelect from "../InputSelect";
 
 export default function RoomDialog({
     form,
@@ -26,18 +26,8 @@ export default function RoomDialog({
     children,
 }) {
     const process = method === "Create" ? "Creating..." : "Updating...";
-    const room_types = [
-        'Single',
-        'Double',
-        'Studio',
-        'Dormitory'
-    ];
-    const room_status = [
-        'Available',
-        'Occupied',
-        'Reserved',
-        'Maintenance'
-    ];
+    const room_types = ["Single", "Double", "Studio", "Dormitory"];
+    const room_status = ["Available", "Occupied", "Reserved", "Maintenance"];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

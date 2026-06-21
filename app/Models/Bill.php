@@ -11,6 +11,7 @@ class Bill extends Model
 {
     use HasUuids, HasActivityLog;
     protected $fillable = [
+        'booking_id',
         'type',
         'title',
         'amount',
@@ -19,17 +20,23 @@ class Bill extends Model
         'rate_used',
         'bill_date',
         'due_date',
-        'status',
+        'status',   
         'notes'
     ];
+
+    protected $appends = ['remaining_balance'];
 
     public function booking()
     {
         return $this->belongsTo(Booking::class);
     }
 
-    public function bill_payment()
+    public function payments()
     {
-        return $this->hasMany(BillPayment::class);
+        return $this->hasMany(Payment::class);
     }
+
+    public function getRemainingBalanceAttribute(){
+        return $this->amount - $this->payments()->sum('amount_paid');
+    }   
 }

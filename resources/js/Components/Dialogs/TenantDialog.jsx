@@ -8,10 +8,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/Components/ui/dialog";
-import InputWithLabel from "./InputWithLabel";
-import { Button } from "./ui/button";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
+import InputWithLabel from "../InputWithLabel";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 export default function TenantDialog({
     form,
@@ -33,7 +33,10 @@ export default function TenantDialog({
             <DialogContent className="sm:max-w-[550px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader className="py-2">
-                        <DialogTitle>{method === 'Create' ? 'Add New ' : 'Update '} Tenant</DialogTitle>
+                        <DialogTitle>
+                            {method === "Create" ? "Add New " : "Update "}{" "}
+                            Tenant
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="h-[270px] overflow-y-auto scroll">
                         <div className="grid gap-4 grid-cols-8 py-4 px-2">

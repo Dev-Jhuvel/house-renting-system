@@ -1,5 +1,5 @@
 import InputWithLabel from "@/Components/InputWithLabel";
-import HouseDialog from "@/Components/HouseDialog";
+import HouseDialog from "@/Components/Dialogs/HouseDialog";
 import AddCard from "@/Components/AddCard";
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
@@ -35,10 +35,10 @@ export default function HouseIndex({ houses }) {
         address: "",
         description: "",
         city: "",
-        max_floor: 1,
-        max_room: 1,
-        water_rate: 0,
-        electric_rate: 0,
+        max_floor: "",
+        max_room: "",
+        water_rate: "",
+        electric_rate: "",
         status: "active",
     });
 
@@ -58,7 +58,7 @@ export default function HouseIndex({ houses }) {
         const { name, type, value } = e.target;
         setData((prev) => ({
             ...prev,
-            [name]: type === "number" ? parseFloat(value) || 0 : value,
+            [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
         }));
     }
 
@@ -134,7 +134,11 @@ function HouseCard({ house }) {
                 </CardDescription>
                 <div className="my-2 space-x-2">
                     {badgeInfos.map((info) => (
-                        <Badge key={info} variant="outline" className="bg-gray-500 text-white">
+                        <Badge
+                            key={info}
+                            variant="outline"
+                            className="bg-gray-500 text-white"
+                        >
                             {info}
                         </Badge>
                     ))}

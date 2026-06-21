@@ -14,14 +14,15 @@ class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with(['tenant.user', 'room.house', 'bills'])->latest()->get();
-        $tenants = Tenant::with('user', 'booking')->orderBy('name')->get()->map(function ($item) {
+        $bookings = Booking::with(['tenant.user', 'room.house'])->withCount('unpaid_bills')->latest()->get();
+        $tenants = Tenant::with('user', 'booking')->get()->map(function ($item) {
             return [
                 'label'     => $item->user->name,
                 'value'     => $item->id,
                 'disabled'  => $item->booking !== null,
             ];
         })->sortBy('label')->values();
+
         $rooms = Room::orderBy('room_number')->get()->map(function ($item) {
             return [
                 'label'     => $item->room_number,
@@ -63,16 +64,16 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        $booking
-            ->loadCount([
-                'rooms',
-                'rooms as occupied_count' => function ($q) {
-                    return $q->where('status', 'occupied');
-                }
-            ])
-            ->load('rooms');
+        // $booking
+        //     ->loadCount([
+        //         'rooms',
+        //         'rooms as occupied_count' => function ($q) {
+        //             return $q->where('status', 'occupied');
+        //         }
+        //     ])
+        //     ->load('rooms');
 
-        return Inertia::render('Bookings/BookingShow', ['booking' => $booking]);
+        // return Inertia::render('Bookings/BookingShow', ['booking' => $booking]);
     }
 
     public function update(Request $request, Booking $booking)
@@ -99,6 +100,7 @@ class BookingController extends Controller
 
         DB::transaction(function () use ($booking) {
             $this->updateRoom($booking);
+            $booking->bills()->delete();
             $booking->delete();
         });
         return redirect()->route('bookings.index')->with('success', 'Booking deleted successfully!');
@@ -122,6 +124,17 @@ class BookingController extends Controller
 
         DB::transaction(function () use ($booking, $validated) {
             $booking->update($validated);
+
+            if($validated['status'] === 'active'){
+                $booking->bills()->create([
+                    'type' => 'rent',
+                    'title' => $booking->tenant->user->name. " Rent Bill ".now()->format('F Y'),
+                    'amount' => $booking->room->monthly_rent,
+                    'bill_date' => now()->toDateString(),
+                    'due_date'  => now()->day($booking->due_day)->toDateString(),
+                    'status'    => 'unpaid',
+                ]);
+            }
 
             $this->updateRoom($booking);
         });

@@ -28,10 +28,10 @@ import {
     Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import HouseDialog from "@/Components/HouseDialog";
+import HouseDialog from "@/Components/Dialogs/HouseDialog";
 import InputWithLabel from "@/Components/InputWithLabel";
 import DeleteAlert from "@/Components/DeleteAlert";
-import RoomDialog from "@/Components/RoomDialog";
+import RoomDialog from "@/Components/Dialogs/RoomDialog";
 import RoomSection from "../Rooms/RoomSection";
 
 export default function HouseShow({ house }) {
@@ -52,7 +52,7 @@ export default function HouseShow({ house }) {
         const { name, type, value } = e.target;
         setData((prev) => ({
             ...prev,
-            [name]: type === "number" ? parseFloat(value) || 0 : value,
+            [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
         }));
     }
 
@@ -60,14 +60,18 @@ export default function HouseShow({ house }) {
         router.delete(route("houses.destroy", house_id));
     }
     const activeHouse = house.status === "active";
-    const max_floor = house.max_floor + house.max_floor > 1 ? " floors" : " floor";
+    const max_floor =
+        house.max_floor + house.max_floor > 1 ? " floors" : " floor";
     const houseDetails = [
         { detail: house.address, icon: MapPin },
         { detail: house.water_rate, icon: Droplets },
-        { detail: max_floor, icon: Layers2},
+        { detail: max_floor, icon: Layers2 },
         { detail: house.city, icon: Building2 },
         { detail: house.electric_rate + "kwh", icon: Zap },
-        { detail: `${house.occupied_count}/${house.max_room}` , icon: DoorClosed },
+        {
+            detail: `${house.occupied_count}/${house.max_room}`,
+            icon: DoorClosed,
+        },
     ];
     return (
         <div className="overflow-y-auto">
@@ -93,11 +97,11 @@ export default function HouseShow({ house }) {
                                 </h1>
                                 <span>
                                     <Badge
-                                    variant="outline"
-                                    className={`z-30 rounded-sm ${activeHouse ? "bg-green-300" : "bg-gray-300"}`}
-                                >
-                                    {house.status.toUpperCase()}
-                                </Badge>
+                                        variant="outline"
+                                        className={`z-30 rounded-sm ${activeHouse ? "bg-green-300" : "bg-gray-300"}`}
+                                    >
+                                        {house.status.toUpperCase()}
+                                    </Badge>
                                 </span>
                             </div>
                             <DropdownMenu>
@@ -150,7 +154,10 @@ export default function HouseShow({ house }) {
                             {houseDetails.map(({ detail, icon }) => {
                                 const Icon = icon;
                                 return (
-                                    <p className="flex items-center text-lg text-gray-700 gap-1" key={detail}>
+                                    <p
+                                        className="flex items-center text-lg text-gray-700 gap-1"
+                                        key={detail}
+                                    >
                                         <Icon className="size-5" /> {detail}
                                     </p>
                                 );
@@ -158,7 +165,7 @@ export default function HouseShow({ house }) {
                         </div>
                     </div>
                 </div>
-                <RoomSection rooms={house.rooms} house={house}  />
+                <RoomSection rooms={house.rooms} house={house} />
             </div>
         </div>
     );

@@ -128,7 +128,7 @@ class DatabaseSeeder extends Seeder
             'notes'            => null,
         ]);
 
-        $electric_bill->bill_payment()->create([
+        $electric_bill->payments()->create([
             'amount_paid'      => 250.00,
             'paid_at'          => '2025-01-03 10:00:00',
             'method'           => 'cash',

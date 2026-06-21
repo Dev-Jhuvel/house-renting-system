@@ -27,7 +27,7 @@ class Room extends Model
     public function booking(){
         return $this->hasOne(Booking::class)
         ->whereIn('status',['active', 'pending'])
-        ->latestOfMany();
+        ->latest    ();
     }
 
     public function house(){

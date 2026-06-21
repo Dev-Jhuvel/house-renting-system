@@ -8,10 +8,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/Components/ui/dialog";
-import InputWithLabel from "./InputWithLabel";
-import { Button } from "./ui/button";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
+import InputWithLabel from "../InputWithLabel";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 export default function HouseDialog({
     form,
@@ -126,14 +126,18 @@ export default function HouseDialog({
                                 <Label>Status</Label>
                                 <div className="flex items-center justify-center h-10">
                                     <Switch
-                                        checked={form.status === 'active'}
-                                        onCheckedChange={(checked) => handleChange({
-                                            target:{
-                                                name: 'status',
-                                                type: 'text',
-                                                value: checked ? "active" : "inactive"
-                                            }
-                                        })}
+                                        checked={form.status === "active"}
+                                        onCheckedChange={(checked) =>
+                                            handleChange({
+                                                target: {
+                                                    name: "status",
+                                                    type: "text",
+                                                    value: checked
+                                                        ? "active"
+                                                        : "inactive",
+                                                },
+                                            })
+                                        }
                                         // disabled
                                         aria-readonly
                                     />

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bill;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -11,26 +12,36 @@ class BillController extends Controller
 {
     public function index()
     {
-        $bills = Bill::with(['booking.room.house', 'booking.tenant.user', 'bill_payment'])->latest()->get();
-        return Inertia::render('Bills/BillIndex', ['bills' => $bills]);
+        $bills = Bill::with(['booking.room.house', 'booking.tenant.user', 'payments'])->latest()->get();
+        $bookings = Booking::with('tenant.user')->where('status', 'active')->get()->map(function ($item) {
+            return [
+                'label'     => $item->tenant->user->name.' - '.$item->created_at->format('F Y'),
+                'value'     => $item->id,
+            ];
+        })->sortBy('label')->values();
+
+        $data = [
+            'bills'     => $bills,
+            'bookings'  => $bookings
+        ];
+        return Inertia::render('Bills/BillIndex', $data);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'type'                  => 'required|in:rent,water,electric,other',
+            'type'                  => 'required|in:rent,water,electric,repair,other',
             'title'                 => 'required|string',
-            'amount'                => 'required|string',
-            'previous_reading'      => 'required|string',
-            'current_reading'       => 'required|string',
-            'rate_used'             => 'required|string',
-            'bill_date'             => 'required|string',
-            'due_date'              => 'required|string',
-            'notes'                 => 'required|string',
-            'status'                => 'required|in:active,inactive'
+            'booking_id'            => 'required|uuid',
+            'amount'                => 'required|numeric',
+            'previous_reading'      => 'required|numeric',
+            'current_reading'       => 'required|numeric|gt:previous_reading',
+            'rate_used'             => 'required|numeric',
+            'bill_date'             => 'required|date',
+            'due_date'              => 'required|date',
+            // 'notes'                 => 'string',
+            // 'status'                => 'required|in:paid,unpaid,partial,overdue'
         ]);
-
-        $validated['user_id'] = Auth::user()->id;
 
         Bill::create($validated);
 
@@ -54,21 +65,21 @@ class BillController extends Controller
     public function update(Request $request, Bill $bill)
     {
         $validated = $request->validate([
-            'type'                  => 'required|in:rent,water,electric,other',
+            'type'                  => 'required|in:rent,water,electric,repair,other',
             'title'                 => 'required|string',
-            'amount'                => 'required|string',
-            'previous_reading'      => 'required|string',
-            'current_reading'       => 'required|string',
-            'rate_used'             => 'required|string',
-            'bill_date'             => 'required|string',
-            'due_date'              => 'required|string',
-            'notes'                 => 'required|string',
-            'status'                => 'required|in:active,inactive'
+            'amount'                => 'required|numeric',
+            'previous_reading'      => 'required|numeric',
+            'current_reading'       => 'required|numeric',
+            'rate_used'             => 'required|numeric',
+            'bill_date'             => 'required|date',
+            'due_date'              => 'required|date',
+            // 'notes'                 => 'required|string',
+            // 'status'                => 'required|in:paid,unpaid,partial,overdue'
         ]);
 
         $bill->update($validated);
 
-        return redirect()->route('bills.show', $bill)->with('success', 'Bill updated successfully!');
+        return redirect()->route('bills.index', $bill)->with('success', 'Bill updated successfully!');
     }
 
     public function destroy(Bill $bill)

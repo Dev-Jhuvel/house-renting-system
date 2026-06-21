@@ -30,6 +30,6 @@ class Tenant extends Model
     public function booking(){
         return $this->hasOne(Booking::class)
         ->whereIn('status',['active', 'pending'])
-        ->latestOfMany();
+        ->latest();
     }
 }

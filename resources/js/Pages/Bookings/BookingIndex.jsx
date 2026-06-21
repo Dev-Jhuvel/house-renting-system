@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import InputWithLabel from "@/Components/InputWithLabel";
-import HouseDialog from "@/Components/HouseDialog";
+import HouseDialog from "@/Components/Dialogs/HouseDialog";
 import AddCard from "@/Components/AddCard";
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
@@ -40,8 +40,10 @@ import {
     PlusIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import BookingDialog from "@/Components/BookingDialog";
+import BookingDialog from "@/Components/Dialogs/BookingDialog";
 import DeleteAlert from "@/Components/DeleteAlert";
+import TenantColumn from "@/Components/TenantColumn";
+import RoomColumn from "@/Components/RoomColumn";
 
 export default function BookingIndex({ bookings, tenants, rooms }) {
     const today = new Date();
@@ -54,7 +56,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
         move_in_date: today.toISOString().slice(0, 10),
         move_out_date: next_month.toISOString().slice(0, 10),
         deposit_amount: "",
-        due_day: 0,
+        due_day: "",
         notes: "",
         status: "pending",
     });
@@ -76,7 +78,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
             move_out_date: booking.move_out_date,
             deposit_amount: booking.deposit_amount,
             due_day: booking.due_day,
-            notes: booking.notes,
+            notes: booking.notes ?? "",
             status: booking.status,
         });
         setSelectedBooking(booking);
@@ -108,7 +110,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
         const { name, type, value } = e.target;
         setData((prev) => ({
             ...prev,
-            [name]: type === "number" ? parseFloat(value) || 0 : value,
+            [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
         }));
     }
 
@@ -134,7 +136,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                         processing={processing}
                         rooms={rooms}
                         tenants={tenants}
-                        method={selectedBooking ? 'Update' : 'Create'}
+                        method={selectedBooking ? "Update" : "Create"}
                     >
                         <Button
                             className="px-3 py-1 flex items-center"
@@ -162,7 +164,8 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                 <TableHead className="">Move-in</TableHead>
                                 <TableHead className="">Due Date</TableHead>
                                 <TableHead className="">Deposit</TableHead>
-                                <TableHead className="">Status</TableHead>
+                                <TableHead className="text-center">Unpaid Bills</TableHead>
+                                <TableHead className="text-center">Status</TableHead>
                                 <TableHead className="">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -170,56 +173,46 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                             {bookings.map((booking, key) => (
                                 <TableRow key={key}>
                                     <TableCell className="flex items-center gap-x-2">
-                                        <div>
-                                            <Avatar className="h-8 w-8 rounded-lg grayscale">
-                                                <AvatarImage
-                                                    src={
-                                                        booking.tenant.user
-                                                            .avatar ?? ""
-                                                    }
-                                                    alt={
-                                                        booking.tenant.user.name
-                                                    }
-                                                />
-                                                <AvatarFallback className="rounded-lg">
-                                                    {booking.tenant.user.name
-                                                        .slice(0, 1)
-                                                        .toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="font-semibold text-sm/3">
-                                                {booking.tenant.user.name}
-                                            </span>
-                                            <span className="text-xs text-gray-500">
-                                                {booking.tenant.user.email}
-                                            </span>
-                                        </div>
+                                        <TenantColumn name={booking.tenant.user.name} email={booking.tenant.user.email}  />
                                     </TableCell>
                                     <TableCell className="">
-                                        <div className="flex flex-col">
-                                            <span className="font-semibold text-sm/3">
-                                                {booking?.room?.room_number ??
-                                                    "-"}
-                                            </span>
-                                            <span className="text-xs text-gray-500">
-                                                {booking?.room?.house?.name ??
-                                                    "-"}
-                                            </span>
-                                        </div>
+                                        <RoomColumn room_number={booking.room.room_number} house_name={booking.room.house.name} />
                                     </TableCell>
                                     <TableCell className="">
-                                        {booking?.move_in_date ?? "-"}
+                                        {booking.move_in_date}
                                     </TableCell>
                                     <TableCell className="">
-                                        {booking?.move_out_date ?? "-"}
+                                        {booking.move_out_date}
                                     </TableCell>
                                     <TableCell className="">
-                                        {booking?.deposit_amount ?? "-"}
+                                        {booking.deposit_amount
+                                            ? `₱${booking.deposit_amount}`
+                                            : "-"}
                                     </TableCell>
-                                    <TableCell className="">
-                                        {booking?.status ?? "-"}
+                                    <TableCell className="text-center">
+                                        {booking.unpaid_bills_count}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <span
+                                            className={`px-2 py-1 rounded-md font-semibold 
+                                                ${
+                                                    booking.status === "active"
+                                                        ? "bg-green-500"
+                                                        : booking.status ===
+                                                            "pending"
+                                                          ? "bg-yellow-500"
+                                                          : booking.status ===
+                                                              "ended"
+                                                            ? "bg-red-500"
+                                                            : "bg-gray-500"
+                                                }
+                                            `}
+                                        >
+                                            {booking.status
+                                                .slice(0, 1)
+                                                .toUpperCase() +
+                                                booking.status.slice(1) ?? "-"}
+                                        </span>
                                     </TableCell>
                                     <TableCell className="">
                                         <DropdownMenu>
@@ -237,15 +230,13 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
-                                                        onSelect={(e) => {
-                                                            e.preventDefault();
-                                                            handleOpenEdit(
-                                                                booking,
-                                                            );
-                                                        }}
-                                                    >
-                                                        Edit Booking
-                                                    </DropdownMenuItem>
+                                                    onSelect={(e) => {
+                                                        e.preventDefault();
+                                                        handleOpenEdit(booking);
+                                                    }}
+                                                >
+                                                    Edit Booking
+                                                </DropdownMenuItem>
                                                 <DeleteAlert
                                                     handleDelete={() =>
                                                         handleDelete(booking.id)
@@ -253,7 +244,13 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                     message="Are you sure to Delete this booking?"
                                                 >
                                                     <DropdownMenuItem
-                                                        disabled={booking.status === 'active' ||booking.status === 'pending'}
+                                                        disabled={
+                                                            booking.status ===
+                                                                "active" ||
+                                                            booking.status ===
+                                                                "pending" ||
+                                                            booking.unpaid_bills_count > 0
+                                                        }
                                                         onSelect={(e) =>
                                                             e.preventDefault()
                                                         }
@@ -262,30 +259,42 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                     </DropdownMenuItem>
                                                 </DeleteAlert>
                                                 <DropdownMenuItem
-                                                    disabled={booking.status === 'active'}
-                                                    onSelect={(e) =>{
-                                                        e.preventDefault()
+                                                    disabled={
+                                                        booking.status ===
+                                                        "active"
+                                                    }
+                                                    onSelect={(e) => {
                                                         router.patch(
-                                                            route('booking.updateStatus', booking.id), 
-                                                            {status: 'active'}
-                                                        )
+                                                            route(
+                                                                "booking.updateStatus",
+                                                                booking.id,
+                                                            ),
+                                                            {
+                                                                status: "active",
+                                                            },
+                                                        );
                                                     }}
                                                 >
                                                     Activate Booking
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
-                                                    disabled={booking.status === 'ended'}
-                                                    onSelect={(e) =>{
-                                                        e.preventDefault()
+                                                    disabled={
+                                                        booking.status ===
+                                                        "ended" || booking.unpaid_bills_count > 0
+
+                                                    }
+                                                    onSelect={(e) => {
                                                         router.patch(
-                                                            route('booking.updateStatus', booking.id), 
-                                                            {status: 'ended'}
-                                                        )
+                                                            route(
+                                                                "booking.updateStatus",
+                                                                booking.id,
+                                                            ),
+                                                            { status: "ended" },
+                                                        );
                                                     }}
                                                 >
                                                     End Booking
                                                 </DropdownMenuItem>
-
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
@@ -296,58 +305,5 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                 </div>
             </div>
         </div>
-    );
-}
-
-function HouseCard({ house }) {
-    const activeHouse = house.status === "active";
-    const max_floor =
-        house.max_floor + (house.max_floor > 1 ? " Floors" : " Floor");
-    const badgeInfos = [max_floor, house.city];
-    return (
-        <Card className="relative mx-auto w-full max-w-sm pt-0 shadow-md flex flex-col">
-            <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-            <Badge
-                variant="outline"
-                className={`absolute z-30 right-5 top-5 rounded-sm ${activeHouse ? "bg-green-300" : "bg-gray-300"}`}
-            >
-                {house.status.toUpperCase()}
-            </Badge>
-            <img
-                src="https://images.pexels.com/photos/18078684/pexels-photo-18078684.jpeg"
-                alt="Event cover"
-                className={`relative z-20 aspect-video w-full object-cover brightness-60 dark:brightness-40 ${activeHouse ? "" : "grayscale"}`}
-            />
-            <CardHeader className="flex-grow pt-2">
-                <div className="flex justify-end"></div>
-                <CardTitle className="text-xl/7 truncate">
-                    {house.name}
-                </CardTitle>
-                <CardDescription className="flex flex-col">
-                    <p className="truncate">
-                        <MapPin className="size-4 inline-block" />
-                        {house.address}
-                    </p>
-                </CardDescription>
-                <div className="my-2 space-x-2">
-                    {badgeInfos.map((info) => (
-                        <Badge
-                            key={info}
-                            variant="outline"
-                            className="bg-gray-500 text-white"
-                        >
-                            {info}
-                        </Badge>
-                    ))}
-                </div>
-            </CardHeader>
-            <CardFooter>
-                <Link className="w-full" href={route("houses.show", house.id)}>
-                    <Button className="w-full">
-                        Manage Property <ArrowRight />
-                    </Button>
-                </Link>
-            </CardFooter>
-        </Card>
     );
 }

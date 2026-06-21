@@ -1,5 +1,5 @@
 import AddCard from "@/Components/AddCard";
-import RoomDialog from "@/Components/RoomDialog";
+import RoomDialog from "@/Components/Dialogs/RoomDialog.jsx";
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
 import {
@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import { toOrdinal} from "../../utils/general.js";
+import { toOrdinal } from "../../utils/general.js";
 import { Link, useForm } from "@inertiajs/react";
 import { ArrowRight, DoorClosed, Layers2, PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -18,11 +18,11 @@ export default function RoomSection({ rooms, house }) {
         house_id: house.id,
         room_number: "",
         description: "",
-        floor: 1,
+        floor: "",
         type: "single",
         status: "available",
-        capacity: 1,
-        monthly_rent: 0,
+        capacity: "",
+        monthly_rent: "",
     });
 
     const [open, setOpen] = useState(false);
@@ -41,7 +41,7 @@ export default function RoomSection({ rooms, house }) {
         const { name, type, value } = e.target;
         setData((prev) => ({
             ...prev,
-            [name]: type === "number" ? parseFloat(value) || 0 : value,
+            [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
         }));
     }
     return (
@@ -58,14 +58,20 @@ export default function RoomSection({ rooms, house }) {
                     processing={processing}
                     method="Create"
                 >
-                    <Button className="px-3 py-1 flex items-center" disabled={house.rooms_count >= house.max_room}>
+                    <Button
+                        className="px-3 py-1 flex items-center"
+                        disabled={house.rooms_count >= house.max_room}
+                    >
                         <PlusIcon className="hover:text-primary" size={32} />
                         Add Room
                     </Button>
                 </RoomDialog>
             </div>
             <div className="grid grid-cols-3 gap-8 p-4">
-                {rooms && rooms.map((room, key) => <RoomCard key={key} room={room} />)}
+                {rooms &&
+                    rooms.map((room, key) => (
+                        <RoomCard key={key} room={room} />
+                    ))}
             </div>
         </div>
     );
@@ -90,7 +96,9 @@ function RoomCard({ room }) {
             />
             <CardHeader className="flex-grow pt-2">
                 <div className="flex justify-end"></div>
-                <CardTitle className="text-xl/7">Room {room.room_number}</CardTitle>
+                <CardTitle className="text-xl/7">
+                    Room {room.room_number}
+                </CardTitle>
                 <CardDescription className="flex flex-col">
                     <p className="text-sm">
                         <Layers2 className="size-4 mr-2 inline-block" />
@@ -99,7 +107,11 @@ function RoomCard({ room }) {
                 </CardDescription>
                 <div className="my-2 space-x-2">
                     {badgeInfos.map((info) => (
-                        <Badge variant="outline" key={info} className="bg-gray-500 text-white">
+                        <Badge
+                            variant="outline"
+                            key={info}
+                            className="bg-gray-500 text-white"
+                        >
                             {info}
                         </Badge>
                     ))}

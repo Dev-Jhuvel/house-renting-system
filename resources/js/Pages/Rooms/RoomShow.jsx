@@ -1,7 +1,6 @@
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
 
-
 import { Form } from "@/Components/ui/form";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
@@ -33,7 +32,7 @@ import {
 import { useEffect, useState } from "react";
 import InputWithLabel from "@/Components/InputWithLabel";
 import DeleteAlert from "@/Components/DeleteAlert";
-import RoomDialog from "@/Components/RoomDialog";
+import RoomDialog from "@/Components/Dialogs/RoomDialog";
 import RoomSection from "../Rooms/RoomSection";
 
 export default function RoomShow({ room }) {
@@ -54,7 +53,7 @@ export default function RoomShow({ room }) {
         const { name, type, value } = e.target;
         setData((prev) => ({
             ...prev,
-            [name]: type === "number" ? parseFloat(value) || 0 : value,
+            [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
         }));
     }
 
@@ -63,10 +62,10 @@ export default function RoomShow({ room }) {
     }
     const maintenanceRoom = room.status === "maintenance";
     const roomDetails = [
-        {detail: room.floor, icon: Layers2},
-        {detail: room.type, icon: SquareDashedBottom},
-        {detail: room.capacity, icon: Users},
-    ]
+        { detail: room.floor, icon: Layers2 },
+        { detail: room.type, icon: SquareDashedBottom },
+        { detail: room.capacity, icon: Users },
+    ];
 
     console.log(room);
     return (
@@ -93,11 +92,11 @@ export default function RoomShow({ room }) {
                                 </h1>
                                 <span>
                                     <Badge
-                                    variant="outline"
-                                    className={`z-30 rounded-sm ${!maintenanceRoom ? "bg-green-300" : "bg-gray-300"}`}
-                                >
-                                    {room.status.toUpperCase()}
-                                </Badge>
+                                        variant="outline"
+                                        className={`z-30 rounded-sm ${!maintenanceRoom ? "bg-green-300" : "bg-gray-300"}`}
+                                    >
+                                        {room.status.toUpperCase()}
+                                    </Badge>
                                 </span>
                             </div>
                             <DropdownMenu>
@@ -138,7 +137,6 @@ export default function RoomShow({ room }) {
                                         message="Are you sure to Delete this room?"
                                     >
                                         <DropdownMenuItem
-                                        
                                             disabled={room.booking}
                                             onSelect={(e) => e.preventDefault()}
                                         >
@@ -149,13 +147,13 @@ export default function RoomShow({ room }) {
                             </DropdownMenu>
                         </div>
                         <div className="grid grid-cols-3 gap-y-1">
-                            { roomDetails.map(({detail, icon}) =>{
+                            {roomDetails.map(({ detail, icon }) => {
                                 const Icon = icon;
                                 return (
                                     <p className="flex items-center text-lg text-gray-700 gap-1">
                                         <Icon className="size-5" /> {detail}
                                     </p>
-                                )
+                                );
                             })}
                         </div>
                     </div>

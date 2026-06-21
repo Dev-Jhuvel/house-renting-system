@@ -13,7 +13,9 @@ class TenantController extends Controller
 {
     public function index()
     {
-        $tenants = Tenant::with(['user', 'booking.room.house'])->orderBy('name')->get();
+        $tenants = Tenant::with(['user', 'booking.room.house', 'booking.bills.payments'])
+            ->orderBy('name')
+            ->get();
         return Inertia::render('Tenants/TenantIndex', ['tenants' => $tenants]);
     }
 
@@ -23,11 +25,11 @@ class TenantController extends Controller
             'name'                  => 'required|string',
             'email'                 => 'required|email|unique:users,email',
             'password'              => 'required|confirmed',
-            'phone'                 => 'required|string|unique:rooms,phone',
+            'phone'                 => 'required|string|unique:tenants,phone',
             'address'               => 'required|string',
             'emergency_contact'     => 'required|string',
             'id_type'               => 'required|string',
-            'id_number'             => 'required|numeric|unique:rooms,id_number',
+            'id_number'             => 'required|numeric|unique:tenants,id_number',
             'status'                => 'required|in:active,inactive'
         ]);
 
@@ -71,11 +73,11 @@ class TenantController extends Controller
             'name'                  => 'required|string',
             'email'                 => 'required|email|unique:users,email,'.$tenant->email,
             // 'password'              => 'required|confirmed',
-            'phone'                 => 'required|string|unique:rooms,phone,'.$tenant->phone,
+            'phone'                 => 'required|string|unique:tenants,phone,'.$tenant->phone,
             'address'               => 'required|string',
             'emergency_contact'     => 'required|string',
             'id_type'               => 'required|string',
-            'id_number'             => 'required|numeric|unique:rooms,id_number,'.$tenant->id_number,
+            'id_number'             => 'required|numeric|unique:tenants,id_number,'.$tenant->id_number,
             'status'                => 'required|in:active,inactive'
         ]);
 

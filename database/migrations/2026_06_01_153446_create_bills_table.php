@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bills', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('booking_id')->constrained();
-            $table->enum('type', ['rent', 'water', 'electric', 'other']);
+            $table->enum('type', ['rent', 'water', 'electric', 'repair', 'other']);
             $table->string('title');           // e.g. "Electric Bill – June 2025"
             $table->decimal('amount', 10, 2);
             $table->decimal('previous_reading', 10, 2)->nullable(); // for water/electric
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('rate_used', 8, 4)->nullable();         // snapshot of rate at time of billing
             $table->date('bill_date');
             $table->date('due_date');
-            $table->enum('status', ['unpaid', 'partial', 'paid', 'overdue'])->default('unpaid');
+            $table->enum('status', ['unpaid', 'partial', 'paid', 'overdue',])->default('unpaid');
             $table->text('notes')->nullable();
             $table->timestamps();
         });
