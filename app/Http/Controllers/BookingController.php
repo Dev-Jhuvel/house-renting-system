@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Room;
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class BookingController extends Controller
@@ -12,60 +15,115 @@ class BookingController extends Controller
     public function index()
     {
         $bookings = Booking::with(['tenant.user', 'room.house', 'bills'])->latest()->get();
-        return Inertia::render('Bookings/BookingIndex', ['bookings' => $bookings]);
+        $tenants = Tenant::with('user', 'booking')->orderBy('name')->get()->map(function ($item) {
+            return [
+                'label'     => $item->user->name,
+                'value'     => $item->id,
+                'disabled'  => $item->booking !== null,
+            ];
+        })->sortBy('label')->values();
+        $rooms = Room::orderBy('room_number')->get()->map(function ($item) {
+            return [
+                'label'     => $item->room_number,
+                'value'     => $item->id,
+                'disabled'  => in_array($item->status, ['occupied', 'maintenance', 'reserved']),
+            ];
+        })->sortBy('label')->values();
+        $data = [
+            'bookings' => $bookings,
+            'tenants' => $tenants,
+            'rooms' => $rooms,
+        ];
+
+        return Inertia::render('Bookings/BookingIndex', $data);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'phone'                 => 'required|string|unique:rooms,phone',
-            'address'               => 'required|string',
-            'emergency_contact'     => 'required|string',
-            'id_type'               => 'required|string',
-            'id_number'             => 'required|numeric|unique:rooms,id_number',
-            'status'                => 'required|in:active,inactive'
+            'tenant_id'             => 'required|uuid',
+            'room_id'               => 'required|uuid',
+            'move_in_date'          => 'required|date',
+            'move_out_date'         => 'date',
+            'deposit_amount'        => 'required|numeric',
+            // 'due_day'              => 'required|numeric',
+            'notes'                  => 'string',
+            'status'                => 'required|in:active,ended,pending,canceled'
         ]);
 
-        $validated['user_id'] = Auth::user()->id;
+        DB::transaction(function () use ($validated) {
+            $booking = Booking::create($validated);
 
-        Booking::create($validated);
+            $this->updateRoom($booking);
+        });
 
         return redirect()->route('bookings.index')->with('success', 'Booking created successfully!');
     }
+
 
     public function show(Booking $booking)
     {
         $booking
             ->loadCount([
                 'rooms',
-                'rooms as occupied_count' => function($q){
+                'rooms as occupied_count' => function ($q) {
                     return $q->where('status', 'occupied');
                 }
             ])
             ->load('rooms');
-            
+
         return Inertia::render('Bookings/BookingShow', ['booking' => $booking]);
     }
 
     public function update(Request $request, Booking $booking)
     {
+
         $validated = $request->validate([
-            'phone'                 => 'required|string|unique:bookings,phone,'.$booking->id,
-            'address'               => 'required|string',
-            'emergency_contact'     => 'required|string',
-            'id_type'               => 'required|string',
-            'id_number'             => 'required|numeric|unique:bookings,id_number,'.$booking->id,
-            'status'                => 'required|in:active,inactive'
+            'tenant_id'             => 'required|uuid',
+            'room_id'               => 'required|uuid',
+            'move_in_date'          => 'required|date',
+            'move_out_date'         => 'date',
+            'deposit_amount'        => 'required|numeric',
+            // 'due_day'               => 'required|numeric',
+            'notes'                 => 'string',
+            'status'                => 'required|in:active,ended,pending,canceled'
         ]);
 
         $booking->update($validated);
 
-        return redirect()->route('bookings.show', $booking)->with('success', 'Booking updated successfully!');
+        return redirect()->route('bookings.index', $booking)->with('success', 'Booking updated successfully!');
     }
 
     public function destroy(Booking $booking)
     {
-        $booking->delete();
+
+        DB::transaction(function () use ($booking) {
+            $this->updateRoom($booking);
+            $booking->delete();
+        });
         return redirect()->route('bookings.index')->with('success', 'Booking deleted successfully!');
+    }
+
+    private function updateRoom(Booking $booking)
+    {
+        $room_status = match ($booking->status) {
+            'active'            => 'occupied',
+            'ended', 'canceled' => 'available',
+            'pending'           => 'reserved',
+        };
+        $booking->room()->update(['status' => $room_status]);
+    }
+
+    public function updateStatus(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:active,ended,pending,canceled'
+        ]);
+
+        DB::transaction(function () use ($booking, $validated) {
+            $booking->update($validated);
+
+            $this->updateRoom($booking);
+        });
     }
 }

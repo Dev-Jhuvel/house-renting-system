@@ -67,6 +67,8 @@ export default function RoomShow({ room }) {
         {detail: room.type, icon: SquareDashedBottom},
         {detail: room.capacity, icon: Users},
     ]
+
+    console.log(room);
     return (
         <div className="overflow-y-auto">
             <div className="w-full h-[200px] overflow-hidden">
@@ -123,6 +125,7 @@ export default function RoomShow({ room }) {
                                         method="Update"
                                     >
                                         <DropdownMenuItem
+                                            disabled={room.booking}
                                             onSelect={(e) => e.preventDefault()}
                                         >
                                             Edit Room
@@ -136,7 +139,7 @@ export default function RoomShow({ room }) {
                                     >
                                         <DropdownMenuItem
                                         
-                                            disabled={room.status === "occupied"}
+                                            disabled={room.booking}
                                             onSelect={(e) => e.preventDefault()}
                                         >
                                             Delete Room

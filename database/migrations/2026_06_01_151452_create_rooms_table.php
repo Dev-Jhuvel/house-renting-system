@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('type', ['single', 'double', 'studio', 'dormitory'])->default('single');
             $table->decimal('monthly_rent', 8, 4)->default(0);
             $table->integer('capacity');
-            $table->enum('status', ['available', 'occupied', 'maintenance'])->default('available');
+            $table->enum('status', ['available', 'occupied', 'reserved', 'maintenance'])->default('available');
             $table->string('description')->nullable();
             $table->softDeletes();
             $table->timestamps();

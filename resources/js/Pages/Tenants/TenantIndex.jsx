@@ -30,7 +30,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useForm, Link } from "@inertiajs/react";
+import { useForm, Link, router } from "@inertiajs/react";
 
 import {
     ArrowRight,
@@ -84,7 +84,7 @@ export default function TenantIndex({ tenants }) {
     function handleSubmit(e) {
         e.preventDefault();
         if (selectedTenant) {
-            put(route("tenants.store", selectedTenant.id), {
+            put(route("tenants.update", selectedTenant.id), {
                 onSuccess: () => {
                     reset();
                     setOpen(false);
@@ -99,6 +99,10 @@ export default function TenantIndex({ tenants }) {
                 },
             });
         }
+    }
+
+    function handleDelete(tenant_id) {
+        router.delete(route("tenants.destroy", tenant_id));
     }
 
     function handleChange(e) {
@@ -125,7 +129,7 @@ export default function TenantIndex({ tenants }) {
                         handleSubmit={handleSubmit}
                         handleChange={handleChange}
                         processing={processing}
-                        method="Create"
+                        method={selectedTenant ? 'Update' : 'Create'}
                     >
                         <Button
                             className="px-3 py-1 flex items-center"
@@ -197,12 +201,12 @@ export default function TenantIndex({ tenants }) {
                                     </TableCell>
                                     {/* <TableCell className="">{tenant.booking?.move_in_date ?? "-"}</TableCell> */}
                                     <TableCell className="">
-                                        {tenant.booking?.room.monthly_rent ??
+                                        {tenant.booking?.room?.monthly_rent ??
                                             "-"}
                                     </TableCell>
                                     {/* <TableCell className="">{tenant.booking?.balance ?? "-"}</TableCell> */}
                                     <TableCell className="">
-                                        {tenant.booking?.status ?? "-"}
+                                        {tenant.status ?? "-"}
                                     </TableCell>
                                     <TableCell className="">
                                         <DropdownMenu>
@@ -219,38 +223,27 @@ export default function TenantIndex({ tenants }) {
                                                     Actions
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <TenantDialog
-                                                    setOpen={setOpen}
-                                                    open={open}
-                                                    form={data}
-                                                    errors={errors}
-                                                    handleSubmit={handleSubmit}
-                                                    handleChange={handleChange}
-                                                    processing={processing}
-                                                    method="Update"
+                                                <DropdownMenuItem
+                                                    onSelect={(e) => {
+                                                        e.preventDefault();
+                                                        handleOpenEdit(tenant);
+                                                    }}
                                                 >
-                                                    <DropdownMenuItem
-                                                        onSelect={(e) => {
-                                                            e.preventDefault();
-                                                            handleOpenEdit(tenant);
-                                                        }}
-                                                    >
-                                                        Edit Property
-                                                    </DropdownMenuItem>
-                                                </TenantDialog>
+                                                    Edit Tenant
+                                                </DropdownMenuItem>
                                                 <DeleteAlert
                                                     handleDelete={() =>
                                                         handleDelete(tenant.id)
                                                     }
-                                                    message="Are you sure to Delete this property?"
+                                                    message="Are you sure to Delete this tenant?"
                                                 >
                                                     <DropdownMenuItem
-                                                        // disabled={house.rooms_count > 0}
+                                                        disabled={tenant.status === 'active'}
                                                         onSelect={(e) =>
                                                             e.preventDefault()
                                                         }
                                                     >
-                                                        Delete Property
+                                                        Delete Tenant
                                                     </DropdownMenuItem>
                                                 </DeleteAlert>
                                             </DropdownMenuContent>

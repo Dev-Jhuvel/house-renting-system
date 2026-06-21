@@ -25,7 +25,7 @@ class RoomController extends Controller
             'type'          => 'required|in:single,double,studio,dormitory',
             'monthly_rent'  => 'required|numeric',
             'capacity'      => 'required|numeric',
-            'status'        => 'required|in:available,occupied,maintenance'
+            'status'        => 'required|in:available,occupied,reserved,maintenance'
         ]);
 
         $validated['user_id'] = Auth::user()->id;
@@ -37,7 +37,7 @@ class RoomController extends Controller
 
     public function show(Room $room)
     {
-        return Inertia::render('Rooms/RoomShow', ['room' => $room]);
+        return Inertia::render('Rooms/RoomShow', ['room' => $room->load('booking')]);
     }
 
     public function update(Request $request, Room $room)
@@ -50,7 +50,7 @@ class RoomController extends Controller
             'type'          => 'required|in:single,double,studio,dormitory',
             'monthly_rent'  => 'required|numeric',
             'capacity'      => 'required|numeric',
-            'status'        => 'required|in:available,occupied,maintenance'
+            'status'        => 'required|in:available,occupied,reserved,maintenance'
         ]);
 
         $room->update($validated);

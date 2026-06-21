@@ -16,8 +16,8 @@ class Booking extends Model
         'move_out_date',
         'deposit_amount',
         'due_day',
-        'status',
-        'notes'
+        'notes',
+        'status'
     ];
 
     public function tenant(){

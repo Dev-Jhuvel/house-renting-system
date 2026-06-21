@@ -30,6 +30,6 @@ class Bill extends Model
 
     public function bill_payment()
     {
-        return $this->hasOne(BillPayment::class);
+        return $this->hasMany(BillPayment::class);
     }
 }

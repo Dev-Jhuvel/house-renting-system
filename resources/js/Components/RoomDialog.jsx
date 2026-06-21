@@ -35,8 +35,10 @@ export default function RoomDialog({
     const room_status = [
         'Available',
         'Occupied',
+        'Reserved',
         'Maintenance'
     ];
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger onClick={() => setOpen(true)} asChild>
@@ -104,6 +106,8 @@ export default function RoomDialog({
                                 className="col-span-8"
                             />
                             <InputSelect
+                                id="type"
+                                label="Type"
                                 name="type"
                                 value={form.type}
                                 options={room_types}
@@ -113,6 +117,8 @@ export default function RoomDialog({
                                 className="col-span-4"
                             />
                             <InputSelect
+                                id="status"
+                                label="Status"
                                 name="status"
                                 value={form.status}
                                 options={room_status}

@@ -83,8 +83,6 @@ class TenantController extends Controller
             $tenant->user->update([
                 'name'     => $validated['name'],
                 'email'    => $validated['email'],
-                'password' => bcrypt($validated['password']),
-                'role'     => 'tenant',
             ]);
             $tenant->update([
                 'phone'             => $validated['phone'],
@@ -96,7 +94,7 @@ class TenantController extends Controller
             ]);
         });
 
-        return redirect()->route('tenants.show', $tenant)->with('success', 'Tenant updated successfully!');
+        return redirect()->route('tenants.index', $tenant)->with('success', 'Tenant updated successfully!');
     }
 
     public function destroy(Tenant $tenant)

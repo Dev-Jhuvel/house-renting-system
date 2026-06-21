@@ -56,8 +56,8 @@ export default function HouseShow({ house }) {
         }));
     }
 
-    function handleDelete(houseId) {
-        router.delete(route("houses.destroy", houseId));
+    function handleDelete(house_id) {
+        router.delete(route("houses.destroy", house_id));
     }
     const activeHouse = house.status === "active";
     const max_floor = house.max_floor + house.max_floor > 1 ? " floors" : " floor";

@@ -33,7 +33,7 @@ export default function TenantDialog({
             <DialogContent className="sm:max-w-[550px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader className="py-2">
-                        <DialogTitle>Add New Property</DialogTitle>
+                        <DialogTitle>{method === 'Create' ? 'Add New ' : 'Update '} Tenant</DialogTitle>
                     </DialogHeader>
                     <div className="h-[270px] overflow-y-auto scroll">
                         <div className="grid gap-4 grid-cols-8 py-4 px-2">

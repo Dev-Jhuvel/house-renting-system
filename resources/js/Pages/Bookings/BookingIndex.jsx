@@ -13,6 +13,14 @@ import {
     CardTitle,
 } from "@/Components/ui/card";
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
     Table,
     TableBody,
     TableCaption,
@@ -22,32 +30,78 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-import { useForm, Link } from "@inertiajs/react";
+import { useForm, Link, router } from "@inertiajs/react";
 
-import { ArrowRight, EllipsisVertical, MapPin, PlusCircleIcon, PlusIcon } from "lucide-react";
+import {
+    ArrowRight,
+    EllipsisVertical,
+    MapPin,
+    PlusCircleIcon,
+    PlusIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import TenantDialog from "@/Components/TenantDialog";
+import BookingDialog from "@/Components/BookingDialog";
+import DeleteAlert from "@/Components/DeleteAlert";
 
-export default function BookingIndex({ bookings }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        phone: "",
-        address: "",
-        emergency_contact: "",
-        id_type: "",
-        id_number: "",
-        status: "active",
+export default function BookingIndex({ bookings, tenants, rooms }) {
+    const today = new Date();
+    const next_month = new Date(today);
+    next_month.setMonth(next_month.getMonth() + 1);
+
+    const { data, setData, post, put, processing, errors, reset } = useForm({
+        tenant_id: "",
+        room_id: "",
+        move_in_date: today.toISOString().slice(0, 10),
+        move_out_date: next_month.toISOString().slice(0, 10),
+        deposit_amount: "",
+        due_day: 0,
+        notes: "",
+        status: "pending",
     });
 
     const [open, setOpen] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
+
+    function handleOpenCreate() {
+        reset();
+        setSelectedBooking(null);
+        setOpen(true);
+    }
+
+    function handleOpenEdit(booking) {
+        setData({
+            tenant_id: booking.tenant_id,
+            room_id: booking.room_id,
+            move_in_date: booking.move_in_date,
+            move_out_date: booking.move_out_date,
+            deposit_amount: booking.deposit_amount,
+            due_day: booking.due_day,
+            notes: booking.notes,
+            status: booking.status,
+        });
+        setSelectedBooking(booking);
+        setOpen(true);
+    }
 
     function handleSubmit(e) {
         e.preventDefault();
-        post(route("houses.store"), {
-            onSuccess: () => {
-                reset();
-                setOpen(false);
-            },
-        });
+        if (selectedBooking) {
+            console.log(selectedBooking);
+            put(route("bookings.update", selectedBooking.id), {
+                onSuccess: () => {
+                    reset();
+                    setOpen(false);
+                    setSelectedBooking(null);
+                },
+            });
+        } else {
+            post(route("bookings.store"), {
+                onSuccess: () => {
+                    reset();
+                    setOpen(false);
+                },
+            });
+        }
     }
 
     function handleChange(e) {
@@ -58,6 +112,10 @@ export default function BookingIndex({ bookings }) {
         }));
     }
 
+    function handleDelete(booking_id) {
+        router.delete(route("bookings.destroy", booking_id));
+    }
+
     return (
         <div className="flex flex-col p-4 bg-gray-200">
             <div className="flex mb-4">
@@ -66,7 +124,7 @@ export default function BookingIndex({ bookings }) {
                     <p>Manage booking</p>
                 </div>
                 <div className="flex items-end px-4">
-                    <TenantDialog
+                    <BookingDialog
                         setOpen={setOpen}
                         open={open}
                         form={data}
@@ -74,16 +132,21 @@ export default function BookingIndex({ bookings }) {
                         handleSubmit={handleSubmit}
                         handleChange={handleChange}
                         processing={processing}
-                        method="Create"
+                        rooms={rooms}
+                        tenants={tenants}
+                        method={selectedBooking ? 'Update' : 'Create'}
                     >
-                        <Button className="px-3 py-1 flex items-center">
+                        <Button
+                            className="px-3 py-1 flex items-center"
+                            onClick={handleOpenCreate}
+                        >
                             <PlusIcon
                                 className="hover:text-primary"
                                 size={32}
                             />
-                            Add Tenant
+                            Add Booking
                         </Button>
-                    </TenantDialog>
+                    </BookingDialog>
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto">
@@ -93,7 +156,9 @@ export default function BookingIndex({ bookings }) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="">Tenant Name</TableHead>
-                                <TableHead className="">Property/Room</TableHead>
+                                <TableHead className="">
+                                    Property/Room
+                                </TableHead>
                                 <TableHead className="">Move-in</TableHead>
                                 <TableHead className="">Due Date</TableHead>
                                 <TableHead className="">Deposit</TableHead>
@@ -108,11 +173,18 @@ export default function BookingIndex({ bookings }) {
                                         <div>
                                             <Avatar className="h-8 w-8 rounded-lg grayscale">
                                                 <AvatarImage
-                                                    src={booking.tenant.user.avatar ?? ""}
-                                                    alt={booking.tenant.user.name}
+                                                    src={
+                                                        booking.tenant.user
+                                                            .avatar ?? ""
+                                                    }
+                                                    alt={
+                                                        booking.tenant.user.name
+                                                    }
                                                 />
                                                 <AvatarFallback className="rounded-lg">
-                                                    {booking.tenant.user.name.slice(0,1).toUpperCase()}
+                                                    {booking.tenant.user.name
+                                                        .slice(0, 1)
+                                                        .toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </div>
@@ -127,25 +199,100 @@ export default function BookingIndex({ bookings }) {
                                     </TableCell>
                                     <TableCell className="">
                                         <div className="flex flex-col">
-                                            <span className="font-semibold text-sm/3">{booking?.room?.room_number ?? "-"}</span>
-                                            <span className="text-xs text-gray-500">{booking?.room?.house?.name ?? "-"}</span>
+                                            <span className="font-semibold text-sm/3">
+                                                {booking?.room?.room_number ??
+                                                    "-"}
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                                {booking?.room?.house?.name ??
+                                                    "-"}
+                                            </span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="">{booking?.move_in_date ?? "-"}</TableCell>
-                                    <TableCell className="">{booking?.move_out_date ?? "-"}</TableCell>
-                                    <TableCell className="">{booking?.deposit_amount ?? "-"}</TableCell>
-                                    <TableCell className="">{booking?.status ?? "-"}</TableCell>
                                     <TableCell className="">
-                                        <Button variant="ghost">
-                                            <EllipsisVertical />
-                                        </Button>
+                                        {booking?.move_in_date ?? "-"}
+                                    </TableCell>
+                                    <TableCell className="">
+                                        {booking?.move_out_date ?? "-"}
+                                    </TableCell>
+                                    <TableCell className="">
+                                        {booking?.deposit_amount ?? "-"}
+                                    </TableCell>
+                                    <TableCell className="">
+                                        {booking?.status ?? "-"}
+                                    </TableCell>
+                                    <TableCell className="">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button className="px-3 py-1">
+                                                    <EllipsisVertical
+                                                        className="hover:text-primary"
+                                                        size={18}
+                                                    />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuLabel>
+                                                    Actions
+                                                </DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                        onSelect={(e) => {
+                                                            e.preventDefault();
+                                                            handleOpenEdit(
+                                                                booking,
+                                                            );
+                                                        }}
+                                                    >
+                                                        Edit Booking
+                                                    </DropdownMenuItem>
+                                                <DeleteAlert
+                                                    handleDelete={() =>
+                                                        handleDelete(booking.id)
+                                                    }
+                                                    message="Are you sure to Delete this booking?"
+                                                >
+                                                    <DropdownMenuItem
+                                                        disabled={booking.status === 'active' ||booking.status === 'pending'}
+                                                        onSelect={(e) =>
+                                                            e.preventDefault()
+                                                        }
+                                                    >
+                                                        Delete Booking
+                                                    </DropdownMenuItem>
+                                                </DeleteAlert>
+                                                <DropdownMenuItem
+                                                    disabled={booking.status === 'active'}
+                                                    onSelect={(e) =>{
+                                                        e.preventDefault()
+                                                        router.patch(
+                                                            route('booking.updateStatus', booking.id), 
+                                                            {status: 'active'}
+                                                        )
+                                                    }}
+                                                >
+                                                    Activate Booking
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    disabled={booking.status === 'ended'}
+                                                    onSelect={(e) =>{
+                                                        e.preventDefault()
+                                                        router.patch(
+                                                            route('booking.updateStatus', booking.id), 
+                                                            {status: 'ended'}
+                                                        )
+                                                    }}
+                                                >
+                                                    End Booking
+                                                </DropdownMenuItem>
+
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
-
-                    
                 </div>
             </div>
         </div>

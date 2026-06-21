@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('move_out_date')->nullable();
             $table->decimal('deposit_amount', 8, 2)->default(0);
             $table->unsignedTinyInteger('due_day')->default(1);
-            $table->enum('status', ['pending', 'active', 'ended', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'active', 'ended', 'canceled'])->default('pending');
             $table->text('notes')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
             'type'          => 'single',
             'monthly_rent'  => 3500.00,
             'capacity'      => 1,
-            'status'        => 'available',
+            'status'        => 'occupied',
             'description'   => 'Single room with a window and shared bathroom.',
         ]);
 
@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
             'tenant_id'      => $tenant->id,
             'room_id'        => $room->id,
             'move_in_date'   => '2025-01-01',
-            'move_out_date'  => null, // null = no fixed end date
+            'move_out_date'  => '2025-02-01', // null = no fixed end date
             'deposit_amount' => 3500.00,
             'due_day'        => 5, // due every 5th of the month
             'status'         => 'active',
@@ -84,7 +84,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Electric Bill
-        $bill = Bill::create([
+        $electric_bill = Bill::create([
             'booking_id'       => $booking->id,
             'type'             => 'electric',
             'title'            => 'Electric Bill - January 2025',
@@ -99,7 +99,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Water Bill
-        $waterBill = Bill::create([
+        $water_bill = Bill::create([
             'booking_id'       => $booking->id,
             'type'             => 'water',
             'title'            => 'Water Bill - January 2025',
@@ -114,7 +114,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Monthly Rent Bill
-        $rentBill = Bill::create([
+        $rent_bill = Bill::create([
             'booking_id'       => $booking->id,
             'type'             => 'rent',
             'title'            => 'Monthly Rent - January 2025',
@@ -127,5 +127,69 @@ class DatabaseSeeder extends Seeder
             'status'           => 'unpaid',
             'notes'            => null,
         ]);
+
+        $electric_bill->bill_payment()->create([
+            'amount_paid'      => 250.00,
+            'paid_at'          => '2025-01-03 10:00:00',
+            'method'           => 'cash',
+            'reference_number' => null,
+            'proof_photo'      => null,
+            'status'           => 'confirmed',
+        ]);
+
+        $electric_bill->update([
+            'status' => 'paid'
+        ]);
+
+        // after your existing seeder code, add:
+
+        // 10 additional available rooms
+        $room_types = ['single', 'double', 'studio', 'dormitory'];
+
+        foreach (range(102, 111) as $index => $room_number) {
+            Room::create([
+                'house_id'     => $house->id,
+                'room_number'  => (string) $room_number,
+                'floor'        => rand(1, 3),
+                'type'         => $room_types[$index % count($room_types)],
+                'monthly_rent' => rand(2, 5) * 500,
+                'capacity'     => rand(1, 4),
+                'status'       => 'available',
+                'description'  => "Room $room_number - available for occupancy.",
+            ]);
+        }
+
+        // 10 additional tenants with no booking
+        $tenant_data = [
+            ['name' => 'Maria Santos',    'email' => 'maria@email.com'],
+            ['name' => 'Pedro Reyes',     'email' => 'pedro@email.com'],
+            ['name' => 'Ana Cruz',        'email' => 'ana@email.com'],
+            ['name' => 'Jose Dela Cruz',  'email' => 'jose@email.com'],
+            ['name' => 'Rosa Mendoza',    'email' => 'rosa@email.com'],
+            ['name' => 'Carlos Garcia',   'email' => 'carlos@email.com'],
+            ['name' => 'Elena Villanueva', 'email' => 'elena@email.com'],
+            ['name' => 'Ramon Torres',    'email' => 'ramon@email.com'],
+            ['name' => 'Luisa Ramos',     'email' => 'luisa@email.com'],
+            ['name' => 'Miguel Flores',   'email' => 'miguel@email.com'],
+        ];
+
+        foreach ($tenant_data as $data) {
+            $user = User::factory()->create([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'password' => 'secretpassword',
+                'role'     => 'tenant',
+            ]);
+
+            Tenant::create([
+                'user_id'           => $user->id,
+                'phone'             => '09' . rand(100000000, 999999999),
+                'address'           => 'Cavite',
+                'emergency_contact' => 'Parent',
+                'id_type'           => 'National ID',
+                'id_number'         => 'NID-' . rand(10000, 99999),
+                'status'            => 'active',
+            ]);
+        }
     }
 }

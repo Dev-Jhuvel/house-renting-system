@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('tenants', TenantController::class);
     Route::resource('bookings', BookingController::class);
     Route::resource('bills', BillController::class);
+
+    Route::patch('bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('booking.updateStatus');
 });
 
 require __DIR__.'/auth.php';

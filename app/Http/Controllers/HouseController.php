@@ -42,11 +42,11 @@ class HouseController extends Controller
             ->loadCount([
                 'rooms',
                 'rooms as occupied_count' => function($q){
-                    return $q->where('status', 'occupied');
+                    return $q->whereIn('status', ['occupied', 'reserved']);
                 }
             ])
-            ->load('rooms');
-            
+            ->load('rooms.booking');
+        
         return Inertia::render('Houses/HouseShow', ['house' => $house]);
     }
 

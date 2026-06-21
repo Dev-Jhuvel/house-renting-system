@@ -12,6 +12,7 @@ class BillPayment extends Model
     use HasUuids, HasActivityLog;
 
     protected $fillable = [
+        'bill_id',
         'amount_paid',
         'paid_at',
         'method',

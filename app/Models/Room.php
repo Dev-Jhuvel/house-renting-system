@@ -20,8 +20,14 @@ class Room extends Model
         'description'
     ];
 
+    public function bookings(){
+        return $this->hasMany(Booking::class);
+    }
+
     public function booking(){
-        return $this->belongsTo(Tenant::class);
+        return $this->hasOne(Booking::class)
+        ->whereIn('status',['active', 'pending'])
+        ->latestOfMany();
     }
 
     public function house(){

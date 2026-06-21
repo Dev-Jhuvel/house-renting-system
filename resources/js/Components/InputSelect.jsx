@@ -5,19 +5,38 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
+import { Label } from "./ui/label";
 export default function InputSelect({
     name,
+    label,
+    id,
     value,
     options,
     onChange,
     error,
     placeholder,
     className,
+    disabled = false,
 }) {
+    const normalize = options.map((option) => {
+        return typeof option === "string"
+            ? {
+                  value: option.toLowerCase().replace(/\s+/g, "_"),
+                  label: option,
+              }
+            : {
+                  value: option.value,
+                  label: option.label,
+                  disabled: option.disabled,
+              };
+    });
     return (
         <div className={className}>
+            <Label htmlFor={id}>{label}</Label>
             <Select
+                id={id}
                 value={value}
+                disabled={disabled}
                 onValueChange={(value) =>
                     onChange({
                         target: {
@@ -32,9 +51,9 @@ export default function InputSelect({
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                    {options.map((option, key) => (
-                        <SelectItem key={key} value={option.toLowerCase().replace(/\s+/g, "_")}>
-                            {option}
+                    {normalize.map((option, key) => (
+                        <SelectItem key={key} disabled={option.disabled ?? false} value={option.value}>
+                            {option.label}
                         </SelectItem>
                     ))}
                 </SelectContent>
