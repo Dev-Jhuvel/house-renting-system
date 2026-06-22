@@ -14,8 +14,9 @@ class TenantController extends Controller
     public function index()
     {
         $tenants = Tenant::with(['user', 'booking.room.house', 'booking.bills.payments'])
-            ->orderBy('name')
-            ->get();
+        ->get()
+        ->sortBy('user.name')
+        ->values();
         return Inertia::render('Tenants/TenantIndex', ['tenants' => $tenants]);
     }
 

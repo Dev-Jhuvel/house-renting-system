@@ -156,8 +156,8 @@ export default function TenantIndex({ tenants }) {
                                 <TableHead className="">
                                     Room/Property
                                 </TableHead>
-                                <TableHead className="">Total Bills</TableHead>
-                                <TableHead className="">Total Payments</TableHead>
+                                {/* <TableHead className="">Total Bills</TableHead> */}
+                                {/* <TableHead className="">Total Payments</TableHead> */}
                                 <TableHead className="">Balance</TableHead>
                                 <TableHead className="">Status</TableHead>
                                 <TableHead className="">Actions</TableHead>
@@ -173,17 +173,14 @@ export default function TenantIndex({ tenants }) {
                                         <RoomColumn room_number={tenant.booking?.room?.room_number} house_name={tenant.booking?.room?.house?.name} />
                                     </TableCell>
                                     {/* <TableCell className="">{tenant.booking?.move_in_date ?? "-"}</TableCell> */}
-                                    <TableCell className="">
-                                        {tenant.booking?.total_bills ??
-                                            "-"}
-                                    </TableCell>
+                                    {/* <TableCell className="">
+                                        {tenant.booking?.total_bills ? `₱${tenant.booking?.total_bills}` : "-"}
+                                    </TableCell> */}
+                                    {/* <TableCell className="">
+                                        {tenant.booking?.total_paid  ? `₱${tenant.booking?.total_paid}` : "-"}
+                                    </TableCell> */}
                                      <TableCell className="">
-                                        {tenant.booking?.total_paid  ??
-                                            "-"}
-                                    </TableCell>
-                                     <TableCell className="">
-                                        {tenant.booking?.balance  ??
-                                            "-"}
+                                        {tenant.booking?.balance  ? `₱${tenant.booking?.balance}` : "-"}
                                     </TableCell>
                                     {/* <TableCell className="">{tenant.booking?.balance ?? "-"}</TableCell> */}
                                     <TableCell className="">

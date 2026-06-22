@@ -45,6 +45,7 @@ import DeleteAlert from "@/Components/DeleteAlert";
 import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
 import PaymentDialog from "@/Components/Dialogs/PaymentDialog";
+import PaymentHistorySheet from "@/Components/PaymentHistorySheet";
 
 export default function BookingIndex({ bills, bookings }) {
     const today = new Date();
@@ -108,8 +109,11 @@ export default function BookingIndex({ bills, bookings }) {
 
     const [openPayment, setOpenPayment] = useState(false);
     const [openBill, setOpenBill] = useState(false);
+    const [openPaymentHistory, setOpenPaymentHistory] = useState(false);
     const [selectedBill, setSelectedBill] = useState(null);
     const [selectedBillForPayment, setSelectedBillForPayment] = useState(null);
+    const [selectedBillForPaymentHistory, setSelectedBillForPaymentHistory] =
+        useState(null);
 
     function handleOpenBillCreate() {
         resetBill();
@@ -133,6 +137,12 @@ export default function BookingIndex({ bills, bookings }) {
         });
         setSelectedBill(bill);
         setOpenBill(true);
+    }
+
+    function handleOpenPaymentHistory(bill) {
+        resetBill();
+        setSelectedBillForPaymentHistory(bill);
+        setOpenPaymentHistory(true);
     }
 
     function handleSubmitBill(e) {
@@ -177,8 +187,28 @@ export default function BookingIndex({ bills, bookings }) {
         }));
     }
 
-    function handleDelete(bill_id) {
+    function handleDeleteBill(bill_id) {
         router.delete(route("bills.destroy", bill_id));
+    }
+
+    function handleDeletePayment(payment_id) {
+        router.delete(
+            route("bills.payments.destroy", {
+                bill: selectedBillForPaymentHistory.id,
+                payment: payment_id,
+            }),
+            {
+                onSuccess: () => {
+                    router.reload({ only: ["bills"] });
+                    setSelectedBillForPaymentHistory((prev) => ({
+                        ...prev,
+                        payments: prev.payments.filter(
+                            (p) => p.id !== payment_id,
+                        ),
+                    }));
+                },
+            },
+        );
     }
 
     useEffect(() => {
@@ -243,6 +273,12 @@ export default function BookingIndex({ bills, bookings }) {
                 processing={paymentProcessing}
                 bill={selectedBillForPayment}
                 method={selectedBillForPayment ? "Update" : "Create"}
+            />
+            <PaymentHistorySheet
+                open={openPaymentHistory}
+                setOpen={setOpenPaymentHistory}
+                bill={selectedBillForPaymentHistory}
+                handleDeletePayment={handleDeletePayment}
             />
             <div className="flex mb-4">
                 <div className="flex-grow">
@@ -342,7 +378,9 @@ export default function BookingIndex({ bills, bookings }) {
                                                 </DropdownMenuItem>
                                                 <DeleteAlert
                                                     handleDelete={() =>
-                                                        handleDelete(bill.id)
+                                                        handleDeleteBill(
+                                                            bill.id,
+                                                        )
                                                     }
                                                     message="Are you sure to Delete this bill?"
                                                 >
@@ -373,6 +411,20 @@ export default function BookingIndex({ bills, bookings }) {
                                                     }}
                                                 >
                                                     Record Payment
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    disabled={
+                                                        !bill.payments.length >
+                                                        0
+                                                    }
+                                                    onSelect={(e) => {
+                                                        e.preventDefault();
+                                                        handleOpenPaymentHistory(
+                                                            bill,
+                                                        );
+                                                    }}
+                                                >
+                                                    View Payment History
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

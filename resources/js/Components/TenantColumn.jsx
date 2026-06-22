@@ -1,13 +1,15 @@
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 
 export default function TenantColumn({ name, email, avatar = null }) {
+    const parts = name.split(' ');
+    const initials = parts[0].charAt(0) + parts[1].charAt(0);
     return (
         <>
             <div>
                 <Avatar className="h-8 w-8 rounded-lg grayscale">
                     <AvatarImage src={avatar ?? ""} alt={name + 'profile'} />
                     <AvatarFallback className="rounded-lg">
-                        {name.slice(0, 1).toUpperCase()}
+                        {initials}
                     </AvatarFallback>
                 </Avatar>
             </div>
