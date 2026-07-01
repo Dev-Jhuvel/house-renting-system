@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepositController;
 use App\Http\Controllers\HouseController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
@@ -20,9 +22,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -35,10 +34,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('bookings', BookingController::class);
     Route::resource('bills', BillController::class);
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::patch('bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('booking.updateStatus');
 
     Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
     Route::delete('bills/{bill}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bills.payments.destroy');
+    Route::post('bookings/{booking}/deposits', [DepositController::class, 'store'])->name('bookings.deposits.store');
+    Route::delete('deposits/{deposit}', [DepositController::class, 'destroy'])->name('deposits.destroy');
 });
 
 require __DIR__ . '/auth.php';

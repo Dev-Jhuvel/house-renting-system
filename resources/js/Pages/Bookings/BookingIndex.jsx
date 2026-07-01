@@ -41,81 +41,164 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import BookingDialog from "@/Components/Dialogs/BookingDialog";
+import DepositDialog from "@/Components/Dialogs/DepositDialog";
 import DeleteAlert from "@/Components/DeleteAlert";
 import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
+import DepositHistorySheet from "@/Components/Sheets/DepositHistorySheet";
+import { FocusTrapFeatures } from "@headlessui/react";
 
 export default function BookingIndex({ bookings, tenants, rooms }) {
     const today = new Date();
     const next_month = new Date(today);
     next_month.setMonth(next_month.getMonth() + 1);
 
-    const { data, setData, post, put, processing, errors, reset } = useForm({
+    // Booking process and variable
+    const {
+        data: bookingData,
+        setData: setBookingData,
+        post: postBooking,
+        put: putBooking,
+        processing: processingBooking,
+        errors: bookingErrors,
+        reset: resetBll,
+    } = useForm({
         tenant_id: "",
         room_id: "",
         move_in_date: today.toISOString().slice(0, 10),
-        move_out_date: next_month.toISOString().slice(0, 10),
-        deposit_amount: "",
+        // move_out_date: next_month.toISOString().slice(0, 10),
+        move_out_date: "",
         due_day: "",
         notes: "",
         status: "pending",
     });
 
-    const [open, setOpen] = useState(false);
+    const [openBooking, setOpenBooking] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
 
-    function handleOpenCreate() {
-        reset();
+    function handleOpenBookingCreate() {
+        resetBll();
         setSelectedBooking(null);
-        setOpen(true);
+        setOpenBooking(true);
     }
 
-    function handleOpenEdit(booking) {
-        setData({
+    function handleOpenBookingEdit(booking) {
+        setBookingData({
             tenant_id: booking.tenant_id,
             room_id: booking.room_id,
             move_in_date: booking.move_in_date,
             move_out_date: booking.move_out_date,
-            deposit_amount: booking.deposit_amount,
             due_day: booking.due_day,
             notes: booking.notes ?? "",
             status: booking.status,
         });
         setSelectedBooking(booking);
-        setOpen(true);
+        setOpenBooking(true);
     }
 
-    function handleSubmit(e) {
+    function handleBookingSubmit(e) {
         e.preventDefault();
         if (selectedBooking) {
-            console.log(selectedBooking);
-            put(route("bookings.update", selectedBooking.id), {
+            putBooking(route("bookings.update", selectedBooking.id), {
                 onSuccess: () => {
-                    reset();
-                    setOpen(false);
+                    resetBll();
+                    setOpenBooking(false);
                     setSelectedBooking(null);
                 },
             });
         } else {
-            post(route("bookings.store"), {
+            postBooking(route("bookings.store"), {
                 onSuccess: () => {
-                    reset();
-                    setOpen(false);
+                    resetBll();
+                    setOpenBooking(false);
                 },
             });
         }
     }
 
-    function handleChange(e) {
+    function handleBookingChange(e) {
         const { name, type, value } = e.target;
-        setData((prev) => ({
+        setBookingData((prev) => ({
             ...prev,
-            [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
+            [name]:
+                type === "number" && value !== ""
+                    ? parseFloat(value) || 0
+                    : value,
         }));
     }
 
-    function handleDelete(booking_id) {
+    function handleBookingDelete(booking_id) {
         router.delete(route("bookings.destroy", booking_id));
+    }
+
+    // Deposit process and variable
+    const [openDeposit, setOpenDeposit] = useState(false);
+    const [openDepositHistory, setOpenDepositHistory] = useState(false);
+    const [selectedBookingForDeposit, setSelectedBookingForDeposit] =
+        useState(null);
+    const {
+        data: depositData,
+        setData: setDepositData,
+        post: postDeposit,
+        put: putDeposit,
+        processing: processingDeposit,
+        errors: depositErrors,
+        reset: resetDeposit,
+    } = useForm({
+        amount: "",
+        notes: "",
+        paid_at: today.toISOString().slice(0, 10),
+        type: "received",
+    });
+
+    function handleOpenDepositCreate(booking) {
+        resetDeposit();
+        setSelectedBookingForDeposit(booking);
+        setOpenDeposit(true);
+    }
+
+    function handleSubmitDeposit(e) {
+        e.preventDefault();
+        postDeposit(route("bookings.deposits.store", selectedBookingForDeposit.id), {
+            onSuccess: () => {
+                resetDeposit();
+                setOpenDeposit(false);
+                setSelectedBookingForDeposit(null);
+            },
+        });
+    }
+
+    function handleDepositChange(e) {
+        const { name, type, value } = e.target;
+        setDepositData((prev) => ({
+            ...prev,
+            [name]:
+                type === "number" && value !== ""
+                    ? parseFloat(value) || 0
+                    : value,
+        }));
+    }
+
+    function handleDeleteDeposit(deposit_id) {
+        router.delete(
+            route("deposits.destroy", {
+                deposit: deposit_id,
+            }),
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    const updatedDeposit =
+                        selectedBookingForDeposit.deposits.filter(
+                            (d) => d.id !== deposit_id,
+                        );
+
+                    setSelectedBookingForDeposit((prev) => ({
+                        ...prev,
+                        deposits: updatedDeposit,
+                    }));
+                },
+            },
+        );
     }
 
     return (
@@ -126,21 +209,38 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                     <p>Manage booking</p>
                 </div>
                 <div className="flex items-end px-4">
+                    <DepositHistorySheet
+                        open={openDepositHistory}
+                        setOpen={setOpenDepositHistory}
+                        booking={selectedBookingForDeposit}
+                        handleDeleteDeposit={handleDeleteDeposit}
+                    />
+                    <DepositDialog
+                        setOpen={setOpenDeposit}
+                        open={openDeposit}
+                        form={depositData}
+                        errors={depositErrors}
+                        handleSubmit={handleSubmitDeposit}
+                        handleChange={handleDepositChange}
+                        processing={processingDeposit}
+                        booking={selectedBookingForDeposit}
+                        method={selectedBooking ? "Update" : "Create"}
+                    />
                     <BookingDialog
-                        setOpen={setOpen}
-                        open={open}
-                        form={data}
-                        errors={errors}
-                        handleSubmit={handleSubmit}
-                        handleChange={handleChange}
-                        processing={processing}
+                        setOpen={setOpenBooking}
+                        open={openBooking}
+                        form={bookingData}
+                        errors={bookingErrors}
+                        handleSubmit={handleBookingSubmit}
+                        handleChange={handleBookingChange}
+                        processing={processingBooking}
                         rooms={rooms}
                         tenants={tenants}
                         method={selectedBooking ? "Update" : "Create"}
                     >
                         <Button
                             className="px-3 py-1 flex items-center"
-                            onClick={handleOpenCreate}
+                            onClick={handleOpenBookingCreate}
                         >
                             <PlusIcon
                                 className="hover:text-primary"
@@ -164,8 +264,12 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                 <TableHead className="">Move-in</TableHead>
                                 <TableHead className="">Due Date</TableHead>
                                 <TableHead className="">Deposit</TableHead>
-                                <TableHead className="text-center">Unpaid Bills</TableHead>
-                                <TableHead className="text-center">Status</TableHead>
+                                <TableHead className="text-center">
+                                    Unpaid Bills
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Status
+                                </TableHead>
                                 <TableHead className="">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -173,10 +277,18 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                             {bookings.map((booking, key) => (
                                 <TableRow key={key}>
                                     <TableCell className="flex items-center gap-x-2">
-                                        <TenantColumn name={booking.tenant.user.name} email={booking.tenant.user.email}  />
+                                        <TenantColumn
+                                            name={booking.tenant.user.name}
+                                            email={booking.tenant.user.email}
+                                        />
                                     </TableCell>
                                     <TableCell className="">
-                                        <RoomColumn room_number={booking.room.room_number} house_name={booking.room.house.name} />
+                                        <RoomColumn
+                                            room_number={
+                                                booking.room.room_number
+                                            }
+                                            house_name={booking.room.house.name}
+                                        />
                                     </TableCell>
                                     <TableCell className="">
                                         {booking.move_in_date}
@@ -185,9 +297,9 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                         {booking.move_out_date}
                                     </TableCell>
                                     <TableCell className="">
-                                        {booking.deposit_amount
+                                        {/* {booking.deposit_amount
                                             ? `₱${booking.deposit_amount}`
-                                            : "-"}
+                                            : "-"} */}
                                     </TableCell>
                                     <TableCell className="text-center">
                                         {booking.unpaid_bills_count}
@@ -232,14 +344,18 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                 <DropdownMenuItem
                                                     onSelect={(e) => {
                                                         e.preventDefault();
-                                                        handleOpenEdit(booking);
+                                                        handleOpenBookingEdit(
+                                                            booking,
+                                                        );
                                                     }}
                                                 >
                                                     Edit Booking
                                                 </DropdownMenuItem>
                                                 <DeleteAlert
                                                     handleDelete={() =>
-                                                        handleDelete(booking.id)
+                                                        handleBookingDelete(
+                                                            booking.id,
+                                                        )
                                                     }
                                                     message="Are you sure to Delete this booking?"
                                                 >
@@ -249,7 +365,8 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                                 "active" ||
                                                             booking.status ===
                                                                 "pending" ||
-                                                            booking.unpaid_bills_count > 0
+                                                            booking.unpaid_bills_count >
+                                                                0
                                                         }
                                                         onSelect={(e) =>
                                                             e.preventDefault()
@@ -261,7 +378,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                 <DropdownMenuItem
                                                     disabled={
                                                         booking.status ===
-                                                        "active"
+                                                        "active" || booking.required_deposit > 0
                                                     }
                                                     onSelect={(e) => {
                                                         router.patch(
@@ -280,8 +397,9 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                 <DropdownMenuItem
                                                     disabled={
                                                         booking.status ===
-                                                        "ended" || booking.unpaid_bills_count > 0
-
+                                                            "ended" ||
+                                                        booking.unpaid_bills_count >
+                                                            0
                                                     }
                                                     onSelect={(e) => {
                                                         router.patch(
@@ -294,6 +412,32 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                     }}
                                                 >
                                                     End Booking
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    // disabled={
+                                                    //     booking.status !==
+                                                    //     "active"
+                                                    // }
+                                                    onSelect={(e) => {
+                                                        e.preventDefault();
+                                                        handleOpenDepositCreate(
+                                                            booking,
+                                                        );
+                                                    }}
+                                                >
+                                                    Record Deposit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    disabled={
+                                                        !booking.deposits.length > 0
+                                                    }
+                                                    onSelect={(e) => {
+                                                        e.preventDefault();
+                                                        setOpenDepositHistory(true);
+                                                        setSelectedBookingForDeposit(booking)
+                                                    }}
+                                                >
+                                                    View Deposit History
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

@@ -45,12 +45,16 @@ import DeleteAlert from "@/Components/DeleteAlert";
 import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
 import PaymentDialog from "@/Components/Dialogs/PaymentDialog";
-import PaymentHistorySheet from "@/Components/PaymentHistorySheet";
+import PaymentHistorySheet from "@/Components/Sheets/PaymentHistorySheet";
 
 export default function BookingIndex({ bills, bookings }) {
     const today = new Date();
     const due_date = new Date(today);
     due_date.setDate(due_date.getDate() + 10);
+
+    // Bills Process and variable
+    const [openBill, setOpenBill] = useState(false);
+    const [selectedBill, setSelectedBill] = useState(null);
 
     const {
         data: billData,
@@ -74,47 +78,6 @@ export default function BookingIndex({ bills, bookings }) {
         status: "unpaid",
     });
 
-    const {
-        data: paymentData,
-        setData: setPaymentData,
-        post: postPayment,
-        put: putPayment,
-        processing: paymentProcessing,
-        errors: paymentErrors,
-        reset: resetPayment,
-    } = useForm({
-        amount_paid: "",
-        paid_at: today.toISOString().slice(0, 10),
-        method: "",
-        reference_number: "",
-        notes: "",
-    });
-
-    function handleOpenPayment(bill) {
-        resetPayment();
-        setSelectedBillForPayment(bill);
-        setOpenPayment(true);
-    }
-
-    function handleSubmitPayment(e) {
-        e.preventDefault();
-        postPayment(route("bills.payments.store", selectedBillForPayment.id), {
-            onSuccess: () => {
-                resetPayment();
-                setOpenPayment(false);
-                setSelectedBillForPayment(null);
-            },
-        });
-    }
-
-    const [openPayment, setOpenPayment] = useState(false);
-    const [openBill, setOpenBill] = useState(false);
-    const [openPaymentHistory, setOpenPaymentHistory] = useState(false);
-    const [selectedBill, setSelectedBill] = useState(null);
-    const [selectedBillForPayment, setSelectedBillForPayment] = useState(null);
-    const [selectedBillForPaymentHistory, setSelectedBillForPaymentHistory] =
-        useState(null);
-
     function handleOpenBillCreate() {
         resetBill();
         setSelectedBill(null);
@@ -137,12 +100,6 @@ export default function BookingIndex({ bills, bookings }) {
         });
         setSelectedBill(bill);
         setOpenBill(true);
-    }
-
-    function handleOpenPaymentHistory(bill) {
-        resetBill();
-        setSelectedBillForPaymentHistory(bill);
-        setOpenPaymentHistory(true);
     }
 
     function handleSubmitBill(e) {
@@ -176,39 +133,8 @@ export default function BookingIndex({ bills, bookings }) {
         }));
     }
 
-    function handlePaymentChange(e) {
-        const { name, type, value } = e.target;
-        setPaymentData((prev) => ({
-            ...prev,
-            [name]:
-                type === "number" && value !== ""
-                    ? parseFloat(value) || 0
-                    : value,
-        }));
-    }
-
     function handleDeleteBill(bill_id) {
         router.delete(route("bills.destroy", bill_id));
-    }
-
-    function handleDeletePayment(payment_id) {
-        router.delete(
-            route("bills.payments.destroy", {
-                bill: selectedBillForPaymentHistory.id,
-                payment: payment_id,
-            }),
-            {
-                onSuccess: () => {
-                    router.reload({ only: ["bills"] });
-                    setSelectedBillForPaymentHistory((prev) => ({
-                        ...prev,
-                        payments: prev.payments.filter(
-                            (p) => p.id !== payment_id,
-                        ),
-                    }));
-                },
-            },
-        );
     }
 
     useEffect(() => {
@@ -249,6 +175,85 @@ export default function BookingIndex({ bills, bookings }) {
         billData.current_reading,
         billData.rate_used,
     ]);
+
+    // Payments Process and variable
+    const [openPayment, setOpenPayment] = useState(false);
+    const [openPaymentHistory, setOpenPaymentHistory] = useState(false);
+    const [selectedBillForPayment, setSelectedBillForPayment] = useState(null);
+    const [selectedBillForPaymentHistory, setSelectedBillForPaymentHistory] = useState(null);
+    const {
+        data: paymentData,
+        setData: setPaymentData,
+        post: postPayment,
+        put: putPayment,
+        processing: paymentProcessing,
+        errors: paymentErrors,
+        reset: resetPayment,
+    } = useForm({
+        amount_paid: "",
+        paid_at: today.toISOString().slice(0, 10),
+        method: "",
+        reference_number: "",
+        notes: "",
+    });
+
+    function handleOpenPayment(bill) {
+        resetPayment();
+        setSelectedBillForPayment(bill);
+        setOpenPayment(true);
+    }
+
+    function handleSubmitPayment(e) {
+        e.preventDefault();
+        postPayment(route("bills.payments.store", selectedBillForPayment.id), {
+            onSuccess: () => {
+                resetPayment();
+                setOpenPayment(false);
+                setSelectedBillForPayment(null);
+            },
+        });
+    }
+
+    function handleOpenPaymentHistory(bill) {
+        resetBill();
+        setSelectedBillForPaymentHistory(bill);
+        setOpenPaymentHistory(true);
+    }
+
+    function handlePaymentChange(e) {
+        const { name, type, value } = e.target;
+        setPaymentData((prev) => ({
+            ...prev,
+            [name]:
+                type === "number" && value !== ""
+                    ? parseFloat(value) || 0
+                    : value,
+        }));
+    }
+
+    function handleDeletePayment(payment_id) {
+        router.delete(
+            route("bills.payments.destroy", {
+                bill: selectedBillForPaymentHistory.id,
+                payment: payment_id,
+            }),
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    const updatedPayments =
+                        selectedBillForPaymentHistory.payments.filter(
+                            (p) => p.id !== payment_id,
+                        );
+
+                    setSelectedBillForPaymentHistory((prev) => ({
+                        ...prev,
+                        payments: updatedPayments,
+                    }));
+                },
+            },
+        );
+    }
+
 
     return (
         <div className="flex flex-col p-4 bg-gray-200">
@@ -339,7 +344,7 @@ export default function BookingIndex({ bills, bookings }) {
                                             bill.type.slice(1) ?? "-"}
                                     </TableCell>
                                     <TableCell className="">
-                                        P{bill.amount ?? "-"}
+                                        ₱{bill.amount ?? "-"}
                                     </TableCell>
                                     <TableCell className="">
                                         {bill.bill_date ?? "-"}
@@ -414,8 +419,7 @@ export default function BookingIndex({ bills, bookings }) {
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     disabled={
-                                                        !bill.payments.length >
-                                                        0
+                                                        !bill.payments?.length
                                                     }
                                                     onSelect={(e) => {
                                                         e.preventDefault();

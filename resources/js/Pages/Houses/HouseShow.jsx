@@ -60,12 +60,11 @@ export default function HouseShow({ house }) {
         router.delete(route("houses.destroy", house_id));
     }
     const activeHouse = house.status === "active";
-    const max_floor =
-        house.max_floor + house.max_floor > 1 ? " floors" : " floor";
+    const floor = house.max_floor > 1 ? " floors" : " floor";
     const houseDetails = [
         { detail: house.address, icon: MapPin },
         { detail: house.water_rate, icon: Droplets },
-        { detail: max_floor, icon: Layers2 },
+        { detail: `${house.max_floor} ${floor}`, icon: Layers2 },
         { detail: house.city, icon: Building2 },
         { detail: house.electric_rate + "kwh", icon: Zap },
         {

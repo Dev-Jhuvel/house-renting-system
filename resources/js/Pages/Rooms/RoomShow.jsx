@@ -67,7 +67,6 @@ export default function RoomShow({ room }) {
         { detail: room.capacity, icon: Users },
     ];
 
-    console.log(room);
     return (
         <div className="overflow-y-auto">
             <div className="w-full h-[200px] overflow-hidden">

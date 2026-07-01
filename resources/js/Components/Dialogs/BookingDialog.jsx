@@ -39,7 +39,7 @@ export default function BookingDialog({
                 <form onSubmit={handleSubmit}>
                     <DialogHeader className="py-2">
                         <DialogTitle>
-                            {method === "Create" ? "Add New " : "Update "}{" "}
+                            {method === "Create" ? "Add New " : "Update "}
                             Booking
                         </DialogTitle>
                     </DialogHeader>
@@ -85,17 +85,6 @@ export default function BookingDialog({
                                 disabled={method === "Update"}
                                 placeholder="Select Room"
                                 error={errors.room_id}
-                                className="col-span-4"
-                            />
-                            <InputWithLabel
-                                label="Deposit"
-                                id="deposit_amount"
-                                value={form.deposit_amount}
-                                name="deposit_amount"
-                                onChange={handleChange}
-                                error={errors.deposit_amount}
-                                placeholder="3,500"
-                                type="number"
                                 className="col-span-4"
                             />
                             {method === "Update" && (

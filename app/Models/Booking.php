@@ -14,13 +14,12 @@ class Booking extends Model
         'room_id',
         'move_in_date',
         'move_out_date',
-        'deposit_amount',
         'due_day',
         'notes',
         'status'
     ];
 
-    protected $appends = ['total_bills', 'total_paid', 'balance'];
+    protected $appends = ['total_bills', 'total_paid', 'balance', 'required_deposit', 'total_deposit'];
 
     public function tenant()
     {
@@ -57,5 +56,21 @@ class Booking extends Model
     public function getBalanceAttribute()
     {
         return $this->total_bills - $this->total_paid;
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(Deposit::class);
+    }
+
+    public function getRequiredDepositAttribute()
+    {
+        return $this->room->monthly_rent - $this->deposits->sum('amount');
+    }
+    public function getTotalDepositAttribute()
+    {
+        $received   =  $this->deposits->where('type', 'received')->sum('amount');
+        $deduction  =  $this->deposits->whereIn('type', ['refunded', 'forfeited', 'forfeited',])->sum('amount');
+        return $received - $deduction;
     }
 }

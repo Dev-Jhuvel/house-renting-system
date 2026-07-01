@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('proof_photo')->nullable();  // uploaded receipt
             $table->enum('status', ['pending', 'confirmed', 'rejected'])->default('pending');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

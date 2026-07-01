@@ -14,7 +14,7 @@ class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with(['tenant.user', 'room.house'])->withCount('unpaid_bills')->latest()->get();
+        $bookings = Booking::with(['tenant.user', 'room.house', 'deposits'])->withCount('unpaid_bills')->latest()->get();
         $tenants = Tenant::with('user', 'booking')->get()->map(function ($item) {
             return [
                 'label'     => $item->user->name,
@@ -45,8 +45,7 @@ class BookingController extends Controller
             'tenant_id'             => 'required|uuid',
             'room_id'               => 'required|uuid',
             'move_in_date'          => 'required|date',
-            'move_out_date'         => 'date',
-            'deposit_amount'        => 'required|numeric',
+            'move_out_date'         => 'nullable|date',
             // 'due_day'              => 'required|numeric',
             'notes'                  => 'string',
             'status'                => 'required|in:active,ended,pending,canceled'
@@ -83,8 +82,7 @@ class BookingController extends Controller
             'tenant_id'             => 'required|uuid',
             'room_id'               => 'required|uuid',
             'move_in_date'          => 'required|date',
-            'move_out_date'         => 'date',
-            'deposit_amount'        => 'required|numeric',
+            'move_out_date'         => 'nullable|date',
             // 'due_day'               => 'required|numeric',
             'notes'                 => 'string',
             'status'                => 'required|in:active,ended,pending,canceled'

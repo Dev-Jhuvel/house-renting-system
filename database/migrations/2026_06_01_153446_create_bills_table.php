@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('status', ['unpaid', 'partial', 'paid', 'overdue',])->default('unpaid');
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

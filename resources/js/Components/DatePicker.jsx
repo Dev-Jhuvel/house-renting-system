@@ -43,7 +43,6 @@ export default function DatePicker({
                         mode="single"
                         selected={date_object}
                         onSelect={(picked) => {
-                            console.log(picked)
                             onChange({
                                 target: {
                                     name: name,

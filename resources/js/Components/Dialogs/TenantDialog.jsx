@@ -34,7 +34,7 @@ export default function TenantDialog({
                 <form onSubmit={handleSubmit}>
                     <DialogHeader className="py-2">
                         <DialogTitle>
-                            {method === "Create" ? "Add New " : "Update "}{" "}
+                            {method === "Create" ? "Add New " : "Update "}
                             Tenant
                         </DialogTitle>
                     </DialogHeader>

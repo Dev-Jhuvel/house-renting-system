@@ -77,7 +77,6 @@ class DatabaseSeeder extends Seeder
             'room_id'        => $room->id,
             'move_in_date'   => '2025-01-01',
             'move_out_date'  => '2025-02-01', // null = no fixed end date
-            'deposit_amount' => 3500.00,
             'due_day'        => 5, // due every 5th of the month
             'status'         => 'active',
             'notes'          => 'First month free.',

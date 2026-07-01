@@ -6,21 +6,19 @@ use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class Deposit extends Model
 {
     use HasUuidAndSoftDeletes, HasActivityLog;
 
     protected $fillable = [
-        'bill_id',
-        'amount_paid',
+        'booking_id',
+        'amount',
         'paid_at',
-        'method',
-        'reference_number',
-        'proof_photo',
-        'status'
+        'notes',
+        'type'
     ];
 
-    public function bill(){
-        return $this->belongsTo(Bill::class);
+    public function booking(){
+        return $this->belongsTo(Booking::class);
     }
 }
