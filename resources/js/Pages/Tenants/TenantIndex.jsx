@@ -44,6 +44,7 @@ import TenantDialog from "@/Components/Dialogs/TenantDialog";
 import DeleteAlert from "@/Components/DeleteAlert";
 import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
+import { statusColor, toTitleCase } from "@/utils/general";
 
 export default function TenantIndex({ tenants }) {
     const { data, setData, post, put, processing, errors, reset } = useForm({
@@ -111,7 +112,10 @@ export default function TenantIndex({ tenants }) {
         const { name, type, value } = e.target;
         setData((prev) => ({
             ...prev,
-            [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
+            [name]:
+                type === "number" && value !== ""
+                    ? parseFloat(value) || 0
+                    : value,
         }));
     }
 
@@ -164,74 +168,97 @@ export default function TenantIndex({ tenants }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tenants.map((tenant, key) => (
-                                <TableRow key={key}>
-                                    <TableCell className="flex items-center gap-x-2">
-                                        <TenantColumn name={tenant.user.name} email={tenant.user.email} />
-                                    </TableCell>
-                                    <TableCell className="">
-                                        <RoomColumn room_number={tenant.booking?.room?.room_number} house_name={tenant.booking?.room?.house?.name} />
-                                    </TableCell>
-                                    {/* <TableCell className="">{tenant.booking?.move_in_date ?? "-"}</TableCell> */}
-                                    {/* <TableCell className="">
+                            {tenants.map((tenant, key) => {
+                                const status = tenant.status;
+                                const user = tenant.user;
+                                const room = tenant?.booking?.room;
+                                const house = room?.house;
+                                return (
+                                    <TableRow key={key}>
+                                        <TableCell className="flex items-center gap-x-2">
+                                            <TenantColumn
+                                                name={user.name}
+                                                email={user.email}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <RoomColumn
+                                                room_number={room?.room_number}
+                                                house_name={house?.name}
+                                            />
+                                        </TableCell>
+                                        {/* <TableCell className="">{tenant.booking?.move_in_date ?? "-"}</TableCell> */}
+                                        {/* <TableCell className="">
                                         {tenant.booking?.total_bills ? `₱${tenant.booking?.total_bills}` : "-"}
                                     </TableCell> */}
-                                    {/* <TableCell className="">
+                                        {/* <TableCell className="">
                                         {tenant.booking?.total_paid  ? `₱${tenant.booking?.total_paid}` : "-"}
                                     </TableCell> */}
-                                     <TableCell className="">
-                                        {tenant.booking?.balance  ? `₱${tenant.booking?.balance}` : "-"}
-                                    </TableCell>
-                                    {/* <TableCell className="">{tenant.booking?.balance ?? "-"}</TableCell> */}
-                                    <TableCell className="">
-                                        {tenant.status ?? "-"}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <button className="px-3 py-1">
-                                                    <EllipsisVertical
-                                                        className="hover:text-primary"
-                                                        size={18}
-                                                    />
-                                                </button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuLabel>
-                                                    Actions
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onSelect={(e) => {
-                                                        e.preventDefault();
-                                                        handleOpenEdit(tenant);
-                                                    }}
-                                                >
-                                                    Edit Tenant
-                                                </DropdownMenuItem>
-                                                <DeleteAlert
-                                                    handleDelete={() =>
-                                                        handleDelete(tenant.id)
-                                                    }
-                                                    message="Are you sure to Delete this tenant?"
-                                                >
+                                        <TableCell className="">
+                                            {tenant.booking?.balance
+                                                ? `₱${tenant.booking?.balance}`
+                                                : "-"}
+                                        </TableCell>
+                                        {/* <TableCell className="">{tenant.booking?.balance ?? "-"}</TableCell> */}
+                                        <TableCell className="">
+                                            <span
+                                                className={`px-2 py-1 rounded-md font-semibold ${statusColor(status)}`}
+                                            >
+                                                {status
+                                                    ? toTitleCase(
+                                                            status,
+                                                        )
+                                                    : "-"}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <button className="px-3 py-1">
+                                                        <EllipsisVertical
+                                                            className="hover:text-primary"
+                                                            size={18}
+                                                        />
+                                                    </button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuLabel>
+                                                        Actions
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
                                                     <DropdownMenuItem
-                                                        disabled={
-                                                            tenant.status ===
-                                                            "active"
-                                                        }
-                                                        onSelect={(e) =>
-                                                            e.preventDefault()
-                                                        }
+                                                        onSelect={(e) => {
+                                                            e.preventDefault();
+                                                            handleOpenEdit(
+                                                                tenant,
+                                                            );
+                                                        }}
                                                     >
-                                                        Delete Tenant
+                                                        Edit Tenant
                                                     </DropdownMenuItem>
-                                                </DeleteAlert>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                                    <DeleteAlert
+                                                        handleDelete={() =>
+                                                            handleDelete(
+                                                                tenant.id,
+                                                            )
+                                                        }
+                                                        message="Are you sure to Delete this tenant?"
+                                                    >
+                                                        <DropdownMenuItem
+                                                            disabled={tenant.booking}
+                                                            onSelect={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                        >
+                                                            Delete Tenant
+                                                        </DropdownMenuItem>
+                                                    </DeleteAlert>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </div>

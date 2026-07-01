@@ -1,3 +1,8 @@
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import InputWithLabel from "@/Components/InputWithLabel";
 import HouseDialog from "@/Components/Dialogs/HouseDialog";
@@ -19,7 +24,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/Components/ui/dropdown-menu";
 import {
     Table,
     TableBody,
@@ -28,7 +33,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/Components/ui/table";
 
 import { useForm, Link, router } from "@inertiajs/react";
 
@@ -47,6 +52,7 @@ import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
 import DepositHistorySheet from "@/Components/Sheets/DepositHistorySheet";
 import { FocusTrapFeatures } from "@headlessui/react";
+import { toTitleCase, statusColor } from "@/utils/general";
 
 export default function BookingIndex({ bookings, tenants, rooms }) {
     const today = new Date();
@@ -159,13 +165,16 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
 
     function handleSubmitDeposit(e) {
         e.preventDefault();
-        postDeposit(route("bookings.deposits.store", selectedBookingForDeposit.id), {
-            onSuccess: () => {
-                resetDeposit();
-                setOpenDeposit(false);
-                setSelectedBookingForDeposit(null);
+        postDeposit(
+            route("bookings.deposits.store", selectedBookingForDeposit.id),
+            {
+                onSuccess: () => {
+                    resetDeposit();
+                    setOpenDeposit(false);
+                    setSelectedBookingForDeposit(null);
+                },
             },
-        });
+        );
     }
 
     function handleDepositChange(e) {
@@ -274,176 +283,246 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {bookings.map((booking, key) => (
-                                <TableRow key={key}>
-                                    <TableCell className="flex items-center gap-x-2">
-                                        <TenantColumn
-                                            name={booking.tenant.user.name}
-                                            email={booking.tenant.user.email}
-                                        />
-                                    </TableCell>
-                                    <TableCell className="">
-                                        <RoomColumn
-                                            room_number={
-                                                booking.room.room_number
-                                            }
-                                            house_name={booking.room.house.name}
-                                        />
-                                    </TableCell>
-                                    <TableCell className="">
-                                        {booking.move_in_date}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        {booking.move_out_date}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        {/* {booking.deposit_amount
-                                            ? `₱${booking.deposit_amount}`
-                                            : "-"} */}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {booking.unpaid_bills_count}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        <span
-                                            className={`px-2 py-1 rounded-md font-semibold 
-                                                ${
-                                                    booking.status === "active"
-                                                        ? "bg-green-500"
-                                                        : booking.status ===
-                                                            "pending"
-                                                          ? "bg-yellow-500"
-                                                          : booking.status ===
-                                                              "ended"
-                                                            ? "bg-red-500"
-                                                            : "bg-gray-500"
-                                                }
-                                            `}
-                                        >
-                                            {booking.status
-                                                .slice(0, 1)
-                                                .toUpperCase() +
-                                                booking.status.slice(1) ?? "-"}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <button className="px-3 py-1">
-                                                    <EllipsisVertical
-                                                        className="hover:text-primary"
-                                                        size={18}
+                            {bookings.map((booking, key) => {
+                                const unpaid_bills = booking.bills.filter(
+                                    (bill) => bill.status !== "paid",
+                                );
+                                const status = booking.status;
+                                const user = booking?.tenant.user;
+                                const room = booking?.room;
+                                const house = room?.house;
+                                const unpaid_bills_count =
+                                    booking.unpaid_bills_count;
+                                return (
+                                    <HoverCard>
+                                        <HoverCardTrigger asChild>
+                                            <TableRow key={key}>
+                                                <TableCell className="flex items-center gap-x-2">
+                                                    <TenantColumn
+                                                        name={user.name}
+                                                        email={user.email}
                                                     />
-                                                </button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuLabel>
-                                                    Actions
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onSelect={(e) => {
-                                                        e.preventDefault();
-                                                        handleOpenBookingEdit(
-                                                            booking,
-                                                        );
-                                                    }}
-                                                >
-                                                    Edit Booking
-                                                </DropdownMenuItem>
-                                                <DeleteAlert
-                                                    handleDelete={() =>
-                                                        handleBookingDelete(
-                                                            booking.id,
-                                                        )
-                                                    }
-                                                    message="Are you sure to Delete this booking?"
-                                                >
-                                                    <DropdownMenuItem
-                                                        disabled={
-                                                            booking.status ===
-                                                                "active" ||
-                                                            booking.status ===
-                                                                "pending" ||
-                                                            booking.unpaid_bills_count >
-                                                                0
+                                                </TableCell>
+                                                <TableCell className="">
+                                                    <RoomColumn
+                                                        room_number={
+                                                            room?.room_number
                                                         }
-                                                        onSelect={(e) =>
-                                                            e.preventDefault()
-                                                        }
+                                                        house_name={house?.name}
+                                                    />
+                                                </TableCell>
+                                                <TableCell className="">
+                                                    {booking.move_in_date}
+                                                </TableCell>
+                                                <TableCell className="">
+                                                    {booking.move_out_date ? booking.move_out_date : '-'}
+                                                </TableCell>
+                                                <TableCell className="">
+                                                    {booking.total_deposit 
+                                                        ? `₱${booking.total_deposit}`
+                                                        : "-"}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    {unpaid_bills_count}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <span
+                                                        className={`px-2 py-1 rounded-md font-semibold ${statusColor(status)}`}
                                                     >
-                                                        Delete Booking
-                                                    </DropdownMenuItem>
-                                                </DeleteAlert>
-                                                <DropdownMenuItem
-                                                    disabled={
-                                                        booking.status ===
-                                                        "active" || booking.required_deposit > 0
-                                                    }
-                                                    onSelect={(e) => {
-                                                        router.patch(
-                                                            route(
-                                                                "booking.updateStatus",
-                                                                booking.id,
-                                                            ),
-                                                            {
-                                                                status: "active",
-                                                            },
-                                                        );
-                                                    }}
-                                                >
-                                                    Activate Booking
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    disabled={
-                                                        booking.status ===
-                                                            "ended" ||
-                                                        booking.unpaid_bills_count >
-                                                            0
-                                                    }
-                                                    onSelect={(e) => {
-                                                        router.patch(
-                                                            route(
-                                                                "booking.updateStatus",
-                                                                booking.id,
-                                                            ),
-                                                            { status: "ended" },
-                                                        );
-                                                    }}
-                                                >
-                                                    End Booking
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    // disabled={
-                                                    //     booking.status !==
-                                                    //     "active"
-                                                    // }
-                                                    onSelect={(e) => {
-                                                        e.preventDefault();
-                                                        handleOpenDepositCreate(
-                                                            booking,
-                                                        );
-                                                    }}
-                                                >
-                                                    Record Deposit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    disabled={
-                                                        !booking.deposits.length > 0
-                                                    }
-                                                    onSelect={(e) => {
-                                                        e.preventDefault();
-                                                        setOpenDepositHistory(true);
-                                                        setSelectedBookingForDeposit(booking)
-                                                    }}
-                                                >
-                                                    View Deposit History
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                                        {status
+                                                            ? toTitleCase(
+                                                                  status,
+                                                              )
+                                                            : "-"}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger
+                                                            asChild
+                                                        >
+                                                            <button className="px-3 py-1">
+                                                                <EllipsisVertical
+                                                                    className="hover:text-primary"
+                                                                    size={18}
+                                                                />
+                                                            </button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent>
+                                                            <DropdownMenuLabel>
+                                                                Actions
+                                                            </DropdownMenuLabel>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem
+                                                                onSelect={(
+                                                                    e,
+                                                                ) => {
+                                                                    e.preventDefault();
+                                                                    handleOpenBookingEdit(
+                                                                        booking,
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Edit Booking
+                                                            </DropdownMenuItem>
+                                                            <DeleteAlert
+                                                                handleDelete={() =>
+                                                                    handleBookingDelete(
+                                                                        booking.id,
+                                                                    )
+                                                                }
+                                                                message="Are you sure to Delete this booking?"
+                                                            >
+                                                                <DropdownMenuItem
+                                                                    disabled={
+                                                                        status ===
+                                                                            "active" ||
+                                                                        status ===
+                                                                            "pending" ||
+                                                                        unpaid_bills_count >
+                                                                            0
+                                                                    }
+                                                                    onSelect={(
+                                                                        e,
+                                                                    ) =>
+                                                                        e.preventDefault()
+                                                                    }
+                                                                >
+                                                                    Delete
+                                                                    Booking
+                                                                </DropdownMenuItem>
+                                                            </DeleteAlert>
+                                                            <DropdownMenuItem
+                                                                disabled={
+                                                                    status ===
+                                                                        "active" ||
+                                                                    booking.required_deposit >
+                                                                        0
+                                                                }
+                                                                onSelect={(
+                                                                    e,
+                                                                ) => {
+                                                                    router.patch(
+                                                                        route(
+                                                                            "booking.updateStatus",
+                                                                            booking.id,
+                                                                        ),
+                                                                        {
+                                                                            status: "active",
+                                                                        },
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Activate Booking
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                disabled={
+                                                                    status ===
+                                                                        "ended" ||
+                                                                    unpaid_bills_count >
+                                                                        0
+                                                                }
+                                                                onSelect={(
+                                                                    e,
+                                                                ) => {
+                                                                    router.patch(
+                                                                        route(
+                                                                            "booking.updateStatus",
+                                                                            booking.id,
+                                                                        ),
+                                                                        {
+                                                                            status: "ended",
+                                                                        },
+                                                                    );
+                                                                }}
+                                                            >
+                                                                End Booking
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                // disabled={
+                                                                //     booking.status !==
+                                                                //     "active"
+                                                                // }
+                                                                onSelect={(
+                                                                    e,
+                                                                ) => {
+                                                                    e.preventDefault();
+                                                                    handleOpenDepositCreate(
+                                                                        booking,
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Record Deposit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                disabled={
+                                                                    !booking
+                                                                        .deposits
+                                                                        .length >
+                                                                    0
+                                                                }
+                                                                onSelect={(
+                                                                    e,
+                                                                ) => {
+                                                                    e.preventDefault();
+                                                                    setOpenDepositHistory(
+                                                                        true,
+                                                                    );
+                                                                    setSelectedBookingForDeposit(
+                                                                        booking,
+                                                                    );
+                                                                }}
+                                                            >
+                                                                View Deposit
+                                                                History
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </TableRow>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent>
+                                            <div>
+                                                <div>
+                                                    <h2 className="text-center font-bold">
+                                                        {
+                                                            booking.tenant.user
+                                                                .name
+                                                        }
+                                                        's Booking
+                                                    </h2>
+                                                </div>
+                                                {unpaid_bills_count > 0 && (
+                                                    <div>
+                                                        <h3 className="font-bold">
+                                                            Unpaid Bills
+                                                        </h3>
+                                                        <ul>
+                                                            {unpaid_bills.map(
+                                                                (bill) => (
+                                                                    <li>
+                                                                        {toTitleCase(
+                                                                            bill.type,
+                                                                        )}{" "}
+                                                                        - ₱
+                                                                        {
+                                                                            bill.amount
+                                                                        }
+                                                                        {bill.remaining_balance !==
+                                                                        bill.amount
+                                                                            ? `/₱${bill.remaining_balance}`
+                                                                            : ""}
+                                                                    </li>
+                                                                ),
+                                                            )}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </div>

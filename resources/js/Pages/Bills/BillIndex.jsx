@@ -46,6 +46,7 @@ import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
 import PaymentDialog from "@/Components/Dialogs/PaymentDialog";
 import PaymentHistorySheet from "@/Components/Sheets/PaymentHistorySheet";
+import { statusColor, toTitleCase } from "@/utils/general";
 
 export default function BookingIndex({ bills, bookings }) {
     const today = new Date();
@@ -180,7 +181,8 @@ export default function BookingIndex({ bills, bookings }) {
     const [openPayment, setOpenPayment] = useState(false);
     const [openPaymentHistory, setOpenPaymentHistory] = useState(false);
     const [selectedBillForPayment, setSelectedBillForPayment] = useState(null);
-    const [selectedBillForPaymentHistory, setSelectedBillForPaymentHistory] = useState(null);
+    const [selectedBillForPaymentHistory, setSelectedBillForPaymentHistory] =
+        useState(null);
     const {
         data: paymentData,
         setData: setPaymentData,
@@ -254,7 +256,6 @@ export default function BookingIndex({ bills, bookings }) {
         );
     }
 
-
     return (
         <div className="flex flex-col p-4 bg-gray-200">
             <BillDialog
@@ -311,7 +312,9 @@ export default function BookingIndex({ bills, bookings }) {
                                     Property/Room
                                 </TableHead>
                                 <TableHead className="">Type</TableHead>
-                                <TableHead className="">Amount</TableHead>
+                                <TableHead className="">
+                                    Amount/Balance
+                                </TableHead>
                                 <TableHead className="">Bill Date</TableHead>
                                 <TableHead className="">Due Date</TableHead>
                                 <TableHead className="">Status</TableHead>
@@ -319,122 +322,130 @@ export default function BookingIndex({ bills, bookings }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {bills.map((bill, key) => (
-                                <TableRow key={key}>
-                                    <TableCell className="flex items-center gap-x-2">
-                                        <TenantColumn
-                                            name={bill.booking.tenant.user.name}
-                                            email={
-                                                bill.booking.tenant.user.email
-                                            }
-                                        />
-                                    </TableCell>
-                                    <TableCell className="">
-                                        <RoomColumn
-                                            room_number={
-                                                bill.booking?.room?.room_number
-                                            }
-                                            house_name={
-                                                bill.booking?.room?.house?.name
-                                            }
-                                        />
-                                    </TableCell>
-                                    <TableCell className="">
-                                        {bill.type.slice(0, 1).toUpperCase() +
-                                            bill.type.slice(1) ?? "-"}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        ₱{bill.amount ?? "-"}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        {bill.bill_date ?? "-"}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        {bill.due_date ?? "-"}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        {bill.status.slice(0, 1).toUpperCase() +
-                                            bill.status.slice(1) ?? "-"}
-                                    </TableCell>
-                                    <TableCell className="">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <button className="px-3 py-1">
-                                                    <EllipsisVertical
-                                                        className="hover:text-primary"
-                                                        size={18}
-                                                    />
-                                                </button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuLabel>
-                                                    Actions
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onSelect={(e) => {
-                                                        e.preventDefault();
-                                                        handleOpenBillEdit(
-                                                            bill,
-                                                        );
-                                                    }}
-                                                >
-                                                    Edit Booking
-                                                </DropdownMenuItem>
-                                                <DeleteAlert
-                                                    handleDelete={() =>
-                                                        handleDeleteBill(
-                                                            bill.id,
-                                                        )
-                                                    }
-                                                    message="Are you sure to Delete this bill?"
-                                                >
+                            {bills.map((bill, key) => {
+                                const status = bill.booking.status;
+                                const user = bill.booking?.tenant.user;
+                                const room = bill.booking?.room;
+                                const house = room?.house;
+                                return (
+                                    <TableRow key={key}>
+                                        <TableCell className="flex items-center gap-x-2">
+                                            <TenantColumn
+                                                name={user.name}
+                                                email={user.email}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <RoomColumn
+                                                room_number={room?.room_number}
+                                                house_name={house?.name}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="">
+                                            {toTitleCase(bill.type)}
+                                        </TableCell>
+                                        <TableCell className="">
+                                            ₱{bill.amount}/
+                                            {bill.remaining_balance}
+                                        </TableCell>
+                                        <TableCell className="">
+                                            {bill.bill_date}
+                                        </TableCell>
+                                        <TableCell className="">
+                                            {bill.due_date}
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <span
+                                                className={`px-2 py-1 rounded-md font-semibold ${statusColor(status)}`}
+                                            >
+                                                {status
+                                                    ? toTitleCase(status)
+                                                    : "-"}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <button className="px-3 py-1">
+                                                        <EllipsisVertical
+                                                            className="hover:text-primary"
+                                                            size={18}
+                                                        />
+                                                    </button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuLabel>
+                                                        Actions
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onSelect={(e) => {
+                                                            e.preventDefault();
+                                                            handleOpenBillEdit(
+                                                                bill,
+                                                            );
+                                                        }}
+                                                    >
+                                                        Edit Booking
+                                                    </DropdownMenuItem>
+                                                    <DeleteAlert
+                                                        handleDelete={() =>
+                                                            handleDeleteBill(
+                                                                bill.id,
+                                                            )
+                                                        }
+                                                        message="Are you sure to Delete this bill?"
+                                                    >
+                                                        <DropdownMenuItem
+                                                            disabled={
+                                                                status ===
+                                                                    "active" ||
+                                                                status ===
+                                                                    "pending" ||
+                                                                bill.unpaid_bills_count >
+                                                                    0
+                                                            }
+                                                            onSelect={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                        >
+                                                            Delete Booking
+                                                        </DropdownMenuItem>
+                                                    </DeleteAlert>
+
                                                     <DropdownMenuItem
                                                         disabled={
-                                                            bill.status ===
-                                                                "active" ||
-                                                            bill.status ===
-                                                                "pending" ||
-                                                            bill.unpaid_bills_count >
-                                                                0
+                                                            status === "paid"
                                                         }
-                                                        onSelect={(e) =>
-                                                            e.preventDefault()
-                                                        }
+                                                        onSelect={(e) => {
+                                                            e.preventDefault();
+                                                            handleOpenPayment(
+                                                                bill,
+                                                            );
+                                                        }}
                                                     >
-                                                        Delete Booking
+                                                        Record Payment
                                                     </DropdownMenuItem>
-                                                </DeleteAlert>
-
-                                                <DropdownMenuItem
-                                                    disabled={
-                                                        bill.status === "paid"
-                                                    }
-                                                    onSelect={(e) => {
-                                                        e.preventDefault();
-                                                        handleOpenPayment(bill);
-                                                    }}
-                                                >
-                                                    Record Payment
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    disabled={
-                                                        !bill.payments?.length
-                                                    }
-                                                    onSelect={(e) => {
-                                                        e.preventDefault();
-                                                        handleOpenPaymentHistory(
-                                                            bill,
-                                                        );
-                                                    }}
-                                                >
-                                                    View Payment History
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                                    <DropdownMenuItem
+                                                        disabled={
+                                                            !bill.payments
+                                                                ?.length
+                                                        }
+                                                        onSelect={(e) => {
+                                                            e.preventDefault();
+                                                            handleOpenPaymentHistory(
+                                                                bill,
+                                                            );
+                                                        }}
+                                                    >
+                                                        View Payment History
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </div>
