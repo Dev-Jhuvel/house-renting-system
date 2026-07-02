@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
+use App\Models\Traits\OwnedByUser;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class House extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
     protected $fillable = [
         'user_id',
         'name',
@@ -28,11 +30,15 @@ class House extends Model
         'deleted_at',
     ];
 
-    public function owner(){
+    public function user(){
         return $this->belongsTo(User::class);
     }
 
     public function rooms(){
         return $this->hasMany(Room::class);
+    }
+
+    protected function ownershipPath(): ?string{
+        return null;
     }
 }

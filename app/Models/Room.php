@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
+use App\Models\Traits\OwnedByUser;
 use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
     protected $fillable = [
         'house_id',
         'room_number',
@@ -32,5 +33,9 @@ class Room extends Model
 
     public function house(){
         return $this->belongsTo(House::class);
+    }
+
+    protected function ownershipPath(): string{
+        return 'house';
     }
 }

@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
+use App\Models\Traits\OwnedByUser;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
     protected $fillable = [
         'tenant_id',
         'room_id',
@@ -70,7 +71,11 @@ class Booking extends Model
     public function getTotalDepositAttribute()
     {
         $received   =  $this->deposits->where('type', 'received')->sum('amount');
-        $deduction  =  $this->deposits->whereIn('type', ['refunded', 'forfeited', 'forfeited',])->sum('amount');
+        $deduction  =  $this->deposits->whereIn('type', ['refunded', 'forfeited', 'forfeited', 'applied'])->sum('amount');
         return $received - $deduction;
+    }
+
+    protected function ownershipPath(): string{
+        return 'room.house';
     }
 }

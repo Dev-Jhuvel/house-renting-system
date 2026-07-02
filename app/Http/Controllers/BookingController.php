@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Tenant;
@@ -14,7 +15,8 @@ class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with(['tenant.user', 'room.house', 'deposits'])->withCount('unpaid_bills')->latest()->get();
+        $auth_id = Auth::id();
+        $bookings = Booking::ownedBy($auth_id)->with(['tenant.user', 'room.house', 'deposits'])->withCount('unpaid_bills')->latest()->get();
         $tenants = Tenant::with('user', 'booking')->get()->map(function ($item) {
             return [
                 'label'     => $item->user->name,
@@ -23,7 +25,7 @@ class BookingController extends Controller
             ];
         })->sortBy('label')->values();
 
-        $rooms = Room::orderBy('room_number')->get()->map(function ($item) {
+        $rooms = Room::ownedBy($auth_id)->orderBy('room_number')->get()->map(function ($item) {
             return [
                 'label'     => $item->room_number,
                 'value'     => $item->id,
@@ -39,17 +41,10 @@ class BookingController extends Controller
         return Inertia::render('Bookings/BookingIndex', $data);
     }
 
-    public function store(Request $request)
+    public function store(StoreBookingRequest $request)
     {
-        $validated = $request->validate([
-            'tenant_id'             => 'required|uuid',
-            'room_id'               => 'required|uuid',
-            'move_in_date'          => 'required|date',
-            'move_out_date'         => 'nullable|date',
-            // 'due_day'              => 'required|numeric',
-            'notes'                  => 'string',
-            'status'                => 'required|in:active,ended,pending,canceled'
-        ]);
+        $validated = $request->validated();
+        $validated['status'] = 'pending';
 
         DB::transaction(function () use ($validated) {
             $booking = Booking::create($validated);
@@ -121,6 +116,12 @@ class BookingController extends Controller
         ]);
 
         DB::transaction(function () use ($booking, $validated) {
+            $today = now()->toDateString();
+            
+            if($validated['status'] === 'ended'){
+                $validated['move_out_date'] = $today;
+            }
+
             $booking->update($validated);
 
             if($validated['status'] === 'active'){
@@ -128,7 +129,7 @@ class BookingController extends Controller
                     'type' => 'rent',
                     'title' => $booking->tenant->user->name. " Rent Bill ".now()->format('F Y'),
                     'amount' => $booking->room->monthly_rent,
-                    'bill_date' => now()->toDateString(),
+                    'bill_date' => $today,
                     'due_date'  => now()->day($booking->due_day)->toDateString(),
                     'status'    => 'unpaid',
                 ]);

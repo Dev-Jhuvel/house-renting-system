@@ -11,7 +11,7 @@ class RoomController extends Controller
 {
     // public function index()
     // {
-    //     $Rooms = Room::with('owner')->latest()->get();
+    //     $Rooms = Room::with('user')->latest()->get();
     //     return Inertia::render('Rooms/RoomIndex', ['Rooms' => $rooms]);
     // }
 

@@ -13,7 +13,8 @@ class TenantController extends Controller
 {
     public function index()
     {
-        $tenants = Tenant::with(['user', 'booking.room.house', 'booking.bills.payments'])
+        $auth_id = Auth::id();
+        $tenants = Tenant::ownedBy($auth_id)->with(['user', 'booking.room.house', 'booking.bills.payments'])
         ->get()
         ->sortBy('user.name')
         ->values();

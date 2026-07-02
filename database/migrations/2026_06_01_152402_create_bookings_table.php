@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignUuid('tenant_id')->constrained()->cascadeOnDelete();
             $table->date('move_in_date');
             $table->date('move_out_date')->nullable();
-            $table->decimal('deposit_amount', 8, 2)->default(0);
             $table->unsignedTinyInteger('due_day')->default(1);
             $table->enum('status', ['pending', 'active', 'ended', 'canceled'])->default('pending');
             $table->text('notes')->nullable();

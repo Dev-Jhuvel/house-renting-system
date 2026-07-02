@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import { toOrdinal } from "../../utils/general.js";
+import { statusColor, toOrdinal } from "../../utils/general.js";
 import { Link, useForm } from "@inertiajs/react";
 import { ArrowRight, DoorClosed, Layers2, PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -85,7 +85,7 @@ function RoomCard({ room }) {
             <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
             <Badge
                 variant="outline"
-                className={`absolute z-30 right-5 top-5 rounded-sm ${!maintenanceRoom ? "bg-green-300" : "bg-gray-300"}`}
+                className={`absolute z-30 right-5 top-5 rounded-sm ${statusColor(room.status)}`}
             >
                 {room.status.toUpperCase()}
             </Badge>

@@ -210,6 +210,28 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
         );
     }
 
+    const bookingActions = (booking) => {
+        const {
+            status,
+            unpaid_bills_count,
+            required_deposit,
+            total_deposit,
+            deposits,
+        } = booking;
+
+        // # think of when I can do this action
+        return {
+            canDelete: status === "pending" && unpaid_bills_count === 0,
+            canActivate:
+                status === "pending" && total_deposit >= required_deposit,
+            canEnd: status === "active" && unpaid_bills_count === 0,
+            canCancel: status === "pending",
+            canEdit: status !== "ended" && status !== "canceled",
+            canRecordDeposit: status !== "ended" && status !== "canceled",
+            canViewDeposit: deposits.length > 0,
+        };
+    };
+
     return (
         <div className="flex flex-col p-4 bg-gray-200">
             <div className="flex mb-4">
@@ -246,6 +268,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                         rooms={rooms}
                         tenants={tenants}
                         method={selectedBooking ? "Update" : "Create"}
+                        status={selectedBooking ? selectedBooking.status : null}
                     >
                         <Button
                             className="px-3 py-1 flex items-center"
@@ -293,6 +316,8 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                 const house = room?.house;
                                 const unpaid_bills_count =
                                     booking.unpaid_bills_count;
+                                const status_color = statusColor(status);
+                                const actions = bookingActions(booking);
                                 return (
                                     <HoverCard>
                                         <HoverCardTrigger asChild>
@@ -315,25 +340,19 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                     {booking.move_in_date}
                                                 </TableCell>
                                                 <TableCell className="">
-                                                    {booking.move_out_date ? booking.move_out_date : '-'}
-                                                </TableCell>
-                                                <TableCell className="">
-                                                    {booking.total_deposit 
-                                                        ? `₱${booking.total_deposit}`
+                                                    {booking.move_out_date
+                                                        ? booking.move_out_date
                                                         : "-"}
                                                 </TableCell>
+                                                <TableCell className="">{`₱${booking.total_deposit}`}</TableCell>
                                                 <TableCell className="text-center">
                                                     {unpaid_bills_count}
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <span
-                                                        className={`px-2 py-1 rounded-md font-semibold ${statusColor(status)}`}
+                                                        className={`px-2 py-1 rounded-md font-semibold ${status_color}`}
                                                     >
-                                                        {status
-                                                            ? toTitleCase(
-                                                                  status,
-                                                              )
-                                                            : "-"}
+                                                        {toTitleCase(status)}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="">
@@ -354,6 +373,9 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                             </DropdownMenuLabel>
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem
+                                                                disabled={
+                                                                    !actions.canEdit
+                                                                }
                                                                 onSelect={(
                                                                     e,
                                                                 ) => {
@@ -375,12 +397,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                             >
                                                                 <DropdownMenuItem
                                                                     disabled={
-                                                                        status ===
-                                                                            "active" ||
-                                                                        status ===
-                                                                            "pending" ||
-                                                                        unpaid_bills_count >
-                                                                            0
+                                                                        !actions.canDelete
                                                                     }
                                                                     onSelect={(
                                                                         e,
@@ -394,10 +411,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                             </DeleteAlert>
                                                             <DropdownMenuItem
                                                                 disabled={
-                                                                    status ===
-                                                                        "active" ||
-                                                                    booking.required_deposit >
-                                                                        0
+                                                                    !actions.canActivate
                                                                 }
                                                                 onSelect={(
                                                                     e,
@@ -417,10 +431,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 disabled={
-                                                                    status ===
-                                                                        "ended" ||
-                                                                    unpaid_bills_count >
-                                                                        0
+                                                                    !actions.canEnd
                                                                 }
                                                                 onSelect={(
                                                                     e,
@@ -439,10 +450,29 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                                 End Booking
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
-                                                                // disabled={
-                                                                //     booking.status !==
-                                                                //     "active"
-                                                                // }
+                                                                disabled={
+                                                                    !actions.canCancel
+                                                                }
+                                                                onSelect={(
+                                                                    e,
+                                                                ) => {
+                                                                    router.patch(
+                                                                        route(
+                                                                            "booking.updateStatus",
+                                                                            booking.id,
+                                                                        ),
+                                                                        {
+                                                                            status: "canceled",
+                                                                        },
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Cancel Booking
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                disabled={
+                                                                    !actions.canRecordDeposit
+                                                                }
                                                                 onSelect={(
                                                                     e,
                                                                 ) => {
@@ -456,10 +486,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 disabled={
-                                                                    !booking
-                                                                        .deposits
-                                                                        .length >
-                                                                    0
+                                                                    !actions.canViewDeposit
                                                                 }
                                                                 onSelect={(
                                                                     e,
@@ -485,11 +512,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                             <div>
                                                 <div>
                                                     <h2 className="text-center font-bold">
-                                                        {
-                                                            booking.tenant.user
-                                                                .name
-                                                        }
-                                                        's Booking
+                                                        {`${user.name}'s Booking`}
                                                     </h2>
                                                 </div>
                                                 {unpaid_bills_count > 0 && (
@@ -500,17 +523,14 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                         <ul>
                                                             {unpaid_bills.map(
                                                                 (bill) => (
-                                                                    <li>
-                                                                        {toTitleCase(
-                                                                            bill.type,
-                                                                        )}{" "}
-                                                                        - ₱
-                                                                        {
-                                                                            bill.amount
+                                                                    <li
+                                                                        key={
+                                                                            bill.id
                                                                         }
-                                                                        {bill.remaining_balance !==
-                                                                        bill.amount
-                                                                            ? `/₱${bill.remaining_balance}`
+                                                                    >
+                                                                        {toTitleCase(`${bill.type} - ₱${bill.remaining_balance}`)}
+                                                                        {bill.status == 'partial'
+                                                                            ? `/₱${bill.amount}`
                                                                             : ""}
                                                                     </li>
                                                                 ),

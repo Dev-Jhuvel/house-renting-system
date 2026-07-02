@@ -7,25 +7,39 @@ use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
+        $auth_id = Auth::user()->id;
         # Tenants
-        $active_tenants = Tenant::where('status', 'active')->count();
-        $total_tenants = Tenant::count();
-        $t_occupancy_rate = $total_tenants > 0 ? round(($active_tenants/ $total_tenants) * 100, 2) :  0;
+        $tenants_count = Tenant::ownedBy($auth_id)
+        ->selectRaw("COUNT(*) AS total, SUM(status = 'active') AS active")
+        ->first();
+
+        $total_tenants      = (int) $tenants_count->total;
+        $active_tenants     = (int) $tenants_count->active;
+        $t_occupancy_rate   = $total_tenants > 0 ? round(($active_tenants / $total_tenants) * 100, 2) :  0;
 
         # Rooms
-        $occupied_rooms = Room::where('status', 'occupied')->count();
-        $total_rooms = Room::count();
-        $r_occupancy_rate = $total_rooms > 0 ? round(($occupied_rooms/ $total_rooms) * 100, 2) :  0;
+        $room_count = Room::ownedBy($auth_id)
+        ->selectRaw("COUNT(*) AS total, SUM(status = 'occupied') AS occupied")
+        ->first();
+
+        $total_rooms        = (int) $room_count->total;
+        $occupied_rooms     = (int) $room_count->occupied;
+        $r_occupancy_rate   = $total_rooms > 0 ? round(($occupied_rooms / $total_rooms) * 100, 2) :  0;
 
         # Revenue
-        $total_unpaid_bills = Bill::where('status', 'unpaid')->sum('amount');
-        $total_revenue = Payment::sum('amount_paid');
+        $total_unpaid_bills = Bill::ownedBy($auth_id)
+        ->where('status', 'unpaid')->sum('amount');
+
+        $total_revenue = Payment::ownedBy($auth_id)
+        ->sum('amount_paid');
 
         $data = [
             'tenants' => [

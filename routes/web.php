@@ -22,8 +22,9 @@ Route::get('/', function () {
     ]);
 });
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:landlord,admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -34,7 +35,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('bookings', BookingController::class);
     Route::resource('bills', BillController::class);
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::patch('bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('booking.updateStatus');
 

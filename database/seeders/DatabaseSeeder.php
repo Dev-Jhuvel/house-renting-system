@@ -187,7 +187,7 @@ class DatabaseSeeder extends Seeder
                 'emergency_contact' => 'Parent',
                 'id_type'           => 'National ID',
                 'id_number'         => 'NID-' . rand(10000, 99999),
-                'status'            => 'active',
+                'status'            => 'pending',
             ]);
         }
     }

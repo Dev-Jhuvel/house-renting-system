@@ -27,8 +27,10 @@ export default function BookingDialog({
     children,
     tenants,
     rooms,
+    status,
 }) {
     const process = method === "Create" ? "Creating..." : "Updating...";
+    const activated = status === 'active';
     const booking_status = ["Active", "Pending", "Ended", "Canceled"];
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -51,6 +53,7 @@ export default function BookingDialog({
                                 name="move_in_date"
                                 onChange={handleChange}
                                 value={form.move_in_date}
+                                disabled={activated}
                                 error={errors.move_in_date}
                                 className="col-span-4"
                             />
@@ -70,7 +73,7 @@ export default function BookingDialog({
                                 value={form.tenant_id}
                                 options={tenants}
                                 onChange={handleChange}
-                                disabled={method === "Update"}
+                                disabled={activated}
                                 placeholder="Select Tenant Type"
                                 error={errors.tenant_id}
                                 className="col-span-4"
@@ -82,12 +85,12 @@ export default function BookingDialog({
                                 value={form.room_id}
                                 options={rooms}
                                 onChange={handleChange}
-                                disabled={method === "Update"}
+                                disabled={activated}
                                 placeholder="Select Room"
                                 error={errors.room_id}
                                 className="col-span-4"
                             />
-                            {method === "Update" && (
+                            {/* {method === "Update" && (
                                 <InputSelect
                                     name="status"
                                     id="status"
@@ -99,7 +102,7 @@ export default function BookingDialog({
                                     error={errors.status}
                                     className="col-span-4"
                                 />
-                            )}
+                            )} */}
                             <InputWithLabel
                                 label="Notes"
                                 id="notes"

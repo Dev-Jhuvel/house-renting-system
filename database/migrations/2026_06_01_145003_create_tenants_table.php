@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('emergency_contact')->nullable();
             $table->string('id_type')->nullable();
             $table->string('id_number')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['active', 'inactive', 'pending'])->default('pending');
             $table->softDeletes();
             $table->timestamps();
         });

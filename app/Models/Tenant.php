@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
+use App\Models\Traits\OwnedByUser;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
 class Tenant extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
     protected $fillable = [
         'user_id',
         'phone',
@@ -31,5 +33,9 @@ class Tenant extends Model
         return $this->hasOne(Booking::class)
         ->whereIn('status',['active', 'pending'])
         ->latest();
+    }
+
+    protected function ownershipPath(): string{
+        return 'booking.room.house';
     }
 }

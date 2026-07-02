@@ -11,7 +11,8 @@ class HouseController extends Controller
 {
     public function index()
     {
-        $houses = House::with('owner')->withCount('rooms')->orderBy('name')->get();
+        $auth_id = Auth::id();
+        $houses = House::ownedBy($auth_id)->withCount('rooms')->orderBy('name')->get();
         return Inertia::render('Houses/HouseIndex', ['houses' => $houses]);
     }
 

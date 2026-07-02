@@ -312,9 +312,8 @@ export default function BookingIndex({ bills, bookings }) {
                                     Property/Room
                                 </TableHead>
                                 <TableHead className="">Type</TableHead>
-                                <TableHead className="">
-                                    Amount/Balance
-                                </TableHead>
+                                <TableHead className="">Amount</TableHead>
+                                <TableHead className="">Balance</TableHead>
                                 <TableHead className="">Bill Date</TableHead>
                                 <TableHead className="">Due Date</TableHead>
                                 <TableHead className="">Status</TableHead>
@@ -323,7 +322,7 @@ export default function BookingIndex({ bills, bookings }) {
                         </TableHeader>
                         <TableBody>
                             {bills.map((bill, key) => {
-                                const status = bill.booking.status;
+                                const status = bill.status;
                                 const user = bill.booking?.tenant.user;
                                 const room = bill.booking?.room;
                                 const house = room?.house;
@@ -345,8 +344,10 @@ export default function BookingIndex({ bills, bookings }) {
                                             {toTitleCase(bill.type)}
                                         </TableCell>
                                         <TableCell className="">
-                                            ₱{bill.amount}/
-                                            {bill.remaining_balance}
+                                            ₱{bill.amount}
+                                        </TableCell>
+                                        <TableCell className="">
+                                            ₱{bill.remaining_balance}
                                         </TableCell>
                                         <TableCell className="">
                                             {bill.bill_date}

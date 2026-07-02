@@ -20,6 +20,7 @@ export default function DatePicker({
     onChange,
     error,
     className,
+    disabled,
 }) {
     const date_object = value ? new Date(value) : undefined;
     return (
@@ -28,14 +29,15 @@ export default function DatePicker({
             <Popover modal={true}>
                 <PopoverTrigger asChild>
                     <Button
+                        disabled={disabled}
                         variant={"outline"}
                         className={cn(
                             "w-full justify-start text-left font-normal",
                             !value && "text-muted-foreground",
                         )}  
                     >
-                        <CalendarIcon />
-                        {date_object ? format(date_object, "PPP") : <span>Pick a date</span>}
+                        <CalendarIcon className="text-black" />
+                        {date_object ? format(date_object, "PPP") : <span className="text-black">Pick a date</span>}
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">

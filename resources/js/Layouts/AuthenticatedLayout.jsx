@@ -2,6 +2,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
+import RoleGate from "@/Components/RoleGate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import {
     Sidebar,
@@ -16,9 +17,17 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/Components/ui/sidebar";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/Components/ui/sonner";
-import { Link, usePage } from "@inertiajs/react";
-import { Banknote, House, HousePlus, Layers2, LayoutDashboard, NotepadText, Settings, Users } from "lucide-react";
+import { Link, router, usePage } from "@inertiajs/react";
+import { Banknote, EllipsisVertical, House, HousePlus, Layers2, LayoutDashboard, NotepadText, Settings, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -30,13 +39,13 @@ export default function AuthenticatedLayout({ header, children }) {
         useState(false);
 
     const links = [
-        { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-        { routeLink: "houses.index", label: "House", icon: HousePlus },
-        { routeLink: "houses.index", label: "Floors and Room", icon: Layers2 },
-        { routeLink: "tenants.index", label: "Tenants", icon: Users },
-        { routeLink: "bookings.index", label: "Booking", icon: NotepadText },
-        { routeLink: "bills.index", label: "Bills & Payment", icon: Banknote },
-        { routeLink: "houses.index", label: "Settings", icon: Settings },
+        { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard, auth: ['admin', 'landlord'] },
+        { routeLink: "houses.index", label: "House", icon: HousePlus, auth: ['admin', 'landlord'] },
+        { routeLink: "houses.index", label: "Floors and Room", icon: Layers2, auth: ['admin', 'landlord'] },
+        { routeLink: "tenants.index", label: "Tenants", icon: Users, auth: ['admin', 'landlord'] },
+        { routeLink: "bookings.index", label: "Booking", icon: NotepadText, auth: ['admin', 'landlord'] },
+        { routeLink: "bills.index", label: "Bills & Payment", icon: Banknote, auth: ['admin', 'landlord'] },
+        { routeLink: "houses.index", label: "Settings", icon: Settings, auth: ['admin', 'landlord'] },
     ];
 
     useEffect(() => {
@@ -69,6 +78,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     <SidebarContent>
                         <SidebarGroup>
                             <SidebarGroupContent>
+                                 <RoleGate asChild allow={['admin', 'landlord']}>
                                 <SidebarMenu>
                                     <SidebarMenuItem className="space-y-1">
                                         {links &&
@@ -103,6 +113,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             )}
                                     </SidebarMenuItem>
                                 </SidebarMenu>
+                                </RoleGate>
                             </SidebarGroupContent>
                         </SidebarGroup>
                     </SidebarContent>
@@ -132,6 +143,27 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 {user.email}
                                             </span>
                                         </div>
+                                         <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <button className="px-3 py-1">
+                                                        <EllipsisVertical
+                                                            className="hover:text-primary"
+                                                            size={18}
+                                                        />
+                                                    </button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuItem
+                                                        onSelect={(e) => {
+                                                            e.preventDefault();
+                                                            router.post("logout")
+                                                        }}
+                                                    >
+                                                        Logout
+                                                    </DropdownMenuItem>
+                                                   
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                     </div>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

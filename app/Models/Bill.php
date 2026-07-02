@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
+use App\Models\Traits\OwnedByUser;
 use Illuminate\Database\Eloquent\Model;
 
 class Bill extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
     protected $fillable = [
         'booking_id',
         'type',
@@ -38,4 +39,8 @@ class Bill extends Model
     public function getRemainingBalanceAttribute(){
         return $this->amount - $this->payments()->sum('amount_paid');
     }   
+
+    protected function ownershipPath(): string{
+        return 'booking.room.house';
+    }
 }

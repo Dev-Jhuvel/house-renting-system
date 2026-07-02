@@ -12,8 +12,9 @@ class BillController extends Controller
 {
     public function index()
     {
-        $bills = Bill::with(['booking.room.house', 'booking.tenant.user', 'payments'])->latest()->get();
-        $bookings = Booking::with('tenant.user')->where('status', 'active')->get()->map(function ($item) {
+        $auth_id = Auth::id();
+        $bills = Bill::ownedBy($auth_id)->with(['booking.room.house', 'booking.tenant.user', 'payments'])->latest()->get();
+        $bookings = Booking::ownedBy($auth_id)->with('tenant.user')->where('status', 'active')->get()->map(function ($item) {
             return [
                 'label'     => $item->tenant->user->name.' - '.$item->created_at->format('F Y'),
                 'value'     => $item->id,

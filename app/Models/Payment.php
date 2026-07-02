@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
+use App\Models\Traits\OwnedByUser;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
 
     protected $fillable = [
         'bill_id',
@@ -22,5 +23,9 @@ class Payment extends Model
 
     public function bill(){
         return $this->belongsTo(Bill::class);
+    }
+
+    protected function ownershipPath(): string{
+        return 'bill.booking.room.house';
     }
 }
