@@ -13,6 +13,7 @@ class TenantController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Tenant::class);
         $auth_id = Auth::id();
         $tenants = Tenant::ownedBy($auth_id)->with(['user', 'booking.room.house', 'booking.bills.payments'])
         ->get()
@@ -23,6 +24,8 @@ class TenantController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Tenant::class);
+
         $validated = $request->validate([
             'name'                  => 'required|string',
             'email'                 => 'required|email|unique:users,email',
@@ -57,6 +60,8 @@ class TenantController extends Controller
 
     public function show(Tenant $tenant)
     {
+        $this->authorize('view', $tenant);
+
         $tenant
             ->loadCount([
                 'rooms',
@@ -71,9 +76,11 @@ class TenantController extends Controller
 
     public function update(Request $request, Tenant $tenant)
     {
+        $this->authorize('update', $tenant);
+
         $validated = $request->validate([
             'name'                  => 'required|string',
-            'email'                 => 'required|email|unique:users,email,'.$tenant->email,
+            'email'                 => 'required|email|unique:users,email,'.$tenant->id,
             // 'password'              => 'required|confirmed',
             'phone'                 => 'required|string|unique:tenants,phone,'.$tenant->phone,
             'address'               => 'required|string',
@@ -103,6 +110,8 @@ class TenantController extends Controller
 
     public function destroy(Tenant $tenant)
     {
+        $this->authorize('delete', $tenant);
+
         $tenant->delete();
         return redirect()->route('tenants.index')->with('success', 'Tenant deleted successfully!');
     }

@@ -11,6 +11,8 @@ class HouseController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', House::class);
+
         $auth_id = Auth::id();
         $houses = House::ownedBy($auth_id)->withCount('rooms')->orderBy('name')->get();
         return Inertia::render('Houses/HouseIndex', ['houses' => $houses]);
@@ -18,6 +20,8 @@ class HouseController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', House::class);
+
         $validated = $request->validate([
             'name'          => 'required|string',
             'address'       => 'required|string',
@@ -39,6 +43,8 @@ class HouseController extends Controller
 
     public function show(House $house)
     {
+        $this->authorize('view', $house);
+
         $house
             ->loadCount([
                 'rooms',
@@ -53,6 +59,8 @@ class HouseController extends Controller
 
     public function update(Request $request, House $house)
     {
+        $this->authorize('update', $house);
+
         $validated = $request->validate([
             'name'          => 'required|string',
             'address'       => 'required|string',

@@ -17,6 +17,7 @@ class RoomController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Room::class);
         $validated = $request->validate([
             'room_number'   => 'required|string|unique:rooms,room_number',
             'description'   => 'required|string',
@@ -37,11 +38,15 @@ class RoomController extends Controller
 
     public function show(Room $room)
     {
+        $this->authorize('view', $room);
+
         return Inertia::render('Rooms/RoomShow', ['room' => $room->load('booking')]);
     }
 
     public function update(Request $request, Room $room)
     {
+        $this->authorize('update', $room);
+
         $validated = $request->validate([
             'room_number'   => 'required|string|unique:rooms,room_number,'.$room->id,
             'description'   => 'required|string',
@@ -60,6 +65,8 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
+        $this->authorize('delete', $room);
+
         $house_id = $room->house_id;
         $room->delete();
         return redirect()->route('houses.show', $house_id)->with('success', 'Room deleted successfully!');

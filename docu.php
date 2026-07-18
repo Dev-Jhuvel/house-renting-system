@@ -6,4 +6,6 @@
 #TODO: setting - add a setting if monthly booking or one booking
 #TODO: setting - remove the status selection in dialogs
 #TODO: booking show - Vivian
+#TODO: add form validation to all Controller
+#TODO: have a Controller, Service, Repository Layers
  

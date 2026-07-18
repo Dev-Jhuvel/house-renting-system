@@ -1,3 +1,4 @@
+import { useSidebar } from "@/components/ui/sidebar";
 import AddCard from "@/Components/AddCard";
 import RoomDialog from "@/Components/Dialogs/RoomDialog.jsx";
 import { Badge } from "@/Components/ui/badge";
@@ -12,7 +13,7 @@ import {
 import { statusColor, toOrdinal } from "../../utils/general.js";
 import { Link, useForm } from "@inertiajs/react";
 import { ArrowRight, DoorClosed, Layers2, PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 export default function RoomSection({ rooms, house }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         house_id: house.id,
@@ -24,6 +25,8 @@ export default function RoomSection({ rooms, house }) {
         capacity: "",
         monthly_rent: "",
     });
+
+    const { state } = useSidebar();
 
     const [open, setOpen] = useState(false);
 
@@ -44,6 +47,10 @@ export default function RoomSection({ rooms, house }) {
             [name]: type === "number" && value !== "" ? parseFloat(value) || 0 : value,
         }));
     }
+
+    useEffect(() =>{
+        console.log(state);
+    }, [state])
     return (
         <div className="p-4 bg-gray-100 rounded-md border">
             <div className="flex justify-between items-center mb-2">
@@ -67,7 +74,7 @@ export default function RoomSection({ rooms, house }) {
                     </Button>
                 </RoomDialog>
             </div>
-            <div className="grid grid-cols-3 gap-8 p-4">
+            <div className={`grid ${state === 'collapsed' ? 'grid-cols-4' : 'grid-cols-3'} gap-8 p-4`}>
                 {rooms &&
                     rooms.map((room, key) => (
                         <RoomCard key={key} room={room} />

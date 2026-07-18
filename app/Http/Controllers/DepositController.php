@@ -29,6 +29,8 @@ class DepositController extends Controller
      */
     public function store(Request $request, Booking $booking)
     {
+        $this->authorize('create', $booking);
+
 
         $validated = $request->validate([
             'amount'           => 'required|numeric|min:0.01',
@@ -71,6 +73,8 @@ class DepositController extends Controller
      */
     public function destroy(Deposit $deposit)
     {
+        $this->authorize('delete', $deposit);
+
         $deposit->delete();
 
         return redirect()->back()->with('success', 'Deposit deleted.');

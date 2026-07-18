@@ -15,6 +15,8 @@ class BookingController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Booking::class);
+
         $auth_id = Auth::id();
         $bookings = Booking::ownedBy($auth_id)->with(['tenant.user', 'room.house', 'deposits'])->withCount('unpaid_bills')->latest()->get();
         $tenants = Tenant::with('user', 'booking')->get()->map(function ($item) {
@@ -43,6 +45,8 @@ class BookingController extends Controller
 
     public function store(StoreBookingRequest $request)
     {
+        $this->authorize('create', Booking::class);
+
         $validated = $request->validated();
         $validated['status'] = 'pending';
 
@@ -72,6 +76,7 @@ class BookingController extends Controller
 
     public function update(Request $request, Booking $booking)
     {
+        $this->authorize('update', $booking);
 
         $validated = $request->validate([
             'tenant_id'             => 'required|uuid',
@@ -90,6 +95,7 @@ class BookingController extends Controller
 
     public function destroy(Booking $booking)
     {
+        $this->authorize('delete', $booking);
 
         DB::transaction(function () use ($booking) {
             $this->updateRoom($booking);

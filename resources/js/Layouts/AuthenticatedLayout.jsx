@@ -170,8 +170,10 @@ export default function AuthenticatedLayout({ header, children }) {
                         </SidebarMenu>
                     </SidebarFooter>
                 </Sidebar>
-                <SidebarTrigger />
-                <main className="w-full h-screen">
+                <div className="sticky top-0 z-10 ">
+                    <SidebarTrigger />
+                </div>
+                <main className="w-full h-screen overflow-auto">
                     {children}
                     <Toaster richColors />
                 </main>

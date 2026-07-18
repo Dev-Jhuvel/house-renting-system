@@ -11,6 +11,8 @@ class PaymentController extends Controller
 {
     public function store(Request $request, Bill $bill)
     {
+        $this->authorize('create', $bill);
+
         $validated = $request->validate([
             'amount_paid'      => 'required|numeric|min:0.01|max:'.$bill->remaining_balance,
             'paid_at'          => 'required|date',
@@ -30,6 +32,8 @@ class PaymentController extends Controller
 
     public function destroy(Bill $bill, Payment $payment)
     {
+        $this->authorize('delete', $payment);
+
         DB::transaction(function () use ($payment, $bill) {
             $payment->delete();
 
