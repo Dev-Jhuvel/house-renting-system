@@ -78,41 +78,41 @@ export default function AuthenticatedLayout({ header, children }) {
                     <SidebarContent>
                         <SidebarGroup>
                             <SidebarGroupContent>
-                                 <RoleGate asChild allow={['admin', 'landlord']}>
-                                <SidebarMenu>
-                                    <SidebarMenuItem className="space-y-1">
-                                        {links &&
-                                            links.map(
-                                                (
-                                                    { routeLink, label, icon },
-                                                    key,
-                                                ) => {
-                                                    const Icon = icon;
-                                                    return (
-                                                        <SidebarMenuButton
-                                                            asChild
-                                                            tooltip="label"
-                                                            key={key}
-                                                        >
-                                                            <NavLink
-                                                                href={route(
-                                                                    routeLink,
-                                                                )}
-                                                                active={route().current(
-                                                                    routeLink,
-                                                                )}
+                                <RoleGate asChild allow={['admin', 'landlord']}>
+                                    <SidebarMenu>
+                                        <SidebarMenuItem className="space-y-1">
+                                            {links &&
+                                                links.map(
+                                                    (
+                                                        { routeLink, label, icon },
+                                                        key,
+                                                    ) => {
+                                                        const Icon = icon;
+                                                        return (
+                                                            <SidebarMenuButton
+                                                                asChild
+                                                                tooltip="label"
+                                                                key={key}
                                                             >
-                                                                <Icon className="size-5" />
-                                                                <span className="font-semibold">
-                                                                    {label}
-                                                                </span>
-                                                            </NavLink>
-                                                        </SidebarMenuButton>
-                                                    );
-                                                },
-                                            )}
-                                    </SidebarMenuItem>
-                                </SidebarMenu>
+                                                                <NavLink
+                                                                    href={route(
+                                                                        routeLink,
+                                                                    )}
+                                                                    active={route().current(
+                                                                        routeLink,
+                                                                    )}
+                                                                >
+                                                                    <Icon className="size-5" />
+                                                                    <span className="font-semibold">
+                                                                        {label}
+                                                                    </span>
+                                                                </NavLink>
+                                                            </SidebarMenuButton>
+                                                        );
+                                                    },
+                                                )}
+                                        </SidebarMenuItem>
+                                    </SidebarMenu>
                                 </RoleGate>
                             </SidebarGroupContent>
                         </SidebarGroup>
@@ -156,7 +156,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     <DropdownMenuItem
                                                         onSelect={(e) => {
                                                             e.preventDefault();
-                                                            router.post("logout")
+                                                            router.post("/logout")
                                                         }}
                                                     >
                                                         Logout

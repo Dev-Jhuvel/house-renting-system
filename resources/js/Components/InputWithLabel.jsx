@@ -13,6 +13,8 @@ export default function InputWithLabel({
     isTextArea = false,
     type,
     className,
+    disabled,
+    readOnly,
 }) {
     return (
         <div className={className}>
@@ -24,6 +26,8 @@ export default function InputWithLabel({
                     value={value}
                     onChange={onChange}
                     placeholder={placeholder}
+                    disabled={disabled}
+                    readOnly={readOnly}
                 ></Textarea>
             ) : (
                 <Input
@@ -32,6 +36,8 @@ export default function InputWithLabel({
                     value={value}
                     onChange={onChange}
                     placeholder={placeholder}
+                    disabled={disabled}
+                    readOnly={readOnly}
                     type={type}
                     className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />

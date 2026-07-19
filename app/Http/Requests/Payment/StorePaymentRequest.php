@@ -21,8 +21,13 @@ class StorePaymentRequest extends FormRequest
      */
     public function rules(): array
     {
+        $bill = $this->route('bill');
         return [
-            //
+            'amount_paid'      => ['required', 'numeric', 'min:0.01', 'max:'.$bill->remaining_balance],
+            'paid_at'          => ['required', 'date'] ,
+            'method'           => ['required', 'in:cash,gcash,bank_transfer'] ,
+            'reference_number' => ['nullable', 'string'] ,
+            'notes'            => ['nullable', 'string'] ,
         ];
     }
 }

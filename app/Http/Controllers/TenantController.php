@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Tenant\StoreTenantRequest;
+use App\Http\Requests\Tenant\UpdateTenantRequest;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,21 +24,11 @@ class TenantController extends Controller
         return Inertia::render('Tenants/TenantIndex', ['tenants' => $tenants]);
     }
 
-    public function store(Request $request)
+    public function store(StoreTenantRequest $request)
     {
         $this->authorize('create', Tenant::class);
 
-        $validated = $request->validate([
-            'name'                  => 'required|string',
-            'email'                 => 'required|email|unique:users,email',
-            'password'              => 'required|confirmed',
-            'phone'                 => 'required|string|unique:tenants,phone',
-            'address'               => 'required|string',
-            'emergency_contact'     => 'required|string',
-            'id_type'               => 'required|string',
-            'id_number'             => 'required|numeric|unique:tenants,id_number',
-            'status'                => 'required|in:active,inactive'
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated) {
             $user = User::create([
@@ -52,7 +44,6 @@ class TenantController extends Controller
                 'emergency_contact' => $validated['emergency_contact'],
                 'id_type'           => $validated['id_type'],
                 'id_number'         => $validated['id_number'],
-                'status'            => $validated['status'],
             ]);
         });
 
@@ -75,21 +66,11 @@ class TenantController extends Controller
         return Inertia::render('Tenants/TenantShow', ['tenant' => $tenant]);
     }
 
-    public function update(Request $request, Tenant $tenant)
+    public function update(UpdateTenantRequest $request, Tenant $tenant)
     {
         $this->authorize('update', $tenant);
 
-        $validated = $request->validate([
-            'name'                  => 'required|string',
-            'email'                 => 'required|email|unique:users,email,'.$tenant->id,
-            // 'password'              => 'required|confirmed',
-            'phone'                 => 'required|string|unique:tenants,phone,'.$tenant->phone,
-            'address'               => 'required|string',
-            'emergency_contact'     => 'required|string',
-            'id_type'               => 'required|string',
-            'id_number'             => 'required|numeric|unique:tenants,id_number,'.$tenant->id_number,
-            'status'                => 'required|in:active,inactive'
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $tenant) {
             $tenant->user->update([
@@ -102,7 +83,6 @@ class TenantController extends Controller
                 'emergency_contact' => $validated['emergency_contact'],
                 'id_type'           => $validated['id_type'],
                 'id_number'         => $validated['id_number'],
-                'status'            => $validated['status'],
             ]);
         });
 

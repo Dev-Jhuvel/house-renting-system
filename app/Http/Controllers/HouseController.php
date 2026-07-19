@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\House\StoreHouseRequest;
+use App\Http\Requests\House\UpdateHouseRequest;
 use App\Models\House;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,21 +20,11 @@ class HouseController extends Controller
         return Inertia::render('Houses/HouseIndex', ['houses' => $houses]);
     }
 
-    public function store(Request $request)
+    public function store(StoreHouseRequest $request)
     {
         $this->authorize('create', House::class);
 
-        $validated = $request->validate([
-            'name'          => 'required|string',
-            'address'       => 'required|string',
-            'description'   => 'required|string',
-            'city'          => 'required|string',
-            'max_floor'     => 'required|numeric',
-            'max_room'      => 'required|numeric',
-            'water_rate'    => 'required|numeric',
-            'electric_rate' => 'required|numeric',
-            'status'        => 'required|in:active,inactive'
-        ]);
+        $validated = $request->validated();
 
         $validated['user_id'] = Auth::user()->id;
 
@@ -57,21 +49,11 @@ class HouseController extends Controller
         return Inertia::render('Houses/HouseShow', ['house' => $house]);
     }
 
-    public function update(Request $request, House $house)
+    public function update(UpdateHouseRequest $request, House $house)
     {
         $this->authorize('update', $house);
 
-        $validated = $request->validate([
-            'name'          => 'required|string',
-            'address'       => 'required|string',
-            'description'   => 'required|string',
-            'city'          => 'required|string',
-            'max_floor'     => 'required|numeric',
-            'max_room'      => 'required|numeric',
-            'water_rate'    => 'required|numeric',
-            'electric_rate' => 'required|numeric',
-            'status'        => 'required|in:active,inactive'
-        ]);
+        $validated = $request->validated();
 
         $house->update($validated);
 

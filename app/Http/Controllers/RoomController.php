@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Room\StoreRoomRequest;
+use App\Http\Requests\Room\UpdateRoomRequest;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,18 +18,10 @@ class RoomController extends Controller
     //     return Inertia::render('Rooms/RoomIndex', ['Rooms' => $rooms]);
     // }
 
-    public function store(Request $request)
+    public function store(StoreRoomRequest $request)
     {
         $this->authorize('create', Room::class);
-        $validated = $request->validate([
-            'room_number'   => 'required|string|unique:rooms,room_number',
-            'description'   => 'required|string',
-            'house_id'      => 'required|uuid',
-            'floor'         => 'required|numeric',
-            'type'          => 'required|in:single,double,studio,dormitory',
-            'monthly_rent'  => 'required|numeric',
-            'capacity'      => 'required|numeric',
-        ]);
+        $validated = $request->validated();
 
         $validated['user_id']   = Auth::user()->id;
 
@@ -43,20 +37,11 @@ class RoomController extends Controller
         return Inertia::render('Rooms/RoomShow', ['room' => $room->load('booking')]);
     }
 
-    public function update(Request $request, Room $room)
+    public function update(UpdateRoomRequest $request, Room $room)
     {
         $this->authorize('update', $room);
 
-        $validated = $request->validate([
-            'room_number'   => 'required|string|unique:rooms,room_number,'.$room->id,
-            'description'   => 'required|string',
-            'house_id'      => 'required|uuid',
-            'floor'         => 'required|numeric',
-            'type'          => 'required|in:single,double,studio,dormitory',
-            'monthly_rent'  => 'required|numeric',
-            'capacity'      => 'required|numeric',
-            'status'        => 'required|in:available,occupied,reserved,maintenance'
-        ]);
+        $validated = $request->validated();
 
         $room->update($validated);
 
@@ -73,6 +58,8 @@ class RoomController extends Controller
     }
     public function updateRoomStatus(Request $request, Room $room)
     {
+        $this->authorize('update', $room);
+
         $validated = $request->validate([
             'status' => 'required|in:available,occupied,reserved,maintenance'
         ]);

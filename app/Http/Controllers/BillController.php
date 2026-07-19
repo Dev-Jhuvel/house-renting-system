@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Bill\StoreBillRequest;
 use App\Models\Bill;
 use App\Models\Booking;
 use Illuminate\Http\Request;
@@ -28,19 +29,9 @@ class BillController extends Controller
         return Inertia::render('Bills/BillIndex', $data);
     }
 
-    public function store(Request $request)
+    public function store(StoreBillRequest $request)
     {
-        $validated = $request->validate([
-            'type'                  => 'required|in:rent,water,electric,repair,other',
-            'title'                 => 'required|string',
-            'booking_id'            => 'required|uuid',
-            'amount'                => 'required|numeric',
-            'previous_reading'      => 'required|numeric',
-            'current_reading'       => 'required|numeric|gt:previous_reading',
-            'rate_used'             => 'required|numeric',
-            'bill_date'             => 'required|date',
-            'due_date'              => 'required|date',
-        ]);
+        $validated = $request->validated();
 
         Bill::create($validated);
 
@@ -72,8 +63,6 @@ class BillController extends Controller
             'rate_used'             => 'required|numeric',
             'bill_date'             => 'required|date',
             'due_date'              => 'required|date',
-            // 'notes'                 => 'required|string',
-            // 'status'                => 'required|in:paid,unpaid,partial,overdue'
         ]);
 
         $bill->update($validated);

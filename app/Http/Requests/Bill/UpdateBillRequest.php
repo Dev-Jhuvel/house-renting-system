@@ -11,7 +11,7 @@ class UpdateBillRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,14 @@ class UpdateBillRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title'             => ['required', 'string'],
+            'amount'            => ['required', 'numeric'],
+            'previous_reading'  => ['nullable', 'numeric'],
+            'current_reading'   => ['nullable', 'numeric', 'gt:previous_reading'],
+            'rate_used'         => ['nullable', 'numeric'],
+            'bill_date'         => ['required', 'date'],
+            'due_date'          => ['required', 'date'],
+            'notes'             => ['nullable', 'string'],
         ];
     }
 }

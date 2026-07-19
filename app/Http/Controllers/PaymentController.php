@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Payment\StorePaymentRequest;
 use App\Models\Bill;
 use App\Models\Payment;
 use Illuminate\Http\Request;
@@ -9,17 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
-    public function store(Request $request, Bill $bill)
+    public function store(StorePaymentRequest $request, Bill $bill)
     {
         $this->authorize('create', $bill);
 
-        $validated = $request->validate([
-            'amount_paid'      => 'required|numeric|min:0.01|max:'.$bill->remaining_balance,
-            'paid_at'          => 'required|date',
-            'method'           => 'required|in:cash,gcash,bank_transfer',
-            'reference_number' => 'nullable|string',
-            'notes'            => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $bill) {
             $bill->payments()->create($validated);

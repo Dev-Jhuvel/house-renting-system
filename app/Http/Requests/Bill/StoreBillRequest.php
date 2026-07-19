@@ -11,7 +11,7 @@ class StoreBillRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class StoreBillRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'type'              => ['required', 'in:rent,water,electric,repair,other'],
+            'title'             => ['required', 'string'],
+            'booking_id'        => ['required', 'uuid'],
+            'amount'            => ['required', 'numeric'],
+            'previous_reading'  => ['nullable', 'numeric'],
+            'current_reading'   => ['nullable', 'numeric', 'gt:previous_reading'],
+            'rate_used'         => ['nullable', 'numeric'],
+            'bill_date'         => ['required', 'date'],
+            'due_date'          => ['required', 'date'],
+            'notes'             => ['nullable', 'string'],
+
         ];
     }
 }

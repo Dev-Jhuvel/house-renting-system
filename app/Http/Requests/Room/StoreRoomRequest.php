@@ -3,15 +3,16 @@
 namespace App\Http\Requests\Room;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRoomRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determine if the user is authorized to make this request.    
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,16 @@ class StoreRoomRequest extends FormRequest
      */
     public function rules(): array
     {
+        $unique_room = Rule::unique('rooms')->where(fn ($query) => $query->where('house_id', $this->house_id));
+
         return [
-            //
+            'room_number'   => ['required', 'string', $unique_room],
+            'description'   => ['required', 'string'],
+            'house_id'      => ['required', 'uuid'],
+            'floor'         => ['required', 'numeric'],
+            'type'          => ['required', 'in:single,double,studio,dormitory'],
+            'monthly_rent'  => ['required', 'numeric'],
+            'capacity'      => ['required', 'numeric'],
         ];
     }
 }

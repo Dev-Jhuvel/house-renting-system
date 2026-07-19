@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Booking\StoreBookingRequest as BookingStoreBookingRequest;
+use App\Http\Requests\Booking\StoreBookingRequest;
 use App\Http\Requests\Booking\UpdateBookingRequest;
-use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\BookingService;
 use Inertia\Inertia;
 
 class BookingController extends Controller
 {
+    public function __construct(
+        private BookingService $bookingService
+    )
+    {}
+
     public function index()
     {
         $this->authorize('viewAny', Booking::class);
@@ -45,20 +50,13 @@ class BookingController extends Controller
         return Inertia::render('Bookings/BookingIndex', $data);
     }
 
-    public function store(BookingStoreBookingRequest $request)
+    public function store(StoreBookingRequest $request)
     {
         $this->authorize('create', Booking::class);
 
         $validated = $request->validated();
-        $validated['status'] = 'pending';
 
-        DB::transaction(function () use ($validated) {
-
-            $booking = Booking::create($validated);
-
-            $this->updateRoom($booking);
-            $this->updateTenant($booking);
-        });
+        $this->bookingService->create($validated);
 
         return redirect()->route('bookings.index')->with('success', 'Booking created successfully!');
     }
@@ -66,32 +64,16 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        // $booking
-        //     ->loadCount([
-        //         'rooms',
-        //         'rooms as occupied_count' => function ($q) {
-        //             return $q->where('status', 'occupied');
-        //         }
-        //     ])
-        //     ->load('rooms');
-
-        // return Inertia::render('Bookings/BookingShow', ['booking' => $booking]);
+        //    
     }
 
     public function update(UpdateBookingRequest $request, Booking $booking)
     {
         $this->authorize('update', $booking);
 
-        $validated = $request->validate([
-            'tenant_id'             => 'required|uuid',
-            'room_id'               => 'required|uuid',
-            'move_in_date'          => 'required|date',
-            'move_out_date'         => 'nullable|date',
-            'notes'                 => 'string',
-            'status'                => 'required|in:active,ended,pending,canceled'
-        ]);
+        $validated = $request->validated();
 
-        $booking->update($validated);
+        $this->bookingService->update($booking, $validated);
 
         return redirect()->route('bookings.index', $booking)->with('success', 'Booking updated successfully!');
     }
@@ -100,64 +82,27 @@ class BookingController extends Controller
     {
         $this->authorize('delete', $booking);
 
-        DB::transaction(function () use ($booking) {
-            $booking->status = 'canceled';
-            $this->updateRoom($booking);
-            $this->updateTenant($booking);
-            $booking->bills()->delete();
-            $booking->delete();
-        });
+        $this->bookingService->delete($booking);
+
         return redirect()->route('bookings.index')->with('success', 'Booking deleted successfully!');
-    }
-
-    private function updateRoom(Booking $booking)
-    {
-        $room_status = match ($booking->status) {
-            'active'            => 'occupied',
-            'ended', 'canceled' => 'available',
-            'pending'           => 'reserved',
-        };
-        $booking->room()->update(['status' => $room_status]);
-    }
-
-     private function updateTenant(Booking $booking)
-    {
-        $tenant_status = match ($booking->status) {
-            'active'            => 'active',
-            'ended', 'canceled' => 'inactive',
-            'pending'           => 'pending',
-        };
-        
-        $booking->tenant()->update(['status' => $tenant_status]);
     }
 
     public function updateBookingStatus(Request $request, Booking $booking)
     {
-        $validated = $request->validate([
+        $this->authorize('update', $booking);
+
+        $status = $request->validate([
             'status' => 'required|in:active,ended,pending,canceled'
-        ]);
+        ])['status'];
 
-        DB::transaction(function () use ($booking, $validated) {
-            $today = now()->toDateString();
-            
-            if($validated['status'] === 'ended'){
-                $validated['move_out_date'] = $today;
-            }
+        match($status){
+            'active'    => $this->bookingService->activate($booking),
+            'ended'     => $this->bookingService->end($booking),
+            'canceled'  => $this->bookingService->cancel($booking),
+            'default'    => null,
+        };
 
-            $booking->update($validated);
+        return back()->with('success', 'Booking updated successfully.');
 
-            if($validated['status'] === 'active'){
-                $booking->bills()->create([
-                    'type' => 'rent',
-                    'title' => $booking->tenant->user->name. " Rent Bill ".now()->format('F Y'),
-                    'amount' => $booking->room->monthly_rent,
-                    'bill_date' => $today,
-                    'status'    => 'unpaid',
-                ]);
-            }
-
-            $this->updateRoom($booking);
-            $this->updateTenant($booking);
-        });
     }
 }

@@ -11,7 +11,7 @@ class UpdateHouseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class UpdateHouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name'          => ['required', 'string'],
+            'address'       => ['required', 'string'],
+            'description'   => ['required', 'string'],
+            'city'          => ['required', 'string'],
+            'max_floor'     => ['required', 'numeric'],
+            'max_room'      => ['required', 'numeric'],
+            'water_rate'    => ['required', 'numeric'],
+            'electric_rate' => ['required', 'numeric'],
+            'status'        => ['required', 'in:active,inactive']
         ];
     }
 }

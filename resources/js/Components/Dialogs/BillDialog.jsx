@@ -29,6 +29,8 @@ export default function BillDialog({
 }) {
     const process = method === "Create" ? "Creating..." : "Updating...";
     const bill_types = ["Rent", "Water", "Electric", "Repair", "Other"];
+    const updating = method === "Update";
+    const needCalculation =  ['water', 'electric'].includes(form.type);
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild onClick={() => setOpen(true)}>
@@ -68,7 +70,7 @@ export default function BillDialog({
                                 value={form.booking_id}
                                 options={bookings}
                                 onChange={handleChange}
-                                disabled={method === "Update"}
+                                disabled={updating}
                                 placeholder="Select Booking"
                                 error={errors.booking_id}
                                 className="col-span-4"
@@ -80,7 +82,7 @@ export default function BillDialog({
                                 value={form.type}
                                 options={bill_types}
                                 onChange={handleChange}
-                                disabled={method === "Update"}
+                                disabled={updating}
                                 placeholder="Select Bill Type"
                                 error={errors.type}
                                 className="col-span-4"
@@ -95,39 +97,43 @@ export default function BillDialog({
                                 placeholder="Juan's Bills"
                                 className="col-span-8"
                             />
-                            <InputWithLabel
-                                label="Previous Reading"
-                                id="previous_reading"
-                                value={form.previous_reading}
-                                name="previous_reading"
-                                onChange={handleChange}
-                                error={errors.previous_reading}
-                                placeholder="123456789"
-                                type="number"
-                                className="col-span-4"
-                            />
-                            <InputWithLabel
-                                label="Current Reading"
-                                id="current_reading"
-                                value={form.current_reading}
-                                name="current_reading"
-                                onChange={handleChange}
-                                error={errors.current_reading}
-                                placeholder="123456789"
-                                type="number"
-                                className="col-span-4"
-                            />
-                            <InputWithLabel
-                                label="Rate Used"
-                                id="rate_used"
-                                value={form.rate_used}
-                                name="rate_used"
-                                onChange={handleChange}
-                                error={errors.rate_used}
-                                placeholder="12.5"
-                                type="number"
-                                className="col-span-4"
-                            />
+                            {needCalculation && (
+                               <>
+                                    <InputWithLabel
+                                        label="Previous Reading"
+                                        id="previous_reading"
+                                        value={form.previous_reading}
+                                        name="previous_reading"
+                                        onChange={handleChange}
+                                        error={errors.previous_reading}
+                                        placeholder="123456789"
+                                        type="number"
+                                        className="col-span-4"
+                                    />
+                                    <InputWithLabel
+                                        label="Current Reading"
+                                        id="current_reading"
+                                        value={form.current_reading}
+                                        name="current_reading"
+                                        onChange={handleChange}
+                                        error={errors.current_reading}
+                                        placeholder="123456789"
+                                        type="number"
+                                        className="col-span-4"
+                                    />
+                                    <InputWithLabel
+                                        label="Rate Used"
+                                        id="rate_used"
+                                        value={form.rate_used}
+                                        name="rate_used"
+                                        onChange={handleChange}
+                                        error={errors.rate_used}
+                                        placeholder="12.5"
+                                        type="number"
+                                        className="col-span-4"
+                                    />
+                                </>
+                            )}
                             <InputWithLabel
                                 label="Amount"
                                 id="amount"
@@ -135,6 +141,7 @@ export default function BillDialog({
                                 name="amount"
                                 onChange={handleChange}
                                 error={errors.amount}
+                                readOnly={needCalculation}
                                 placeholder="2500"
                                 type="number"
                                 className="col-span-4"

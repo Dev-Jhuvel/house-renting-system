@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Deposit\StoreDepositRequest;
 use App\Models\Booking;
 use App\Models\Deposit;
+use App\Services\BookingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DepositController extends Controller
 {
+
+    public function __construct(
+        private BookingService $bookingService
+    )
+    {}
     /**
      * Display a listing of the resource.
      */
@@ -28,7 +35,7 @@ class DepositController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Booking $booking)
+    public function store(StoreDepositRequest $request, Booking $booking)
     {
         $this->authorize('create', Deposit::class);
 
@@ -36,19 +43,14 @@ class DepositController extends Controller
 
        DB::transaction(function() use ($booking, &$message, $request){
 
-            $validated = $request->validate([
-                'amount'           => 'required|numeric|min:0.01',
-                'type'             => 'required|in:received,applied,forfeited,refunded',
-                'paid_at'          => 'required|date',
-                'notes'            => 'nullable|string',
-            ]);
+            $validated = $request->validated();
 
             $booking->deposits()->create($validated);
 
-            if($booking->status === 'pending' && $booking->remaining_deposit >= $booking->required_deposit){
+            if($booking->status === 'pending' && $booking->total_deposit >= $booking->required_deposit){
                 $this->authorize('update', $booking);
 
-                $booking->update(['status' => 'active']);
+                $this->bookingService->activate($booking);
                 $message = "Deposit Recorded and Booking is activated";
             }
        });

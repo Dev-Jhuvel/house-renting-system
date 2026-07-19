@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('rate_used', 8, 4)->nullable();         // snapshot of rate at time of billing
             $table->date('bill_date');
             $table->date('due_date');
-            $table->enum('status', ['unpaid', 'partial', 'paid', 'overdue',])->default('unpaid');
+            $table->enum('status', ['unpaid', 'partial', 'paid', 'overdue',])->default('unpaid');   
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();

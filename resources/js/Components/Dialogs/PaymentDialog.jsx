@@ -68,7 +68,7 @@ export default function PaymentDialog({
                                 value={form.amount_paid}
                                 onChange={handleChange}
                                 error={errors.amount_paid}
-                                placeholder={`Amount Due: ${bill?.amount}`}
+                                placeholder={`Amount Due: ${bill?.remaining_balance}`}
                                 type="number"
                                 className="col-span-4"
                             />

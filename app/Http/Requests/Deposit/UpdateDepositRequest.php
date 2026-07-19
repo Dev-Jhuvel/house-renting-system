@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests\Booking;
+namespace App\Http\Requests\Deposit;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateBookingRequest extends FormRequest
+class UpdateDepositRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -22,9 +22,7 @@ class UpdateBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'move_in_date'  => ['nullable','date'],
-            'move_out_date' => ['nullable','date', 'after:move_in_date'],
-            'notes'         => ['nullable','string'],
+            //
         ];
     }
 }

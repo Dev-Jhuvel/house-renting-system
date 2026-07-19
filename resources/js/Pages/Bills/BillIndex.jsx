@@ -137,6 +137,21 @@ export default function BookingIndex({ bills, bookings }) {
         router.delete(route("bills.destroy", bill_id));
     }
 
+    const BillActions = (bill) => {
+        const {
+            status,
+            payments,
+        } = bill;
+
+        // # think of when I can do this action
+        return {
+            canEdit: status === "unpaid" && payments,
+            canDelete: status === "unpaid" && payments,
+            canRecordPayment: status == "unpaid" || status == "partial",
+            canViewPayment: payments && payments.length > 0,
+        };
+    };
+
     useEffect(() => {
         if (!billData.booking_id || !billData.type || selectedBill) return;
 
@@ -325,6 +340,7 @@ export default function BookingIndex({ bills, bookings }) {
                                 const user = bill.booking?.tenant.user;
                                 const room = bill.booking?.room;
                                 const house = room?.house;
+                                const actions = BillActions(bill);
                                 return (
                                     <TableRow key={key}>
                                         <TableCell className="flex items-center gap-x-2">
@@ -379,6 +395,7 @@ export default function BookingIndex({ bills, bookings }) {
                                                     </DropdownMenuLabel>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
+                                                        disabled={!actions.canEdit}
                                                         onSelect={(e) => {
                                                             e.preventDefault();
                                                             handleOpenBillEdit(
@@ -397,14 +414,7 @@ export default function BookingIndex({ bills, bookings }) {
                                                         message="Are you sure to Delete this bill?"
                                                     >
                                                         <DropdownMenuItem
-                                                            disabled={
-                                                                status ===
-                                                                    "active" ||
-                                                                status ===
-                                                                    "pending" ||
-                                                                bill.unpaid_bills_count >
-                                                                    0
-                                                            }
+                                                            disabled={!actions.canDelete}
                                                             onSelect={(e) =>
                                                                 e.preventDefault()
                                                             }
@@ -414,9 +424,7 @@ export default function BookingIndex({ bills, bookings }) {
                                                     </DeleteAlert>
 
                                                     <DropdownMenuItem
-                                                        disabled={
-                                                            status === "paid"
-                                                        }
+                                                        disabled={!actions.canRecordPayment}
                                                         onSelect={(e) => {
                                                             e.preventDefault();
                                                             handleOpenPayment(
@@ -427,10 +435,7 @@ export default function BookingIndex({ bills, bookings }) {
                                                         Record Payment
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        disabled={
-                                                            !bill.payments
-                                                                ?.length
-                                                        }
+                                                        disabled={!actions.canViewPayment}
                                                         onSelect={(e) => {
                                                             e.preventDefault();
                                                             handleOpenPaymentHistory(

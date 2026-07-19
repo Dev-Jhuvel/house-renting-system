@@ -93,6 +93,9 @@ export default function TenantIndex({ tenants }) {
                     setOpen(false);
                     setSelectedTenant(null);
                 },
+                onError: () =>{
+                    console.log(errors)
+                }
             });
         } else {
             post(route("tenants.store"), {
@@ -100,6 +103,7 @@ export default function TenantIndex({ tenants }) {
                     reset();
                     setOpen(false);
                 },
+               
             });
         }
     }
