@@ -36,6 +36,8 @@ class BillController extends Controller
 
     public function store(StoreBillRequest $request)
     {
+        $this->authorize('update', Bill::class);
+
         $validated = $request->validated();
 
         $this->billService->create($validated);
@@ -55,6 +57,8 @@ class BillController extends Controller
 
     public function destroy(Bill $bill)
     {
+        $this->authorize('update', $bill);
+
         $this->billService->delete($bill);
         return redirect()->route('bills.index')->with('success', 'Bill deleted successfully!');
     }
