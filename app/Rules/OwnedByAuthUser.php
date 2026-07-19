@@ -25,7 +25,7 @@ class OwnedByAuthUser implements ValidationRule
             ->exists();
 
         if(! $exists){
-            $fail('The selected '. str($attribute)->replace('_id', '')->repalce('_', ' '). ' is invalid.');
+            $fail('The selected '. str($attribute)->replace('_id', '')->replace('_', ' '). ' is invalid.');
         }
     }
 }

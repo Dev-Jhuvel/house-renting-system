@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Room;
 
+use App\Models\House;
 use App\Rules\OwnedByAuthUser;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -28,7 +29,7 @@ class StoreRoomRequest extends FormRequest
         return [
             'room_number'   => ['required', 'string', $unique_room],
             'description'   => ['required', 'string'],
-            'house_id'      => ['required', 'uuid', new OwnedByAuthUser(Room::class)],
+            'house_id'      => ['required', 'uuid', new OwnedByAuthUser(House::class)],
             'floor'         => ['required', 'numeric'],
             'type'          => ['required', 'in:single,double,studio,dormitory'],
             'monthly_rent'  => ['required', 'numeric'],

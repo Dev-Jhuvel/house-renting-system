@@ -21,6 +21,13 @@ class Payment extends Model
         'status'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'amount_paid'   => 'decimal:2',
+        ];
+    }
+
     public function bill(){
         return $this->belongsTo(Bill::class);
     }

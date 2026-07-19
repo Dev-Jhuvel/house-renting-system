@@ -36,6 +36,9 @@ export default function RoomSection({ rooms, house }) {
                 setOpen(false);
                 reset();
             },
+            onError: () => {
+                console.log(errors);
+            },
         });
     }
 
@@ -47,9 +50,6 @@ export default function RoomSection({ rooms, house }) {
         }));
     }
 
-    useEffect(() =>{
-        console.log(state);
-    }, [state])
     return (
         <div className="p-4 bg-gray-100 rounded-md border">
             <div className="flex justify-between items-center mb-2">

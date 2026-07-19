@@ -24,6 +24,16 @@ class Bill extends Model
         'notes'
     ];
 
+    protected function casts() :array
+    {
+        return [
+            'amount'            => 'decimal:2',
+            'previous_reading'  => 'decimal:2',
+            'current_reading'   => 'decimal:2',
+            'rate_used'         => 'decimal:2',
+        ];
+    }
+
     protected $appends = ['remaining_balance', 'total_paid'];
 
     public function booking()

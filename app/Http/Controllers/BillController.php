@@ -36,7 +36,7 @@ class BillController extends Controller
 
     public function store(StoreBillRequest $request)
     {
-        $this->authorize('update', Bill::class);
+        $this->authorize('create', Bill::class);
 
         $validated = $request->validated();
 

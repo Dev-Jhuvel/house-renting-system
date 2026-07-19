@@ -21,6 +21,15 @@ class Room extends Model
         'description'
     ];
 
+    protected function casts() :array
+    {
+        return [
+            'floor'         => 'integer',
+            'capacity'      => 'integer',
+            'monthly_rent'  => 'decimal:2'
+        ];
+    }
+
     public function bookings(){
         return $this->hasMany(Booking::class);
     }

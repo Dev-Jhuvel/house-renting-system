@@ -24,6 +24,16 @@ class House extends Model
         'status'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'max_floor'     => 'integer',
+            'max_room'      => 'integer',
+            'water_rate'    => 'decimal:2',
+            'electric_rate' => 'decimal:2',
+        ];
+    }
+
     protected $hidden = [
         'created_at',
         'updated_at',

@@ -192,6 +192,18 @@ export default function BookingIndex({ bills, bookings }) {
         billData.rate_used,
     ]);
 
+    useEffect(() => {
+        if(selectedBill) return;
+        if(!billData.booking_id || !['electric', 'water'].includes(billData.type)) return;
+
+        const lastBillOfType = bills.find(
+            (b) => b.booking_id === billData.booking_id && b.type === billData.type
+        );
+
+        setBillData('previous_reading', lastBillOfType ? lastBillOfType.current_reading : "");
+
+    }, [billData.booking_id, billData.type]);
+
     // Payments Process and variable
     const [openPayment, setOpenPayment] = useState(false);
     const [openPaymentHistory, setOpenPaymentHistory] = useState(false);

@@ -19,6 +19,13 @@ class Deposit extends Model
         'type'
     ];
 
+    protected function casts() :array
+    {
+        return [
+            'amount'        => 'decimal:2'
+        ];
+    }
+
     public function booking(){
         return $this->belongsTo(Booking::class);
     }

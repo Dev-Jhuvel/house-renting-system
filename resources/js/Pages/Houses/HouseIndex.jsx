@@ -1,3 +1,4 @@
+import { useSidebar } from "@/components/ui/sidebar";
 import InputWithLabel from "@/Components/InputWithLabel";
 import HouseDialog from "@/Components/Dialogs/HouseDialog";
 import AddCard from "@/Components/AddCard";
@@ -41,6 +42,8 @@ export default function HouseIndex({ houses }) {
         electric_rate: "",
         status: "active",
     });
+
+    const { state } = useSidebar();
 
     const [open, setOpen] = useState(false);
 
@@ -91,7 +94,7 @@ export default function HouseIndex({ houses }) {
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-4 px-3 overflow-scroll pb-5 h-full">
+                <div className={`grid grid-cols-1 ${state === 'collapsed' ? 'grid-cols-4' : 'grid-cols-3'}  gap-8 py-4 px-3 overflow-scroll pb-5 h-full`}>
                     {houses &&
                         houses.map((house) => (
                             <HouseCard house={house} key={house.id} />

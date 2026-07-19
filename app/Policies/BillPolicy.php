@@ -21,7 +21,7 @@ class BillPolicy
      */
     public function view(User $user, Bill $bill): bool
     {
-        return $bill->isOwnedBy($user->id);;
+        return $bill->isOwnedBy($user->id);
     }
 
     /**
@@ -37,7 +37,7 @@ class BillPolicy
      */
     public function update(User $user, Bill $bill): bool
     {
-        return $bill->isOwnedBy($user->id);;
+        return $bill->isOwnedBy($user->id);
     }
 
     /**
@@ -45,7 +45,7 @@ class BillPolicy
      */
     public function delete(User $user, Bill $bill): bool
     {
-        return $bill->isOwnedBy($user->id);;
+        return $bill->isOwnedBy($user->id);
     }
 
     /**
@@ -53,7 +53,7 @@ class BillPolicy
      */
     public function restore(User $user, Bill $bill): bool
     {
-        return $bill->isOwnedBy($user->id);;
+        return $bill->isOwnedBy($user->id);
     }
 
     /**
@@ -61,6 +61,6 @@ class BillPolicy
      */
     public function forceDelete(User $user, Bill $bill): bool
     {
-        return $bill->isOwnedBy($user->id);;
+        return $bill->isOwnedBy($user->id);
     }
 }
