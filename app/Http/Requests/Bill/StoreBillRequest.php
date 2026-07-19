@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Bill;
 
+use App\Models\Booking;
+use App\Rules\OwnedByAuthUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBillRequest extends FormRequest
@@ -24,7 +26,7 @@ class StoreBillRequest extends FormRequest
         return [
             'type'              => ['required', 'in:rent,water,electric,repair,other'],
             'title'             => ['required', 'string'],
-            'booking_id'        => ['required', 'uuid'],
+            'booking_id'        => ['required', 'uuid', new OwnedByAuthUser(Booking::class)],
             'amount'            => ['required', 'numeric'],
             'previous_reading'  => ['nullable', 'numeric'],
             'current_reading'   => ['nullable', 'numeric', 'gt:previous_reading'],
