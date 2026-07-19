@@ -7,6 +7,7 @@ use App\Models\Traits\HasUuidAndSoftDeletes;
 use App\Models\Traits\OwnedByUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Override;
 
 class Tenant extends Model
 {
@@ -35,7 +36,12 @@ class Tenant extends Model
         ->latest();
     }
 
-    protected function ownershipPath(): string{
-        return 'booking.room.house';
+    protected function ownershipPath(): ?string{
+        return null;
+    }
+
+    protected function ownershipColumn(): string
+    {
+        return 'landlord_user_id';
     }
 }

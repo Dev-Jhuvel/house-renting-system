@@ -74,9 +74,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
         move_in_date: today.toISOString().slice(0, 10),
         // move_out_date: next_month.toISOString().slice(0, 10),
         move_out_date: "",
-        due_day: "",
         notes: "",
-        status: "pending",
     });
 
     const [openBooking, setOpenBooking] = useState(false);
@@ -94,7 +92,6 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
             room_id: booking.room_id,
             move_in_date: booking.move_in_date,
             move_out_date: booking.move_out_date,
-            due_day: booking.due_day,
             notes: booking.notes ?? "",
             status: booking.status,
         });
@@ -214,7 +211,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
         const {
             status,
             unpaid_bills_count,
-            required_deposit,
+            remaining_deposit,
             total_deposit,
             deposits,
         } = booking;
@@ -222,8 +219,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
         // # think of when I can do this action
         return {
             canDelete: status === "pending" && unpaid_bills_count === 0,
-            canActivate:
-                status === "pending" && total_deposit >= required_deposit,
+            canActivate: status === "pending" && total_deposit >= remaining_deposit,
             canEnd: status === "active" && unpaid_bills_count === 0,
             canCancel: status === "pending",
             canEdit: status !== "ended" && status !== "canceled",
@@ -418,7 +414,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                                 ) => {
                                                                     router.patch(
                                                                         route(
-                                                                            "booking.updateStatus",
+                                                                            "booking.updateBookingStatus",
                                                                             booking.id,
                                                                         ),
                                                                         {
@@ -438,7 +434,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                                 ) => {
                                                                     router.patch(
                                                                         route(
-                                                                            "booking.updateStatus",
+                                                                            "booking.updateBookingStatus",
                                                                             booking.id,
                                                                         ),
                                                                         {
@@ -458,7 +454,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                                 ) => {
                                                                     router.patch(
                                                                         route(
-                                                                            "booking.updateStatus",
+                                                                            "booking.updateBookingStatus",
                                                                             booking.id,
                                                                         ),
                                                                         {

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tenants', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('landlord_user_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->string('emergency_contact')->nullable();

@@ -15,12 +15,11 @@ class Booking extends Model
         'room_id',
         'move_in_date',
         'move_out_date',
-        'due_day',
         'notes',
         'status'
     ];
 
-    protected $appends = ['total_bills', 'total_paid', 'balance', 'required_deposit', 'total_deposit'];
+    protected $appends = ['total_bills', 'total_paid', 'balance', 'required_deposit', 'remaining_deposit', 'total_deposit'];
 
     public function tenant()
     {
@@ -66,7 +65,15 @@ class Booking extends Model
 
     public function getRequiredDepositAttribute()
     {
-        return $this->room->monthly_rent - $this->deposits->sum('amount');
+        return $this->room->monthly_rent;
+    }
+
+    public function getRemainingDepositAttribute()
+    {
+        return max(
+            0,
+            $this->required_deposit - $this->total_deposit
+        );
     }
     public function getTotalDepositAttribute()
     {

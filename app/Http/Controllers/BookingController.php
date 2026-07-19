@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Booking\StoreBookingRequest as BookingStoreBookingRequest;
+use App\Http\Requests\Booking\UpdateBookingRequest;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Room;
@@ -43,7 +45,7 @@ class BookingController extends Controller
         return Inertia::render('Bookings/BookingIndex', $data);
     }
 
-    public function store(StoreBookingRequest $request)
+    public function store(BookingStoreBookingRequest $request)
     {
         $this->authorize('create', Booking::class);
 
@@ -51,9 +53,11 @@ class BookingController extends Controller
         $validated['status'] = 'pending';
 
         DB::transaction(function () use ($validated) {
+
             $booking = Booking::create($validated);
 
             $this->updateRoom($booking);
+            $this->updateTenant($booking);
         });
 
         return redirect()->route('bookings.index')->with('success', 'Booking created successfully!');
@@ -74,7 +78,7 @@ class BookingController extends Controller
         // return Inertia::render('Bookings/BookingShow', ['booking' => $booking]);
     }
 
-    public function update(Request $request, Booking $booking)
+    public function update(UpdateBookingRequest $request, Booking $booking)
     {
         $this->authorize('update', $booking);
 
@@ -83,7 +87,6 @@ class BookingController extends Controller
             'room_id'               => 'required|uuid',
             'move_in_date'          => 'required|date',
             'move_out_date'         => 'nullable|date',
-            // 'due_day'               => 'required|numeric',
             'notes'                 => 'string',
             'status'                => 'required|in:active,ended,pending,canceled'
         ]);
@@ -98,7 +101,9 @@ class BookingController extends Controller
         $this->authorize('delete', $booking);
 
         DB::transaction(function () use ($booking) {
+            $booking->status = 'canceled';
             $this->updateRoom($booking);
+            $this->updateTenant($booking);
             $booking->bills()->delete();
             $booking->delete();
         });
@@ -115,7 +120,18 @@ class BookingController extends Controller
         $booking->room()->update(['status' => $room_status]);
     }
 
-    public function updateStatus(Request $request, Booking $booking)
+     private function updateTenant(Booking $booking)
+    {
+        $tenant_status = match ($booking->status) {
+            'active'            => 'active',
+            'ended', 'canceled' => 'inactive',
+            'pending'           => 'pending',
+        };
+        
+        $booking->tenant()->update(['status' => $tenant_status]);
+    }
+
+    public function updateBookingStatus(Request $request, Booking $booking)
     {
         $validated = $request->validate([
             'status' => 'required|in:active,ended,pending,canceled'
@@ -136,12 +152,12 @@ class BookingController extends Controller
                     'title' => $booking->tenant->user->name. " Rent Bill ".now()->format('F Y'),
                     'amount' => $booking->room->monthly_rent,
                     'bill_date' => $today,
-                    'due_date'  => now()->day($booking->due_day)->toDateString(),
                     'status'    => 'unpaid',
                 ]);
             }
 
             $this->updateRoom($booking);
+            $this->updateTenant($booking);
         });
     }
 }

@@ -28,7 +28,6 @@ export default function BillDialog({
     bookings,
 }) {
     const process = method === "Create" ? "Creating..." : "Updating...";
-    const bill_status = ["Unpaid", "Paid", "Partial", "OverDue"];
     const bill_types = ["Rent", "Water", "Electric", "Repair", "Other"];
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -86,19 +85,6 @@ export default function BillDialog({
                                 error={errors.type}
                                 className="col-span-4"
                             />
-                            {method === "Update" && (
-                                <InputSelect
-                                    name="status"
-                                    id="status"
-                                    label="Bill Status"
-                                    value={form.status}
-                                    options={bill_status}
-                                    onChange={handleChange}
-                                    placeholder="Select Bill Status"
-                                    error={errors.status}
-                                    className="col-span-4"
-                                />
-                            )}
                             <InputWithLabel
                                 label="Title"
                                 id="title"

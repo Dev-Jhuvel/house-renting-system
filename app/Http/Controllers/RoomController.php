@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class RoomController extends Controller
@@ -26,10 +27,9 @@ class RoomController extends Controller
             'type'          => 'required|in:single,double,studio,dormitory',
             'monthly_rent'  => 'required|numeric',
             'capacity'      => 'required|numeric',
-            'status'        => 'required|in:available,occupied,reserved,maintenance'
         ]);
 
-        $validated['user_id'] = Auth::user()->id;
+        $validated['user_id']   = Auth::user()->id;
 
         Room::create($validated);
     
@@ -70,5 +70,13 @@ class RoomController extends Controller
         $house_id = $room->house_id;
         $room->delete();
         return redirect()->route('houses.show', $house_id)->with('success', 'Room deleted successfully!');
+    }
+    public function updateRoomStatus(Request $request, Room $room)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:available,occupied,reserved,maintenance'
+        ]);
+
+       $room->update($validated);
     }
 }

@@ -39,7 +39,7 @@ export default function PaymentHistorySheet({
                         {booking?.tenant.user.name} Deposit
                     </p>
                     <p className="text-sm text-muted-foreground">
-                        Required Deposit : ₱{booking?.room.monthly_rent}
+                        Required Deposit : ₱{booking?.required_deposit}
                     </p>
                     <p className="text-sm text-muted-foreground">
                         Total Deposit : ₱{total_deposit}

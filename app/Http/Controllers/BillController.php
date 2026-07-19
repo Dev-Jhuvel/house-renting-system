@@ -40,8 +40,6 @@ class BillController extends Controller
             'rate_used'             => 'required|numeric',
             'bill_date'             => 'required|date',
             'due_date'              => 'required|date',
-            // 'notes'                 => 'string',
-            // 'status'                => 'required|in:paid,unpaid,partial,overdue'
         ]);
 
         Bill::create($validated);

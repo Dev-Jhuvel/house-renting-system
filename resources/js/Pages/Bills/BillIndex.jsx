@@ -76,7 +76,6 @@ export default function BookingIndex({ bills, bookings }) {
         bill_date: today.toISOString().slice(0, 10),
         due_date: due_date.toISOString().slice(0, 10),
         notes: "",
-        status: "unpaid",
     });
 
     function handleOpenBillCreate() {

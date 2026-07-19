@@ -35,8 +35,8 @@ Route::middleware(['auth', 'role:landlord,admin'])->group(function () {
     Route::resource('bookings', BookingController::class);
     Route::resource('bills', BillController::class);
 
-
-    Route::patch('bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('booking.updateStatus');
+    Route::patch('bookings/{booking}/status', [BookingController::class, 'updateBookingStatus'])->name('booking.updateBookingStatus');
+    Route::patch('rooms/{room}/status', [RoomController::class, 'updateRoomStatus'])->name('room.updateRoomStatus');
 
     Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
     Route::delete('bills/{bill}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bills.payments.destroy');

@@ -67,6 +67,23 @@ export default function RoomShow({ room }) {
         { detail: room.capacity, icon: Users },
     ];
 
+    const roomActions = (room) => {
+        const {
+            status,
+            booking
+        } = room;
+
+        // # think of when I can do this action
+        return {
+            canMarkAsAvailable: status === "maintenance" && !booking,
+            canMarkAsMaintenance: status === "available" && !booking,
+            canEdit: ["maintenance", "available"].includes(status),
+            canDelete: ["maintenance", "available"].includes(status),
+        };
+    };
+
+    const actions = roomActions(room);
+
     return (
         <div className="overflow-y-auto">
             <div className="w-full h-[200px] overflow-hidden">
@@ -142,6 +159,46 @@ export default function RoomShow({ room }) {
                                             Delete Room
                                         </DropdownMenuItem>
                                     </DeleteAlert>
+                                    <DropdownMenuItem
+                                        disabled={
+                                            !actions.canMarkAsAvailable
+                                        }
+                                        onSelect={(
+                                            e,
+                                        ) => {
+                                            router.patch(
+                                                route(
+                                                    "room.updateRoomStatus",
+                                                    room.id,
+                                                ),
+                                                {
+                                                    status: "available",
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        Mark As Available
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        disabled={
+                                            !actions.canMarkAsMaintenance
+                                        }
+                                        onSelect={(
+                                            e,
+                                        ) => {
+                                            router.patch(
+                                                route(
+                                                    "room.updateRoomStatus",
+                                                    room.id,
+                                                ),
+                                                {
+                                                    status: "maintenance",
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        Mark As Maintenance
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>

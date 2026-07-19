@@ -21,7 +21,6 @@ export default function RoomSection({ rooms, house }) {
         description: "",
         floor: "",
         type: "single",
-        status: "available",
         capacity: "",
         monthly_rent: "",
     });

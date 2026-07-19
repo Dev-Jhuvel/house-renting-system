@@ -30,8 +30,8 @@ export default function BookingDialog({
     status,
 }) {
     const process = method === "Create" ? "Creating..." : "Updating...";
-    const activated = status === 'active';
-    const booking_status = ["Active", "Pending", "Ended", "Canceled"];
+    const activated = status === "active";
+    const updating = method === "Update";
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild onClick={() => setOpen(true)}>
@@ -73,7 +73,7 @@ export default function BookingDialog({
                                 value={form.tenant_id}
                                 options={tenants}
                                 onChange={handleChange}
-                                disabled={activated}
+                                disabled={updating}
                                 placeholder="Select Tenant Type"
                                 error={errors.tenant_id}
                                 className="col-span-4"
@@ -85,24 +85,11 @@ export default function BookingDialog({
                                 value={form.room_id}
                                 options={rooms}
                                 onChange={handleChange}
-                                disabled={activated}
+                                disabled={updating}
                                 placeholder="Select Room"
                                 error={errors.room_id}
                                 className="col-span-4"
                             />
-                            {/* {method === "Update" && (
-                                <InputSelect
-                                    name="status"
-                                    id="status"
-                                    label="Status"
-                                    value={form.status}
-                                    options={booking_status}
-                                    onChange={handleChange}
-                                    placeholder="Select Status"
-                                    error={errors.status}
-                                    className="col-span-4"
-                                />
-                            )} */}
                             <InputWithLabel
                                 label="Notes"
                                 id="notes"

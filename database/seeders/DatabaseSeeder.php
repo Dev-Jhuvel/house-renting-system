@@ -10,6 +10,7 @@ use App\Models\Tenant;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Auth;
 
 class DatabaseSeeder extends Seeder
 {
@@ -77,7 +78,6 @@ class DatabaseSeeder extends Seeder
             'room_id'        => $room->id,
             'move_in_date'   => '2025-01-01',
             'move_out_date'  => '2025-02-01', // null = no fixed end date
-            'due_day'        => 5, // due every 5th of the month
             'status'         => 'active',
             'notes'          => 'First month free.',
         ]);
@@ -182,6 +182,7 @@ class DatabaseSeeder extends Seeder
 
             Tenant::create([
                 'user_id'           => $user->id,
+                'landlord_user_id'  => $landlord->id,
                 'phone'             => '09' . rand(100000000, 999999999),
                 'address'           => 'Cavite',
                 'emergency_contact' => 'Parent',

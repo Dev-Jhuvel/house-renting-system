@@ -27,7 +27,6 @@ export default function RoomDialog({
 }) {
     const process = method === "Create" ? "Creating..." : "Updating...";
     const room_types = ["Single", "Double", "Studio", "Dormitory"];
-    const room_status = ["Available", "Occupied", "Reserved", "Maintenance"];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -84,17 +83,6 @@ export default function RoomDialog({
                                 type="number"
                                 className="col-span-4"
                             />
-                            <InputWithLabel
-                                label="Description"
-                                id="description"
-                                value={form.description}
-                                name="description"
-                                isTextArea={true}
-                                onChange={handleChange}
-                                error={errors.description}
-                                placeholder="Room description"
-                                className="col-span-8"
-                            />
                             <InputSelect
                                 id="type"
                                 label="Type"
@@ -106,16 +94,16 @@ export default function RoomDialog({
                                 error={errors.type}
                                 className="col-span-4"
                             />
-                            <InputSelect
-                                id="status"
-                                label="Status"
-                                name="status"
-                                value={form.status}
-                                options={room_status}
+                            <InputWithLabel
+                                label="Description"
+                                id="description"
+                                value={form.description}
+                                name="description"
+                                isTextArea={true}
                                 onChange={handleChange}
-                                placeholder="Select Room status"
-                                error={errors.status}
-                                className="col-span-4"
+                                error={errors.description}
+                                placeholder="Room description"
+                                className="col-span-8"
                             />
                         </div>
                     </div>

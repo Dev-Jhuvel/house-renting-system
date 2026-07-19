@@ -67,7 +67,7 @@ export default function DepositDialog({
                                 value={form.amount}
                                 onChange={handleChange}
                                 error={errors.amount}
-                                placeholder={`Amount Required: ${booking?.required_deposit ?? ""}`}
+                                placeholder={`Amount Required: ${booking?.remaining_deposit ?? ""}`}
                                 type="number"
                                 className="col-span-4"
                             />
