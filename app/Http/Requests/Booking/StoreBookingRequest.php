@@ -25,7 +25,7 @@ class StoreBookingRequest extends FormRequest
     public function rules(): array
     {
          return [
-            'tenant_id'     => ['required','uuid'],
+            'tenant_id'     => ['required','uuid', new OwnedByAuthUser(Tenant::class)],
             'room_id'       => ['required','uuid', new OwnedByAuthUser(Room::class)],
             'move_in_date'  => ['required','date'],
             'move_out_date' => ['nullable','date', 'after:move_in_date'],
