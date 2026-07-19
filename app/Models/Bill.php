@@ -24,7 +24,7 @@ class Bill extends Model
         'notes'
     ];
 
-    protected $appends = ['remaining_balance'];
+    protected $appends = ['remaining_balance', 'total_paid'];
 
     public function booking()
     {
@@ -37,8 +37,12 @@ class Bill extends Model
     }
 
     public function getRemainingBalanceAttribute(){
-        return $this->amount - $this->payments()->sum('amount_paid');
+        return $this->amount - $this->total_paid;
     }   
+    
+    public function getTotalPaidAttribute(){
+        return $this->payments()->sum('amount_paid');
+    }  
 
     protected function ownershipPath(): string{
         return 'booking.room.house';

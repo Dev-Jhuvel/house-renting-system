@@ -142,13 +142,14 @@ export default function BookingIndex({ bills, bookings }) {
             status,
             payments,
         } = bill;
+        const hasPayments = payments.length > 0;
 
         // # think of when I can do this action
         return {
-            canEdit: status === "unpaid" && payments,
-            canDelete: status === "unpaid" && payments,
-            canRecordPayment: status == "unpaid" || status == "partial",
-            canViewPayment: payments && payments.length > 0,
+            canEdit: !hasPayments,
+            canDelete: !hasPayments,
+            canRecordPayment: status !== "paid",
+            canViewPayment: payments && hasPayments,
         };
     };
 

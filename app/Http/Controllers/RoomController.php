@@ -12,11 +12,10 @@ use Inertia\Inertia;
 
 class RoomController extends Controller
 {
-    // public function index()
-    // {
-    //     $Rooms = Room::with('user')->latest()->get();
-    //     return Inertia::render('Rooms/RoomIndex', ['Rooms' => $rooms]);
-    // }
+    public function index()
+    {
+        //
+    }
 
     public function store(StoreRoomRequest $request)
     {

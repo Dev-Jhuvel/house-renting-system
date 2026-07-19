@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Bill\StoreBillRequest;
 use App\Models\Bill;
 use App\Models\Booking;
+use App\Services\BillService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class BillController extends Controller
 {
+    public function __construct(
+        private BillService $billService
+    )
+    {}
     public function index()
     {
         $auth_id = Auth::id();
@@ -33,46 +38,24 @@ class BillController extends Controller
     {
         $validated = $request->validated();
 
-        Bill::create($validated);
+        $this->billService->create($validated);
 
         return redirect()->route('bills.index')->with('success', 'Bill created successfully!');
     }
 
     public function show(Bill $bill)
     {
-        $bill
-            ->loadCount([
-                'rooms',
-                'rooms as occupied_count' => function ($q) {
-                    return $q->where('status', 'occupied');
-                }
-            ])
-            ->load('rooms');
-
-        return Inertia::render('Bills/BillShow', ['bill' => $bill]);
+        //
     }
 
     public function update(Request $request, Bill $bill)
     {
-        $validated = $request->validate([
-            'type'                  => 'required|in:rent,water,electric,repair,other',
-            'title'                 => 'required|string',
-            'amount'                => 'required|numeric',
-            'previous_reading'      => 'required|numeric',
-            'current_reading'       => 'required|numeric',
-            'rate_used'             => 'required|numeric',
-            'bill_date'             => 'required|date',
-            'due_date'              => 'required|date',
-        ]);
-
-        $bill->update($validated);
-
-        return redirect()->route('bills.index', $bill)->with('success', 'Bill updated successfully!');
+        //
     }
 
     public function destroy(Bill $bill)
     {
-        $bill->delete();
+        $this->billService->delete($bill);
         return redirect()->route('bills.index')->with('success', 'Bill deleted successfully!');
     }
 }

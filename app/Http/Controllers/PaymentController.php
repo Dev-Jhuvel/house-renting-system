@@ -5,22 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Payment\StorePaymentRequest;
 use App\Models\Bill;
 use App\Models\Payment;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    public function __construct(
+        private PaymentService $paymentService
+    )
+    {}
     public function store(StorePaymentRequest $request, Bill $bill)
     {
-        $this->authorize('create', $bill);
+        $this->authorize('create', Payment::class);
 
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated, $bill) {
-            $bill->payments()->create($validated);
-
-            $this->updateBillStatus($bill);
-        });
+       $this->paymentService->create($validated, $bill);
 
         return redirect()->back()->with('success', 'Payment Recorded');
     }
@@ -29,23 +30,8 @@ class PaymentController extends Controller
     {
         $this->authorize('delete', $payment);
 
-        DB::transaction(function () use ($payment, $bill) {
-            $payment->delete();
-
-            $this->updateBillStatus($bill);
-        });
+        $this->paymentService->delete($payment, $bill);
         return redirect()->back()->with('success', 'Payment deleted.');
     }
 
-    private function updateBillStatus(Bill $bill)
-    {
-        $total_paid = $bill->payments()->sum('amount_paid');
-
-        $bill_status = match (true) {
-            $total_paid >= $bill->amount    => 'paid',
-            $total_paid > 0                 => 'partial',
-            default                         => 'unpaid',
-        };
-        $bill->update(['status' => $bill_status]);
-    }
 }
