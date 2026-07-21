@@ -39,7 +39,7 @@ class TenantController extends Controller
             ]);
             $user->tenant()->create([
                 'phone'             => $validated['phone'],
-                'tenant_user_id'    => Auth::user()->id,
+                'created_by'        => Auth::id(),
                 'address'           => $validated['address'],
                 'emergency_contact' => $validated['emergency_contact'],
                 'id_type'           => $validated['id_type'],

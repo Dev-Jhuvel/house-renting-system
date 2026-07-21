@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -20,14 +21,9 @@ trait OwnedByUser
 
     public function isOwnedBy(string $userId): bool
     {
-        $path = $this->ownershipPath();
-        if($path === null){
-            return $this->{$this->ownershipColumn()} === $userId;
-        }
-
-        return data_get($this, $path)?->user_id === $userId;
+        return static::ownedBy($userId)->whereKey($this->getKey())->exists();
     }
-      protected function ownershipColumn(): string
+    protected function ownershipColumn(): string
     {
         return 'user_id';
     }

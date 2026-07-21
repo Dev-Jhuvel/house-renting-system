@@ -14,14 +14,14 @@ export const statusColor = (status) =>{
   const red     = ['ended', 'canceled', 'occupied', 'unpaid', 'overdue', 'inactive'];
   const blue    = ['maintenance'];
   if(green.includes(status)){
-    return 'bg-green-500'
+    return 'bg-green-300'
   }else if(yellow.includes(status)){
-    return 'bg-yellow-500'
+    return 'bg-yellow-300'
   }else if(red.includes(status)){
-    return 'bg-red-500'
+    return 'bg-red-300'
   }else if(blue.includes(status)){
-   return 'bg-blue-500'
+   return 'bg-blue-300'
   }else{
-    return 'bg-gray-500'
+    return 'bg-gray-300'
   }
 }

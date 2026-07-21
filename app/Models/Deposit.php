@@ -5,11 +5,12 @@ namespace App\Models;
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
 use App\Models\Traits\OwnedByUser;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Deposit extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser, HasFactory;
 
     protected $fillable = [
         'booking_id',

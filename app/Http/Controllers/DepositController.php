@@ -37,7 +37,7 @@ class DepositController extends Controller
      */
     public function store(StoreDepositRequest $request, Booking $booking)
     {
-        $this->authorize('create', Deposit::class);
+        $this->authorize('recordDeposit', $booking);
 
         $message = "Deposit Recorded";
 

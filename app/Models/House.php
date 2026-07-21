@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Models\Traits\HasActivityLog;
 use App\Models\Traits\HasUuidAndSoftDeletes;
 use App\Models\Traits\OwnedByUser;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class House extends Model
 {
-    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser;
+    use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser, HasFactory;
     protected $fillable = [
         'user_id',
         'name',

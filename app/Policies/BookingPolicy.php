@@ -40,6 +40,11 @@ class BookingPolicy
         return $booking->isOwnedBy($user->id);;
     }
 
+    public function recordDeposit(User $user, Booking $booking): bool
+    {
+        return $booking->isOwnedBy($user->id);
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

@@ -182,7 +182,7 @@ class DatabaseSeeder extends Seeder
 
             Tenant::create([
                 'user_id'           => $user->id,
-                'landlord_user_id'  => $landlord->id,
+                'created_by'        => $landlord->id,
                 'phone'             => '09' . rand(100000000, 999999999),
                 'address'           => 'Cavite',
                 'emergency_contact' => 'Parent',
