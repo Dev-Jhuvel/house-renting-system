@@ -63,4 +63,9 @@ class BillPolicy
     {
         return $bill->isOwnedBy($user->id);
     }
+
+    public function viewOwn(User $user, Bill $bill): bool
+    {
+        return $user->tenant && $bill->booking->tenant->id === $user->tenant->id;
+    }
 }

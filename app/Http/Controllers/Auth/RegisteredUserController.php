@@ -43,6 +43,10 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        if ($user->role === 'tenant') {
+            $user->tenant()->create(['status' => 'pending']);
+        }
+
         event(new Registered($user));
 
         Auth::login($user);

@@ -18,7 +18,9 @@ return new class extends Migration
             $table->date('paid_at');
             $table->enum('method', ['cash', 'gcash', 'bank_transfer'])->default('cash');
             $table->string('reference_number')->nullable();
-            $table->string('proof_photo')->nullable();  // uploaded receipt
+            $table->string('proof_photo')->nullable();
+            $table->text('rejection_reason')->nullable();
+            $table->foreignUuid('submitted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->enum('status', ['pending', 'confirmed', 'rejected'])->default('pending');
             $table->timestamps();
             $table->softDeletes();

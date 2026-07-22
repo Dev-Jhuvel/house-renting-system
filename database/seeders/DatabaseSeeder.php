@@ -81,6 +81,12 @@ class DatabaseSeeder extends Seeder
             'status'         => 'active',
             'notes'          => 'First month free.',
         ]);
+        $booking->deposits()->create([
+            'amount'        => '3500',
+            'paid_at'       => '2025-01-01',
+            'notes'         => 'Jhuvel Deposit',
+            'type'          => 'received',
+        ]);
 
         // Electric Bill
         $electric_bill = Bill::create([

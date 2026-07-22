@@ -34,7 +34,7 @@ class Booking extends Model
 
     public function bills()
     {
-        return $this->hasMany(Bill::class);
+        return $this->hasMany(Bill::class)->latest();
     }
 
     public function unpaid_bills()
@@ -51,7 +51,7 @@ class Booking extends Model
 
     public function getTotalPaidAttribute()
     {
-        return $this->bills->flatMap->payments->sum('amount_paid');
+        return $this->bills->flatMap->payments->where('status', 'confirmed')->sum('amount_paid');
     }
 
     public function getBalanceAttribute()

@@ -52,7 +52,7 @@ class Bill extends Model
     }   
     
     public function getTotalPaidAttribute(){
-        return $this->payments()->sum('amount_paid');
+        return $this->payments()->where('status', 'confirmed')->sum('amount_paid');
     }  
 
     protected function ownershipPath(): string{

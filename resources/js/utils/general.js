@@ -8,20 +8,41 @@ export const toOrdinal = (n) => {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
 
-export const statusColor = (status) =>{
+export const statusColor = (status, isText = false) =>{
   const green   = ['active', 'available', 'paid'];
   const yellow  = ['pending', 'reserved', 'partial'];
   const red     = ['ended', 'canceled', 'occupied', 'unpaid', 'overdue', 'inactive'];
   const blue    = ['maintenance'];
+  const style = isText ? 'text' : 'bg'
+  const shade = isText ? '500' : '300'
   if(green.includes(status)){
-    return 'bg-green-300'
+    return `${style}-green-${shade}`
   }else if(yellow.includes(status)){
-    return 'bg-yellow-300'
+    return `${style}-yellow-${shade}`
   }else if(red.includes(status)){
-    return 'bg-red-300'
+    return `${style}-red-${shade}`
   }else if(blue.includes(status)){
-   return 'bg-blue-300'
+   return `${style}-blue-${shade}`
   }else{
-    return 'bg-gray-300'
+    return `${style}-gray-${shade}`
+  }
+}
+
+
+export const getTimeOfDay = (date = new Date) =>{
+  if(!(date instanceof Date)  || isNaN(date)){
+    throw new Error("Invalid Date object");
+  }
+
+  const hour = date.getHours(); // Military time
+
+  if(hour >= 5 && hour < 12){
+    return "Good morning";
+  }else if(hour >= 12 && hour < 17){
+    return "Good afternoon";
+  }else if(hour >= 17 && hour < 21){
+    return "Good evening";
+  }else{
+    return "Good night";
   }
 }

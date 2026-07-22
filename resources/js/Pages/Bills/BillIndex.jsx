@@ -305,7 +305,7 @@ export default function BookingIndex({ bills, bookings }) {
                 handleChange={handlePaymentChange}
                 processing={paymentProcessing}
                 bill={selectedBillForPayment}
-                method={selectedBillForPayment ? "Update" : "Create"}
+                method="Record"
             />
             <PaymentHistorySheet
                 open={openPaymentHistory}
@@ -416,7 +416,7 @@ export default function BookingIndex({ bills, bookings }) {
                                                             );
                                                         }}
                                                     >
-                                                        Edit Booking
+                                                        Edit Bill
                                                     </DropdownMenuItem>
                                                     <DeleteAlert
                                                         handleDelete={() =>
@@ -432,7 +432,7 @@ export default function BookingIndex({ bills, bookings }) {
                                                                 e.preventDefault()
                                                             }
                                                         >
-                                                            Delete Booking
+                                                            Delete Bill
                                                         </DropdownMenuItem>
                                                     </DeleteAlert>
 

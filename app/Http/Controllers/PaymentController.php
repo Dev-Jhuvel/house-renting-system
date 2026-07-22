@@ -21,9 +21,23 @@ class PaymentController extends Controller
 
         $validated = $request->validated();
 
-       $this->paymentService->create($validated, $bill);
+       $this->paymentService->record($validated, $bill);
 
-        return redirect()->back()->with('success', 'Payment Recorded');
+        return redirect()->back()->with('success', 'Payment recorded');
+    }
+    
+    public function approve(Payment $payment){
+        $this->authorize('update', $payment);
+
+        $this->paymentService->approve($payment);
+        return redirect()->back()->with('success', "Payment approved.");
+    }
+
+    public function reject(Request $request, Payment $payment){
+        $this->authorize('update', $payment);
+        $request->validate(['reason' => 'nullable|string']);
+        $this->paymentService->reject($payment,  $request->reason);
+        return redirect()->back()->with('success', "Payment rejected.");
     }
 
     public function destroy(Bill $bill, Payment $payment)

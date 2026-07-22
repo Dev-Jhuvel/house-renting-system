@@ -10,12 +10,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class DashboardController extends Controller
+class AdminDashboardController extends Controller
 {
     public function index()
     {
 
-        $auth_id = Auth::user()->id;
+        $auth       = Auth::user();
+        $auth_id    = $auth->id;
+
+        if($auth->role === 'tenant'){
+            return redirect(route('dashboard', absolute: false));
+        }
         # Tenants
         $tenants_count = Tenant::ownedBy($auth_id)
         ->selectRaw("COUNT(*) AS total, SUM(status = 'active') AS active")
@@ -56,6 +61,6 @@ class DashboardController extends Controller
             'total_revenue' => number_format($total_revenue, 2),
         ];
 
-        return Inertia::render('Dashboard', ['data' => $data]);
+        return Inertia::render('Dashboards/AdminDashboard', ['data' => $data]);
     }
 }

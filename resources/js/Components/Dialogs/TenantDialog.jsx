@@ -89,7 +89,7 @@ export default function TenantDialog({
                             )}
 
                             <InputWithLabel
-                                label="phone"
+                                label="Phone"
                                 id="phone"
                                 value={form.phone}
                                 name="phone"

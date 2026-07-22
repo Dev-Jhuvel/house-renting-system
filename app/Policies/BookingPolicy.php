@@ -21,7 +21,7 @@ class BookingPolicy
      */
     public function view(User $user, Booking $booking): bool
     {
-        return $booking->isOwnedBy($user->id);;
+        return $booking->isOwnedBy($user->id);
     }
 
     /**
@@ -37,7 +37,7 @@ class BookingPolicy
      */
     public function update(User $user, Booking $booking): bool
     {
-        return $booking->isOwnedBy($user->id);;
+        return $booking->isOwnedBy($user->id);
     }
 
     public function recordDeposit(User $user, Booking $booking): bool
@@ -50,7 +50,7 @@ class BookingPolicy
      */
     public function delete(User $user, Booking $booking): bool
     {
-        return $booking->isOwnedBy($user->id);;
+        return $booking->isOwnedBy($user->id);
     }
 
     /**
@@ -58,7 +58,7 @@ class BookingPolicy
      */
     public function restore(User $user, Booking $booking): bool
     {
-        return $booking->isOwnedBy($user->id);;
+        return $booking->isOwnedBy($user->id);
     }
 
     /**
@@ -66,6 +66,11 @@ class BookingPolicy
      */
     public function forceDelete(User $user, Booking $booking): bool
     {
-        return $booking->isOwnedBy($user->id);;
+        return $booking->isOwnedBy($user->id);
+    }
+
+    public function viewOwn(User $user, Booking $booking): bool
+    {
+        return $user->tenant && $booking->tenant_id === $user->tenant->id;
     }
 }

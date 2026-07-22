@@ -19,6 +19,8 @@ class Payment extends Model
         'method',
         'reference_number',
         'proof_photo',
+        'submitted_by',
+        'rejection_reason',
         'status'
     ];
 

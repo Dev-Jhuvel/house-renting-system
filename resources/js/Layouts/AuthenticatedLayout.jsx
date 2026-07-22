@@ -27,9 +27,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/Components/ui/sonner";
 import { Link, router, usePage } from "@inertiajs/react";
-import { Banknote, EllipsisVertical, House, HousePlus, Layers2, LayoutDashboard, NotepadText, Settings, Users } from "lucide-react";
+import { Banknote, EllipsisVertical, HandCoins, House, HousePlus, Layers2, LayoutDashboard, NotepadText, ReceiptIcon, Settings, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import NavButton from "@/Components/NavButton";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -39,6 +40,7 @@ export default function AuthenticatedLayout({ header, children }) {
         useState(false);
 
     const links = [
+        // Admin & Landlord
         { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard, auth: ['admin', 'landlord'] },
         { routeLink: "houses.index", label: "House", icon: HousePlus, auth: ['admin', 'landlord'] },
         { routeLink: "houses.index", label: "Floors and Room", icon: Layers2, auth: ['admin', 'landlord'] },
@@ -46,6 +48,12 @@ export default function AuthenticatedLayout({ header, children }) {
         { routeLink: "bookings.index", label: "Booking", icon: NotepadText, auth: ['admin', 'landlord'] },
         { routeLink: "bills.index", label: "Bills & Payment", icon: Banknote, auth: ['admin', 'landlord'] },
         { routeLink: "houses.index", label: "Settings", icon: Settings, auth: ['admin', 'landlord'] },
+
+        // Tenant
+        { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard, auth: ['tenant'] },
+        { routeLink: "bookings.index", label: "My Booking", icon: NotepadText, auth: ['tenant'] },
+        { routeLink: "bills.index", label: "Bills", icon: ReceiptIcon, auth: ['tenant'] },
+        { routeLink: "bills.index", label: "Payment", icon: HandCoins, auth: ['tenant'] },
     ];
 
     useEffect(() => {
@@ -78,36 +86,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     <SidebarContent>
                         <SidebarGroup>
                             <SidebarGroupContent>
-                                <RoleGate asChild allow={['admin', 'landlord']}>
+                                <RoleGate asChild allow={['admin', 'landlord', 'tenant']}>
                                     <SidebarMenu>
                                         <SidebarMenuItem className="space-y-1">
                                             {links &&
-                                                links.map(
-                                                    (
-                                                        { routeLink, label, icon },
-                                                        key,
-                                                    ) => {
-                                                        const Icon = icon;
+                                                links.filter(link => link.auth.includes(user.role)).map(
+                                                    (link,key) => {
                                                         return (
-                                                            <SidebarMenuButton
-                                                                asChild
-                                                                tooltip="label"
-                                                                key={key}
-                                                            >
-                                                                <NavLink
-                                                                    href={route(
-                                                                        routeLink,
-                                                                    )}
-                                                                    active={route().current(
-                                                                        routeLink,
-                                                                    )}
-                                                                >
-                                                                    <Icon className="size-5" />
-                                                                    <span className="font-semibold">
-                                                                        {label}
-                                                                    </span>
-                                                                </NavLink>
-                                                            </SidebarMenuButton>
+                                                           <NavButton link={link} key={key} />
                                                         );
                                                     },
                                                 )}

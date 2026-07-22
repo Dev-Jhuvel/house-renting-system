@@ -2,7 +2,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 
 export default function TenantColumn({ name, email, avatar = null }) {
     const parts = name.split(' ');
-    const initials = parts[0].charAt(0) + parts[1].charAt(0);
+    const initials = parts[0].charAt(0) +( parts[1]?.charAt(0) ?? "");
     return (
         <>
             <div>

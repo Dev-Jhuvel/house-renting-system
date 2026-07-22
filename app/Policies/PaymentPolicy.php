@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Bill;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -62,5 +63,15 @@ class PaymentPolicy
     public function forceDelete(User $user, Payment $payment): bool
     {
         return $payment->isOwnedBy($user->id);
+    }
+
+    public function viewOwn(User $user, Payment $payment): bool
+    {
+        return $user->tenant && $payment->bill->booking->tenant_id === $user->tenant->id;
+    }
+
+    public function submit(User $user, Bill $bill): bool
+    {
+        return $user->tenant && $bill->booking->tenant_id === $user->tenant->id;
     }
 }

@@ -26,7 +26,7 @@ export default function PaymentDialog({
     method,
     bill
 }) {
-    const process = method === "Create" ? "Creating..." : "Updating...";
+    const process = "Recording...";
     const payment_types = ["Cash", "Gcash", "Bank Transfer"];
 
     return (
@@ -36,7 +36,7 @@ export default function PaymentDialog({
                 <form onSubmit={handleSubmit}>
                     <DialogHeader className="py-2">
                         <DialogTitle>
-                            {method === "Create" ? "Add New" : "Update"} Payment
+                            Record Payment
                         </DialogTitle>
                     </DialogHeader>
                     <div className="h-[270px] overflow-y-auto scroll">
