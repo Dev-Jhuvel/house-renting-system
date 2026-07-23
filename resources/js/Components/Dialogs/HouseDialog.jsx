@@ -12,9 +12,12 @@ import InputWithLabel from "../InputWithLabel";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
+import { Search } from "lucide-react";
+import LocationPicker from "../Maps/LocationPicker";
 
 export default function HouseDialog({
     form,
+    setData,
     handleSubmit,
     handleChange,
     processing,
@@ -25,12 +28,30 @@ export default function HouseDialog({
     children,
 }) {
     const process = method === "Create" ? "Creating..." : "Updating...";
+
+    const searchAddress = async (e) => {
+        e.preventDefault();
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(form.address)}`
+        );
+
+        const data = await res.json();
+
+        if (!data.length) {
+            alert("Address not found.");
+            return;
+        }
+
+        setData("latitude", Number(data[0].lat));
+        setData("longitude", Number(data[0].lon));
+        console.log(form);
+    };
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild onClick={() => setOpen(true)}>
                 {children}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[550px]">
+            <DialogContent className="sm:max-w-[660px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader className="py-2">
                         <DialogTitle>Add New Property</DialogTitle>
@@ -81,26 +102,6 @@ export default function HouseDialog({
                                 className="col-span-8"
                             />
                             <InputWithLabel
-                                label="Address"
-                                id="address"
-                                value={form.address}
-                                name="address"
-                                error={errors.address}
-                                onChange={handleChange}
-                                placeholder="123 St. New York City"
-                                className="col-span-5"
-                            />
-                            <InputWithLabel
-                                label="City"
-                                id="city"
-                                value={form.city}
-                                name="city"
-                                error={errors.city}
-                                onChange={handleChange}
-                                placeholder="South Side"
-                                className="col-span-3"
-                            />
-                            <InputWithLabel
                                 label="Water Rate"
                                 id="water_rate"
                                 value={form.water_rate}
@@ -143,6 +144,44 @@ export default function HouseDialog({
                                     />
                                 </div>
                             </div>
+                            <div className="flex col-span-5 items-end">
+                                <InputWithLabel
+                                    label="Address"
+                                    id="address"
+                                    value={form.address}
+                                    name="address"
+                                    error={errors.address}
+                                    onChange={handleChange}
+                                    placeholder="123 St. New York City"
+                                    className="col-span-5"
+                                 />
+                                <Button 
+                                    variant="ghost" 
+                                    disabled={form.address === ''}
+                                    onClick={(e)=>searchAddress(e)}>
+                                        <Search />
+                                </Button>
+                           </div>
+                            <InputWithLabel
+                                label="City"
+                                id="city"
+                                value={form.city}
+                                name="city"
+                                error={errors.city}
+                                onChange={handleChange}
+                                placeholder="South Side"
+                                className="col-span-3"
+                            />
+                             {open && form.latitude && form.longitude && (
+                            <LocationPicker 
+                                className="col-span-8 pr-6"
+                                position={[form.latitude, form.longitude]} 
+                                onChange={([lat, lng]) => {
+                                    setData("latitude", lat);
+                                    setData("longitude", lng);
+                                }}
+                            />
+                        )}
                         </div>
                     </div>
                     <DialogFooter>

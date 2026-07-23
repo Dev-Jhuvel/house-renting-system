@@ -34,6 +34,8 @@ export default function HouseIndex({ houses }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         address: "",
+        latitude: null,
+        longitude: null,
         description: "",
         city: "",
         max_floor: "",
@@ -65,6 +67,10 @@ export default function HouseIndex({ houses }) {
         }));
     }
 
+    useEffect(() =>{
+        console.log(data);
+    }, [data])
+
     return (
         <div className="flex flex-col p-4 bg-gray-200">
             <div className="flex mb-4">
@@ -77,6 +83,7 @@ export default function HouseIndex({ houses }) {
                         setOpen={setOpen}
                         open={open}
                         form={data}
+                        setData={setData}
                         errors={errors}
                         handleSubmit={handleSubmit}
                         handleChange={handleChange}

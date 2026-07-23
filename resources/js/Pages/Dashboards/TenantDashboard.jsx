@@ -23,6 +23,7 @@ import {
     Wallet,
     Zap,
 } from "lucide-react";
+import MapView from "@/Components/Maps/MapView";
 
 export default function TenantDashboard({ tenant }) {
     console.log(tenant);
@@ -84,12 +85,14 @@ export default function TenantDashboard({ tenant }) {
                             <Button variant="link">View All bills</Button>
                         </div>
                         <div className="grid grid-cols-1 gap-4">
-                            {bills.splice(0, 3).map((bill, key) => (
+                            {bills.splice(0, 4).map((bill, key) => (
                                 <BillRow bill={bill} key={key} />
                             ))}
                         </div>
                     </div>
-                    <div className="col-span-3"></div>
+                    <div className="col-span-3 relative">
+                        <MapView className="z-10" latitude={house.latitude} longitude={house.longitude} address={house.address} />
+                    </div>
                 </div>
             </div>
         </div>

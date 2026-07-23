@@ -15,9 +15,11 @@ class House extends Model
     protected $fillable = [
         'user_id',
         'name',
-        'address',
         'description',
+        'address',
         'city',
+        'latitude',
+        'longitude',
         'max_floor',
         'max_room',
         'water_rate',

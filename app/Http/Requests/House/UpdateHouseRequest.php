@@ -24,8 +24,10 @@ class UpdateHouseRequest extends FormRequest
         return [
             'name'          => ['required', 'string'],
             'address'       => ['required', 'string'],
-            'description'   => ['required', 'string'],
             'city'          => ['required', 'string'],
+            'latitude'      => ['nullable', 'numeric'],
+            'longitude'     => ['nullable', 'numeric'],
+            'description'   => ['required', 'string'],
             'max_floor'     => ['required', 'numeric'],
             'max_room'      => ['required', 'numeric'],
             'water_rate'    => ['required', 'numeric'],

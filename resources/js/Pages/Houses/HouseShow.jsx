@@ -121,6 +121,7 @@ export default function HouseShow({ house }) {
                                         setOpen={setOpen}
                                         open={open}
                                         form={data}
+                                        setData={setData}
                                         errors={errors}
                                         handleSubmit={handleSubmit}
                                         handleChange={handleChange}
