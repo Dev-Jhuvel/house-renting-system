@@ -39,7 +39,7 @@ Route::middleware(['auth', 'role:tenant'])->group(function(){
     Route::post('/tenant/store', [RegisteredTenantController::class, 'store'])->name('register.tenant.store');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bills/{bill}', [BillController::class, 'show'])->name('bills.show');
-    Route::get('/bills/{bill}/payments', [BillController::class, 'store'])->name('bills.payments.store');
+    Route::post('/bills/{bill}/payments/submit', [PaymentController::class, 'submit'])->name('bills.payments.submit');
 });
 
 Route::middleware(['auth', 'role:landlord,admin'])->group(function () {
@@ -65,8 +65,8 @@ Route::middleware(['auth', 'role:landlord,admin'])->group(function () {
     # Deposits
     Route::delete('deposits/{deposit}', [DepositController::class, 'destroy'])->name('deposits.destroy');
     # Payments
-    Route::post('payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
-    Route::post('payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
+    Route::patch('payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
+    Route::patch('payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
 });
 
 require __DIR__ . '/auth.php';

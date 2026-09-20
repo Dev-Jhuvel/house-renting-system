@@ -14,9 +14,16 @@ class TenantDashboardController extends Controller
                 ->with([
                     'booking.room.house',
                     'booking.unpaid_bills',
+                    'booking.bills.payments',
                     'booking.deposits'
                 ])
                 ->firstOrFail();
+
+            $sorted_bills = $tenant->booking->bills->sortBy(function($bill){
+                return $bill->status === 'paid';
+            })->values();
+
+            $tenant->booking->setRelation('bills', $sorted_bills);
 
             return Inertia::render('Dashboards/TenantDashboard', ['tenant' => $tenant]);
        } catch (\Throwable $th) {

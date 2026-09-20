@@ -29,7 +29,7 @@ class PaymentService
     public function submit(array $data, Bill $bill): void
     {
         DB::transaction(function () use ($data, $bill) {
-            $bill->payments()->create([
+            $payment = $bill->payments()->create([
                 ...$data,
                 'status'        => 'pending',
                 'submitted_by'  => Auth::id()

@@ -14,6 +14,7 @@ import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import DatePicker from "@/Components/DatePicker";
 import InputSelect from "../InputSelect";
+import { usePage } from "@inertiajs/react";
 
 export default function PaymentDialog({
     form,
@@ -26,7 +27,13 @@ export default function PaymentDialog({
     method,
     bill
 }) {
-    const process = "Recording...";
+    const user = usePage().props.auth.user;
+    
+    const processes = {
+        record: 'Recording',
+        submit: 'Submitting'
+    };
+    const process = `${processes[method]}...`;
     const payment_types = ["Cash", "Gcash", "Bank Transfer"];
 
     return (

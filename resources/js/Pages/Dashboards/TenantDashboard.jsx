@@ -11,8 +11,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { getTimeOfDay, statusColor, toTitleCase } from "@/utils/general";
-import { Link, router, usePage } from "@inertiajs/react";
+import { Link, router, useForm, usePage } from "@inertiajs/react";
 import {
     CreditCard,
     Droplets,
@@ -24,9 +29,36 @@ import {
     Zap,
 } from "lucide-react";
 import MapView from "@/Components/Maps/MapView";
+import PaymentDialog from "@/Components/Dialogs/PaymentDialog";
+import { useState } from "react";
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/Components/ui/hover-card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function TenantDashboard({ tenant }) {
-    console.log(tenant);
+    const today = new Date();
+    const {
+        data: paymentData,
+        setData: setPaymentData,
+        post: postPayment,
+        put: putPayment,
+        processing: paymentProcessing,
+        errors: paymentErrors,
+        reset: resetPayment,
+    } = useForm({
+        amount_paid: "",
+        paid_at: today.toISOString().slice(0, 10),
+        method: "",
+        reference_number: "",
+        notes: "",
+    });
+
+    const [openPayment, setOpenPayment] = useState(false);
+    const [selectedBillForPayment, setSelectedBillForPayment] = useState(null);
+    const max_bill_count = 5;
     const user = usePage().props.auth.user;
     const booking = tenant?.booking;
     const bills = tenant?.booking?.bills;
@@ -58,8 +90,55 @@ export default function TenantDashboard({ tenant }) {
             footer: `Room# ${room?.room_number}`,
         },
     ];
+
+    function handleBillRowAction(bill) {
+        console.log(bill);
+        if (bill.status !== "paid" || bill.amount === bill.total_paid) {
+            handleOpenPayment(bill);
+        }
+    }
+
+    function handleOpenPayment(bill) {
+        setOpenPayment(true);
+        setSelectedBillForPayment(bill);
+        resetPayment();
+    }
+
+    function handleSubmitPayment(e) {
+        e.preventDefault();
+        postPayment(route("bills.payments.submit", selectedBillForPayment.id), {
+            onSuccess: () => {
+                resetPayment();
+                setOpenPayment(false);
+                setSelectedBillForPayment(null);
+            },
+        });
+    }
+
+    function handlePaymentChange(e) {
+        const { name, type, value } = e.target;
+        setPaymentData((prev) => ({
+            ...prev,
+            [name]:
+                type === "number" && value !== ""
+                    ? parseFloat(value) || 0
+                    : value,
+        }));
+    }
+
     return (
         <div className="py-12">
+            <PaymentDialog
+                setOpen={setOpenPayment}
+                open={openPayment}
+                form={paymentData}
+                errors={paymentErrors}
+                handleSubmit={handleSubmitPayment}
+                handleChange={handlePaymentChange}
+                processing={paymentProcessing}
+                bill={selectedBillForPayment}
+                method="Submit"
+            />
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg mb-4">
                     <h1 className="text-3xl font-bold">
@@ -72,26 +151,40 @@ export default function TenantDashboard({ tenant }) {
                         </p>
                     )}
                 </div>
-                <div className="grid grid-cols-8 gap-4">
+                <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
                     {cards.map((card) => (
-                        <DashboardCard card={card} />
+                        <DashboardCard card={card} key={card.label} />
                     ))}
                     <QuickActionCard />
                 </div>
-                <div className="grid grid-cols-8 my-4">
+                <div className="grid grid-cols-1 md:grid-cols-8 my-4 gap-2">
                     <div className="col-span-5">
                         <div className="flex justify-between items-center">
                             <h3 className="text-xl font-bold">Recent Bills</h3>
-                            <Button variant="link">View All bills</Button>
+                            {bills.length > max_bill_count && (
+                                <Button variant="link">View All bills</Button>
+                            )}
                         </div>
                         <div className="grid grid-cols-1 gap-4">
-                            {bills.splice(0, 4).map((bill, key) => (
-                                <BillRow bill={bill} key={key} />
+                            {bills.slice(0, max_bill_count).map((bill) => (
+                                <ResponsiveBillRow
+                                    bill={bill}
+                                    key={bill.id}
+                                    onClick={() => handleBillRowAction(bill)}
+                                />
                             ))}
                         </div>
                     </div>
-                    <div className="col-span-3 relative">
-                        <MapView className="z-10" latitude={house.latitude} longitude={house.longitude} address={house.address} />
+                    <div className={`col-span-3 relative h-[397px] ${openPayment ? 'z-0': 'z-10'}`}>
+                        <h3 className="text-xl font-bold py-1">
+                            Location/Address
+                        </h3>
+                        <MapView
+                            className="z-10"
+                            latitude={house.latitude}
+                            longitude={house.longitude}
+                            address={house.address}
+                        />
                     </div>
                 </div>
             </div>
@@ -153,7 +246,7 @@ function QuickActionCard() {
     );
 }
 
-function BillRow({ bill }) {
+function BillRow({ bill, onClick }) {
     let Icon;
     let color;
     switch (bill.type) {
@@ -182,7 +275,7 @@ function BillRow({ bill }) {
     const textColor = `text-${color}-500`;
     const statusTextColor = statusColor(bill.status, true);
     return (
-        <Card className="col-span-2 border">
+        <Card className="col-span-2 border cursor-pointer" onClick={onClick}>
             <CardContent className="flex flex-row items-center p-2 pr-12 gap-2">
                 <div className={`${bgColor} ${textColor} rounded-full p-2`}>
                     <Icon />
@@ -193,13 +286,70 @@ function BillRow({ bill }) {
                 </div>
                 <div>
                     <h3 className="text-lg font-bold">₱{bill.amount}</h3>
-                    <p
-                        className={`text-xs font-semibold text-right ${statusTextColor}`}
-                    >
+                    <p className={`text-xs font-semibold text-right ${statusTextColor}`} >
                         {bill.status.toUpperCase()}
+                    </p>
+                     <p className={`text-xs font-semibold text-right text-green-500`} >
+                        Payments: {bill.payments.length}
                     </p>
                 </div>
             </CardContent>
         </Card>
+    );
+}
+
+function ResponsiveBillRow({ bill, onClick }) {
+    const isMobile = useIsMobile();
+
+    const Content = ({bill}) => (
+        <div>
+            <div>
+                <h2 className="text-center font-bold">{bill.title}</h2>
+            </div>
+            {bill.payments.length > 0 && (
+                <div>
+                    <h3 className="font-bold">Payments</h3>
+                    <ul>
+                        {bill.payments.map((payment) => (
+                            <li key={payment.id}>
+                                {toTitleCase(
+                                    `${payment.method} - ₱${payment.amount_paid} `,
+                                )}
+                                {toTitleCase(payment.status)}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </div>
+    );
+    return isMobile ? (
+        <Popover>
+            <PopoverTrigger asChild>
+                <div>
+                    <BillRow
+                        bill={bill}
+                        onClick={onClick}
+                    />
+                </div>
+            </PopoverTrigger>
+            <PopoverContent className="z-[401]">
+                <Content bill={bill} />
+            </PopoverContent>
+        </Popover>
+    ) : (
+        <HoverCard key={bill.id}>
+            <HoverCardTrigger asChild>
+                <div>
+                    <BillRow
+                        bill={bill}
+                        onClick={onClick}
+                    />
+                </div>
+            </HoverCardTrigger>
+            <HoverCardContent className="z-[401]">
+                <Content bill={bill} />
+            </HoverCardContent>
+        </HoverCard>
     );
 }

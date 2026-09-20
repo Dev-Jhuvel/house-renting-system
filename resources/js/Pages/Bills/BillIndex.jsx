@@ -208,8 +208,7 @@ export default function BookingIndex({ bills, bookings }) {
     const [openPayment, setOpenPayment] = useState(false);
     const [openPaymentHistory, setOpenPaymentHistory] = useState(false);
     const [selectedBillForPayment, setSelectedBillForPayment] = useState(null);
-    const [selectedBillForPaymentHistory, setSelectedBillForPaymentHistory] =
-        useState(null);
+    const [selectedBillForPaymentHistory, setSelectedBillForPaymentHistory] = useState(null);
     const {
         data: paymentData,
         setData: setPaymentData,

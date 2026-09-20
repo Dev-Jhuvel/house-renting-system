@@ -15,6 +15,9 @@ import {
 } from "@/Components/ui/table";
 import DeleteAlert from "@/Components/DeleteAlert";
 import { Button } from "../ui/button";
+import { toTitleCase } from "@/utils/general";
+import ActionDropDown from "../ActionDropDown";
+import { router } from "@inertiajs/react";
 
 export default function PaymentHistorySheet({
     open,
@@ -22,9 +25,29 @@ export default function PaymentHistorySheet({
     bill,
     handleDeletePayment,
 }) {
+    function handleApprove(payment) {
+        router.patch(route("payments.approve", payment.id));
+    }
+
+    function handleReject(payment) {
+        router.patch(route("payments.reject", payment.id));
+    }
+
+    const PaymentActions = (payment) => {
+        const { status } = payment;
+        const pending = status === "pending";
+
+        // # think of when I can do this action
+        return {
+            canApprove: pending,
+            canReject: pending,
+            canUndo: !pending,
+            canDelete: pending,
+        };
+    };
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent>
+            <SheetContent className="sm:max-w-lg">
                 <SheetHeader>
                     <SheetTitle>Payment History</SheetTitle>
                     <p className="text-sm text-muted-foreground">
@@ -42,20 +65,83 @@ export default function PaymentHistorySheet({
                                 <TableRow>
                                     <TableHead>Amount</TableHead>
                                     <TableHead>Method</TableHead>
+                                    <TableHead>Status</TableHead>
                                     <TableHead>Paid At</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {bill?.payments?.map((payment) => (
-                                    <TableRow key={payment.id}>
-                                        <TableCell>
-                                            ₱{payment.amount_paid}
-                                        </TableCell>
-                                        <TableCell>{payment.method}</TableCell>
-                                        <TableCell>{payment.paid_at}</TableCell>
-                                        <TableCell>
-                                            <DeleteAlert
+                                {bill?.payments?.map((payment) => {
+                                    const actions = PaymentActions(payment);
+                                    return (
+                                        <TableRow key={payment.id}>
+                                            <TableCell>
+                                                ₱{payment.amount_paid}
+                                            </TableCell>
+                                            <TableCell>
+                                                {toTitleCase(payment.method)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {toTitleCase(payment.status)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {payment.paid_at}
+                                            </TableCell>
+                                            <TableCell>
+                                                <ActionDropDown
+                                                    actions={[
+                                                        {
+                                                            label: "Approve",
+                                                            disabled:
+                                                                !actions.canApprove,
+                                                            visible:
+                                                                actions.canApprove,
+                                                            onClick: () =>
+                                                                handleApprove(
+                                                                    payment
+                                                                ),
+                                                            preventDefault: true,
+                                                        },
+                                                        {
+                                                            label: "Reject",
+                                                            disabled:
+                                                                !actions.canReject,
+                                                            visible:
+                                                                actions.canReject,
+                                                            onClick: () =>
+                                                                handleReject(
+                                                                    payment
+                                                                ),
+                                                            preventDefault: true,
+                                                        },
+                                                        // {
+                                                        //     label: "Undo",
+                                                        //     disabled:
+                                                        //         !actions.canUndo,
+                                                        //     visible:
+                                                        //         actions.canUndo,
+                                                        //     onClick: () =>
+                                                        //         handlePaymentActions(
+                                                        //             payment,
+                                                        //             "undo",
+                                                        //         ),
+                                                        //     preventDefault: true,
+                                                        // },
+                                                        {
+                                                            label: "Delete",
+                                                            disabled:
+                                                                !actions.canDelete,
+                                                            onClick: () =>
+                                                                handleDeletePayment(
+                                                                    payment.id,
+                                                                ),
+                                                            delete: true,
+                                                            deleteMessage:
+                                                                "Are you sure you want to delete this payment?",
+                                                        },
+                                                    ]}
+                                                />
+                                                {/* <DeleteAlert
                                                 handleDelete={() =>
                                                     handleDeletePayment(
                                                         payment.id,
@@ -69,10 +155,11 @@ export default function PaymentHistorySheet({
                                                 >
                                                     Delete
                                                 </Button>
-                                            </DeleteAlert>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                            </DeleteAlert> */}
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     )}
