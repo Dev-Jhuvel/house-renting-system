@@ -33,6 +33,7 @@ import InputWithLabel from "@/Components/InputWithLabel";
 import DeleteAlert from "@/Components/DeleteAlert";
 import RoomDialog from "@/Components/Dialogs/RoomDialog";
 import RoomSection from "../Rooms/RoomSection";
+import { StatusBadge } from "@/Components/StatusBadge";
 
 export default function HouseShow({ house }) {
     const { data, setData, patch, processing, errors } = useForm(house);
@@ -87,20 +88,15 @@ export default function HouseShow({ house }) {
                         <ArrowLeft /> Back to Portfolio
                     </Button>
                 </Link>
-                <div className="p-4 bg-gray-100 rounded-md border">
+                <div className="p-4 rounded-md border">
                     <div className="">
                         <div className="flex justify-between items-center mb-2">
-                            <div className="flex justify-between items-center gap-3">
+                            <div className="relative flex justify-between items-center gap-3">
                                 <h1 className="text-4xl font-semibold">
                                     {house.name}
                                 </h1>
                                 <span>
-                                    <Badge
-                                        variant="outline"
-                                        className={`z-30 rounded-sm ${activeHouse ? "bg-green-300" : "bg-gray-300"}`}
-                                    >
-                                        {house.status.toUpperCase()}
-                                    </Badge>
+                                    <StatusBadge status={house.status} className="z-30 rounded-sm" />
                                 </span>
                             </div>
                             <DropdownMenu>

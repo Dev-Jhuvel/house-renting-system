@@ -126,8 +126,8 @@ export default function AdminDashboard({data}) {
     return (
         <div className="py-12">
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg border">
-                    <div className="p-6 text-gray-900 border">
+                <div className="overflow-hidden sm:rounded-lg">
+                    <div className="py-6">
                         <h1 className="text-3xl font-bold ">
                             Dashboard Overview
                         </h1>

@@ -46,7 +46,9 @@ import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
 import PaymentDialog from "@/Components/Dialogs/PaymentDialog";
 import PaymentHistorySheet from "@/Components/Sheets/PaymentHistorySheet";
-import { statusColor, toTitleCase } from "@/utils/general";
+import { toTitleCase } from "@/utils/general";
+import { StatusBadge } from "@/Components/StatusBadge";
+import ActionDropDown from "@/Components/ActionDropDown";
 
 export default function BookingIndex({ bills, bookings }) {
     const today = new Date();
@@ -283,7 +285,7 @@ export default function BookingIndex({ bills, bookings }) {
     }
 
     return (
-        <div className="flex flex-col p-4 bg-gray-200">
+        <div className="flex flex-col p-4">
             <BillDialog
                 setOpen={setOpenBill}
                 open={openBill}
@@ -353,6 +355,40 @@ export default function BookingIndex({ bills, bookings }) {
                                 const room = bill.booking?.room;
                                 const house = room?.house;
                                 const actions = BillActions(bill);
+                                const billDropdownAction = [
+                                    {
+                                        label: "Approve",
+                                        disabled: !actions.canApprove,
+                                        visible: actions.canApprove,
+                                        onClick: () => handleApprove(payment),
+                                        preventDefault: true,
+                                    },
+                                    {
+                                        label: "Edit Bill",
+                                        disabled: !actions.canEdit,
+                                        onClick: () => handleOpenBillEdit(bill),
+                                        preventDefault: true,
+                                    },
+                                    {
+                                        label: "Delete Bill",
+                                        disabled: !actions.canDelete,
+                                        onClick: () => handleDeleteBill(bill.id),
+                                        delete: true,
+                                        deleteMessage: "Are you sure to Delete this bill?"
+                                    },
+                                    {
+                                        label: "Record Payment",
+                                        disabled: !actions.canRecordPayment,
+                                        onClick: () => handleOpenPayment(bill),
+                                        preventDefault: true,
+                                    },
+                                    {
+                                        label: "View Payment History",
+                                        disabled: !actions.canViewPayment,
+                                        onClick: () => handleOpenPaymentHistory(bill),
+                                        preventDefault: true,
+                                    },
+                                ];
                                 return (
                                     <TableRow key={key}>
                                         <TableCell className="flex items-center gap-x-2">
@@ -383,82 +419,10 @@ export default function BookingIndex({ bills, bookings }) {
                                             {bill.due_date}
                                         </TableCell>
                                         <TableCell className="">
-                                            <span
-                                                className={`px-2 py-1 rounded-md font-semibold ${statusColor(status)}`}
-                                            >
-                                                {status
-                                                    ? toTitleCase(status)
-                                                    : "-"}
-                                            </span>
+                                            <StatusBadge status={status} />
                                         </TableCell>
                                         <TableCell className="">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <button className="px-3 py-1">
-                                                        <EllipsisVertical
-                                                            className="hover:text-primary"
-                                                            size={18}
-                                                        />
-                                                    </button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuLabel>
-                                                        Actions
-                                                    </DropdownMenuLabel>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        disabled={!actions.canEdit}
-                                                        onSelect={(e) => {
-                                                            e.preventDefault();
-                                                            handleOpenBillEdit(
-                                                                bill,
-                                                            );
-                                                        }}
-                                                    >
-                                                        Edit Bill
-                                                    </DropdownMenuItem>
-                                                    <DeleteAlert
-                                                        handleDelete={() =>
-                                                            handleDeleteBill(
-                                                                bill.id,
-                                                            )
-                                                        }
-                                                        message="Are you sure to Delete this bill?"
-                                                    >
-                                                        <DropdownMenuItem
-                                                            disabled={!actions.canDelete}
-                                                            onSelect={(e) =>
-                                                                e.preventDefault()
-                                                            }
-                                                        >
-                                                            Delete Bill
-                                                        </DropdownMenuItem>
-                                                    </DeleteAlert>
-
-                                                    <DropdownMenuItem
-                                                        disabled={!actions.canRecordPayment}
-                                                        onSelect={(e) => {
-                                                            e.preventDefault();
-                                                            handleOpenPayment(
-                                                                bill,
-                                                            );
-                                                        }}
-                                                    >
-                                                        Record Payment
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        disabled={!actions.canViewPayment}
-                                                        onSelect={(e) => {
-                                                            e.preventDefault();
-                                                            handleOpenPaymentHistory(
-                                                                bill,
-                                                            );
-                                                        }}
-                                                    >
-                                                        View Payment History
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <ActionDropDown actions={billDropdownAction} />
                                         </TableCell>
                                     </TableRow>
                                 );

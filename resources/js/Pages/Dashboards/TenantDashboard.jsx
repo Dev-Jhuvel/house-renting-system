@@ -141,7 +141,7 @@ export default function TenantDashboard({ tenant }) {
                 method="Submit"
             />
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg mb-4">
+                <div className="overflow-hidden shadow-sm sm:rounded-lg mb-4">
                     <h1 className="text-3xl font-bold">
                         {getTimeOfDay()}, {user.name}!
                     </h1>

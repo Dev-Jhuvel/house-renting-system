@@ -10,10 +10,11 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import { statusColor, toOrdinal } from "../../utils/general.js";
+import { toOrdinal } from "../../utils/general.js";
 import { Link, useForm } from "@inertiajs/react";
 import { ArrowRight, DoorClosed, Layers2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { StatusBadge } from "@/Components/StatusBadge.jsx";
 export default function RoomSection({ rooms, house }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         house_id: house.id,
@@ -51,7 +52,7 @@ export default function RoomSection({ rooms, house }) {
     }
 
     return (
-        <div className="p-4 bg-gray-100 rounded-md border">
+        <div className="p-4">
             <div className="flex justify-between items-center mb-2">
                 <h1 className="text-4xl font-semibold">Manage Rooms</h1>
                 <RoomDialog
@@ -89,12 +90,7 @@ function RoomCard({ room }) {
     return (
         <Card className="relative mx-auto w-full max-w-sm pt-0 shadow-md flex flex-col">
             <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-            <Badge
-                variant="outline"
-                className={`absolute z-30 right-5 top-5 bg-yellow-300 rounded-sm ${statusColor(room.status)}`}
-            >
-                {room.status.toUpperCase()}
-            </Badge>
+            <StatusBadge status={room.status} className="absolute z-30 right-5 top-5 rounded-sm" />
             <img
                 src="https://images.pexels.com/photos/279810/pexels-photo-279810.jpeg"
                 alt="Event cover"

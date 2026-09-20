@@ -52,7 +52,9 @@ import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
 import DepositHistorySheet from "@/Components/Sheets/DepositHistorySheet";
 import { FocusTrapFeatures } from "@headlessui/react";
-import { toTitleCase, statusColor } from "@/utils/general";
+import { toTitleCase } from "@/utils/general";
+import { StatusBadge } from "@/Components/StatusBadge";
+import ActionDropDown from "@/Components/ActionDropDown";
 
 export default function BookingIndex({ bookings, tenants, rooms }) {
     const today = new Date();
@@ -229,7 +231,7 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
     };
 
     return (
-        <div className="flex flex-col p-4 bg-gray-200">
+        <div className="flex flex-col p-4">
             <div className="flex mb-4">
                 <div className="flex-grow">
                     <h1 className="text-2xl">My Bookings</h1>
@@ -312,8 +314,79 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                 const house = room?.house;
                                 const unpaid_bills_count =
                                     booking.unpaid_bills_count;
-                                const status_color = statusColor(status);
                                 const actions = bookingActions(booking);
+                                const bookingDropdownActions = [
+                                    {
+                                        label: "Edit Booking",
+                                        disabled: !actions.canEdit,
+                                        onClick: () => handleOpenBookingEdit(booking),
+                                        preventDefault: true,
+                                    },
+                                    {
+                                        label: "Delete Booking",
+                                        disabled: !actions.canDelete,
+                                        onClick: () => handleBookingDelete(booking.id),
+                                        delete: true,
+                                        deleteMessage: "Are you sure to Delete this booking?",
+                                    },
+                                    {
+                                        label: "Activate Booking",
+                                        disabled: !actions.canActivate,
+                                        onClick: () =>
+                                            router.patch(
+                                                route(
+                                                    "booking.updateBookingStatus",
+                                                    booking.id,
+                                                ),
+                                                {
+                                                    status: "active",
+                                                },
+                                            ),
+                                    },
+                                    {
+                                        label: "End Booking",
+                                        disabled: !actions.canEnd,
+                                        onClick: () =>
+                                            router.patch(
+                                                route(
+                                                    "booking.updateBookingStatus",
+                                                    booking.id,
+                                                ),
+                                                {
+                                                    status: "ended",
+                                                },
+                                            ),
+                                    },
+                                    {
+                                        label: "Cancel Booking",
+                                        disabled: !actions.canCancel,
+                                        onClick: () =>
+                                            router.patch(
+                                                route(
+                                                    "booking.updateBookingStatus",
+                                                    booking.id,
+                                                ),
+                                                {
+                                                    status: "canceled",
+                                                },
+                                            ),
+                                    },
+                                    {
+                                        label: "Record Deposit",
+                                        disabled: !actions.canRecordDeposit,
+                                        onClick: () => handleOpenDepositCreate(booking),
+                                        preventDefault: true,
+                                    },
+                                    {
+                                        label: "View Deposit History",
+                                        disabled: !actions.canViewDeposit,
+                                        onClick: () => {
+                                            setOpenDepositHistory(true);
+                                            setSelectedBookingForDeposit(booking);
+                                        },
+                                        preventDefault: true,
+                                    },
+                                ];
                                 return (
                                     <HoverCard>
                                         <HoverCardTrigger asChild>
@@ -345,162 +418,10 @@ export default function BookingIndex({ bookings, tenants, rooms }) {
                                                     {unpaid_bills_count}
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span
-                                                        className={`px-2 py-1 rounded-md font-semibold ${status_color}`}
-                                                    >
-                                                        {toTitleCase(status)}
-                                                    </span>
+                                                    <StatusBadge status={status} />
                                                 </TableCell>
                                                 <TableCell className="">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger
-                                                            asChild
-                                                        >
-                                                            <button className="px-3 py-1">
-                                                                <EllipsisVertical
-                                                                    className="hover:text-primary"
-                                                                    size={18}
-                                                                />
-                                                            </button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent>
-                                                            <DropdownMenuLabel>
-                                                                Actions
-                                                            </DropdownMenuLabel>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem
-                                                                disabled={
-                                                                    !actions.canEdit
-                                                                }
-                                                                onSelect={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.preventDefault();
-                                                                    handleOpenBookingEdit(
-                                                                        booking,
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Edit Booking
-                                                            </DropdownMenuItem>
-                                                            <DeleteAlert
-                                                                handleDelete={() =>
-                                                                    handleBookingDelete(
-                                                                        booking.id,
-                                                                    )
-                                                                }
-                                                                message="Are you sure to Delete this booking?"
-                                                            >
-                                                                <DropdownMenuItem
-                                                                    disabled={
-                                                                        !actions.canDelete
-                                                                    }
-                                                                    onSelect={(
-                                                                        e,
-                                                                    ) =>
-                                                                        e.preventDefault()
-                                                                    }
-                                                                >
-                                                                    Delete
-                                                                    Booking
-                                                                </DropdownMenuItem>
-                                                            </DeleteAlert>
-                                                            <DropdownMenuItem
-                                                                disabled={
-                                                                    !actions.canActivate
-                                                                }
-                                                                onSelect={(
-                                                                    e,
-                                                                ) => {
-                                                                    router.patch(
-                                                                        route(
-                                                                            "booking.updateBookingStatus",
-                                                                            booking.id,
-                                                                        ),
-                                                                        {
-                                                                            status: "active",
-                                                                        },
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Activate Booking
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                disabled={
-                                                                    !actions.canEnd
-                                                                }
-                                                                onSelect={(
-                                                                    e,
-                                                                ) => {
-                                                                    router.patch(
-                                                                        route(
-                                                                            "booking.updateBookingStatus",
-                                                                            booking.id,
-                                                                        ),
-                                                                        {
-                                                                            status: "ended",
-                                                                        },
-                                                                    );
-                                                                }}
-                                                            >
-                                                                End Booking
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                disabled={
-                                                                    !actions.canCancel
-                                                                }
-                                                                onSelect={(
-                                                                    e,
-                                                                ) => {
-                                                                    router.patch(
-                                                                        route(
-                                                                            "booking.updateBookingStatus",
-                                                                            booking.id,
-                                                                        ),
-                                                                        {
-                                                                            status: "canceled",
-                                                                        },
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Cancel Booking
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                disabled={
-                                                                    !actions.canRecordDeposit
-                                                                }
-                                                                onSelect={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.preventDefault();
-                                                                    handleOpenDepositCreate(
-                                                                        booking,
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Record Deposit
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                disabled={
-                                                                    !actions.canViewDeposit
-                                                                }
-                                                                onSelect={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.preventDefault();
-                                                                    setOpenDepositHistory(
-                                                                        true,
-                                                                    );
-                                                                    setSelectedBookingForDeposit(
-                                                                        booking,
-                                                                    );
-                                                                }}
-                                                            >
-                                                                View Deposit
-                                                                History
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
+                                                   <ActionDropDown actions={bookingDropdownActions} />
                                                 </TableCell>
                                             </TableRow>
                                         </HoverCardTrigger>

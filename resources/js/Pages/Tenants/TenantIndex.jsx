@@ -44,7 +44,8 @@ import TenantDialog from "@/Components/Dialogs/TenantDialog";
 import DeleteAlert from "@/Components/DeleteAlert";
 import TenantColumn from "@/Components/TenantColumn";
 import RoomColumn from "@/Components/RoomColumn";
-import { statusColor, toTitleCase } from "@/utils/general";
+import { StatusBadge } from "@/Components/StatusBadge";
+import ActionDropDown from "@/Components/ActionDropDown";
 
 export default function TenantIndex({ tenants }) {
     const { data, setData, post, put, processing, errors, reset } = useForm({
@@ -124,7 +125,7 @@ export default function TenantIndex({ tenants }) {
     }
 
     return (
-        <div className="flex flex-col p-4 bg-gray-200">
+        <div className="flex flex-col p-4">
             <div className="flex mb-4">
                 <div className="flex-grow">
                     <h1 className="text-2xl">My Tenants</h1>
@@ -177,6 +178,20 @@ export default function TenantIndex({ tenants }) {
                                 const user = tenant.user;
                                 const room = tenant?.booking?.room;
                                 const house = room?.house;
+                                const tenantDropdownActions = [
+                                    {
+                                        label: "Edit Tenant",
+                                        onClick: () => handleOpenEdit(tenant),
+                                        preventDefault: true,
+                                    },
+                                    {
+                                        label: "Delete Tenant",
+                                        disabled: tenant.booking,
+                                        onClick: () => handleDelete(tenant.id),
+                                        delete: true,
+                                        deleteMessage: "Are you sure to Delete this tenant?",
+                                    },
+                                ];
                                 return (
                                     <TableRow key={key}>
                                         <TableCell className="flex items-center gap-x-2">
@@ -204,61 +219,12 @@ export default function TenantIndex({ tenants }) {
                                                 : "-"}
                                         </TableCell>
                                         {/* <TableCell className="">{tenant.booking?.balance ?? "-"}</TableCell> */}
-                                        <TableCell className="">
-                                            <span
-                                                className={`px-2 py-1 rounded-md font-semibold ${statusColor(status)}`}
-                                            >
-                                                {status
-                                                    ? toTitleCase(
-                                                            status,
-                                                        )
-                                                    : "-"}
-                                            </span>
+                                        <TableCell className="text-center">
+                                           <StatusBadge status={status} />
                                         </TableCell>
                                         <TableCell className="">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <button className="px-3 py-1">
-                                                        <EllipsisVertical
-                                                            className="hover:text-primary"
-                                                            size={18}
-                                                        />
-                                                    </button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuLabel>
-                                                        Actions
-                                                    </DropdownMenuLabel>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        onSelect={(e) => {
-                                                            e.preventDefault();
-                                                            handleOpenEdit(
-                                                                tenant,
-                                                            );
-                                                        }}
-                                                    >
-                                                        Edit Tenant
-                                                    </DropdownMenuItem>
-                                                    <DeleteAlert
-                                                        handleDelete={() =>
-                                                            handleDelete(
-                                                                tenant.id,
-                                                            )
-                                                        }
-                                                        message="Are you sure to Delete this tenant?"
-                                                    >
-                                                        <DropdownMenuItem
-                                                            disabled={tenant.booking}
-                                                            onSelect={(e) =>
-                                                                e.preventDefault()
-                                                            }
-                                                        >
-                                                            Delete Tenant
-                                                        </DropdownMenuItem>
-                                                    </DeleteAlert>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <ActionDropDown actions={tenantDropdownActions} />
+
                                         </TableCell>
                                     </TableRow>
                                 );

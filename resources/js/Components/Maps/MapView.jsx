@@ -32,7 +32,7 @@ export default function MapView({ latitude, longitude, address }) {
                         Address
                     </p>
 
-                    <p className="mt-2 text-2xl font-bold leading-tight">
+                    <p className="mt-2 text-2xl text-secondary  font-bold leading-tight">
                         {address}
                     </p>
                 </div>

@@ -8,13 +8,13 @@ export const toOrdinal = (n) => {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
 
-export const statusColor = (status, isText = false) =>{
+export const statusColor = (status, isText = false, hover = false) =>{
   const green   = ['active', 'available', 'paid'];
   const yellow  = ['pending', 'reserved', 'partial'];
   const red     = ['ended', 'canceled', 'occupied', 'unpaid', 'overdue', 'inactive'];
   const blue    = ['maintenance'];
   const style = isText ? 'text' : 'bg'
-  const shade = isText ? '500' : '300'
+  const shade = isText || hover ? '500' : '300'
   if(green.includes(status)){
     return `${style}-green-${shade}`
   }else if(yellow.includes(status)){

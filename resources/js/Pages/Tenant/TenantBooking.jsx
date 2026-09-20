@@ -18,6 +18,7 @@ export default function TenantBooking({ tenant }) {
         <div className="py-12 space-y-4">
             <BookingCard booking={booking}/>
             <HouseRoomCard booking={booking}/>
+            <ColorTest />
         </div>
     );
 }
@@ -28,7 +29,7 @@ function BookingCard({booking}){
             <Card className="col-span-8 sm:col-span-6 h-full shadow-md">
                         <CardContent className="grid p-2 grid-cols-8 h-full">
                             <div className="col-span-8 sm:col-span-3 flex justify-center items-center gap-4 h-full  border-r-2">
-                                <div className="rounded-full bg-red-200 p-2">
+                                <div className="rounded-full bg-primary/20 p-2">
                                     <Verified className="text-primary" />
                                 </div>
                                 <div>
@@ -168,6 +169,32 @@ function HouseRoomCard({booking}){
                     </div>
                 </CardFooter>
             </Card>
+        </div>
+    );
+}
+
+function ColorTest() {
+    return (
+        <div className="p-10 space-y-4">
+            <div className="bg-primary text-primary-foreground p-5 rounded-lg">
+                PRIMARY
+            </div>
+
+            <div className="bg-destructive text-destructive-foreground p-5 rounded-lg">
+                DESTRUCTIVE
+            </div>
+
+            <div className="bg-secondary text-secondary-foreground p-5 rounded-lg">
+                SECONDARY
+            </div>
+
+            <div className="bg-muted text-muted-foreground p-5 rounded-lg">
+                MUTED
+            </div>
+
+            <div className="bg-accent text-accent-foreground p-5 rounded-lg">
+                ACCENT
+            </div>
         </div>
     );
 }
