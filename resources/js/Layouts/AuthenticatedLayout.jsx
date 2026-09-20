@@ -51,7 +51,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
         // Tenant
         { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard, auth: ['tenant'] },
-        { routeLink: "bookings.index", label: "My Booking", icon: NotepadText, auth: ['tenant'] },
+        { routeLink: "tenant.booking", label: "My Booking", icon: NotepadText, auth: ['tenant'] },
         { routeLink: "bills.index", label: "Bills", icon: ReceiptIcon, auth: ['tenant'] },
         { routeLink: "bills.index", label: "Payment", icon: HandCoins, auth: ['tenant'] },
     ];
@@ -91,7 +91,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <SidebarMenuItem className="space-y-1">
                                             {links &&
                                                 links.filter(link => link.auth.includes(user.role)).map(
-                                                    (link,key) => {
+                                                    (link, key) => {
                                                         return (
                                                            <NavButton link={link} key={key} />
                                                         );

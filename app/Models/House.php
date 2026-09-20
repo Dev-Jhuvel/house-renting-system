@@ -54,4 +54,9 @@ class House extends Model
     protected function ownershipPath(): ?string{
         return null;
     }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

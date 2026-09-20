@@ -9,6 +9,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisteredTenantController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\TenantBookingController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\TenantDashboardController;
 use Illuminate\Foundation\Application;
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'role:tenant'])->group(function(){
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bills/{bill}', [BillController::class, 'show'])->name('bills.show');
     Route::post('/bills/{bill}/payments/submit', [PaymentController::class, 'submit'])->name('bills.payments.submit');
+
+    Route::get('/tenant/booking', [TenantBookingController::class, 'index'])->name('tenant.booking');
+
 });
 
 Route::middleware(['auth', 'role:landlord,admin'])->group(function () {

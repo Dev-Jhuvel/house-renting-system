@@ -28,7 +28,6 @@ export const statusColor = (status, isText = false) =>{
   }
 }
 
-
 export const getTimeOfDay = (date = new Date) =>{
   if(!(date instanceof Date)  || isNaN(date)){
     throw new Error("Invalid Date object");
@@ -45,4 +44,12 @@ export const getTimeOfDay = (date = new Date) =>{
   }else{
     return "Good night";
   }
+}
+
+export const pesoFormatter = (number) =>{
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'PHP'
+  });
+  return formatter.format(number)
 }

@@ -16,7 +16,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { getTimeOfDay, statusColor, toTitleCase } from "@/utils/general";
+import { getTimeOfDay, pesoFormatter, statusColor, toTitleCase } from "@/utils/general";
 import { Link, router, useForm, usePage } from "@inertiajs/react";
 import {
     CreditCard,
@@ -58,6 +58,7 @@ export default function TenantDashboard({ tenant }) {
 
     const [openPayment, setOpenPayment] = useState(false);
     const [selectedBillForPayment, setSelectedBillForPayment] = useState(null);
+    const [viewAll, setViewAll] = useState(false);
     const max_bill_count = 5;
     const user = usePage().props.auth.user;
     const booking = tenant?.booking;
@@ -78,7 +79,7 @@ export default function TenantDashboard({ tenant }) {
             icon: Wallet,
             badge: house.status,
             label: "OUTSTANDING BALANCE",
-            title: `₱${booking?.balance.toFixed(2)}`,
+            title: pesoFormatter(booking?.balance),
             footer: `Room# ${room?.room_number}`,
         },
         {
@@ -86,7 +87,7 @@ export default function TenantDashboard({ tenant }) {
             icon: PiggyBank,
             badge: house.status,
             label: "REMAINING DEPOSIT",
-            title: `₱${booking?.total_deposit.toFixed(2)}`,
+            title: pesoFormatter(booking?.total_deposit),
             footer: `Room# ${room?.room_number}`,
         },
     ];
@@ -157,16 +158,13 @@ export default function TenantDashboard({ tenant }) {
                     ))}
                     <QuickActionCard />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-8 my-4 gap-2">
-                    <div className="col-span-5">
+                <div className="grid grid-cols-1 md:grid-cols-8 my-4 gap-5 md:h-[400px]">
+                    <div className="col-span-5 h-full min-h-0">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-xl font-bold">Recent Bills</h3>
-                            {bills.length > max_bill_count && (
-                                <Button variant="link">View All bills</Button>
-                            )}
+                            <h3 className="text-xl font-bold py-1">Recent Bills</h3>
                         </div>
-                        <div className="grid grid-cols-1 gap-4">
-                            {bills.slice(0, max_bill_count).map((bill) => (
+                        <div className="grid grid-cols-1 gap-4 h-[400px] md:h-[calc(100%-10px)] overflow-y-scroll">
+                            {bills.map((bill) => (
                                 <ResponsiveBillRow
                                     bill={bill}
                                     key={bill.id}
@@ -175,12 +173,12 @@ export default function TenantDashboard({ tenant }) {
                             ))}
                         </div>
                     </div>
-                    <div className={`col-span-3 relative h-[397px] ${openPayment ? 'z-0': 'z-10'}`}>
+                    <div className={`col-span-3 relative h-[400px] md:h-full z-0`}>
                         <h3 className="text-xl font-bold py-1">
                             Location/Address
                         </h3>
                         <MapView
-                            className="z-10"
+                            className="z-10 h-full"
                             latitude={house.latitude}
                             longitude={house.longitude}
                             address={house.address}
@@ -285,7 +283,7 @@ function BillRow({ bill, onClick }) {
                     <p className="text-gray-500">{bill.due_date}</p>
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold">₱{bill.amount}</h3>
+                    <h3 className="text-lg font-bold">{pesoFormatter(bill.amount)}</h3>
                     <p className={`text-xs font-semibold text-right ${statusTextColor}`} >
                         {bill.status.toUpperCase()}
                     </p>
@@ -333,7 +331,7 @@ function ResponsiveBillRow({ bill, onClick }) {
                     />
                 </div>
             </PopoverTrigger>
-            <PopoverContent className="z-[401]">
+            <PopoverContent>
                 <Content bill={bill} />
             </PopoverContent>
         </Popover>
@@ -347,7 +345,7 @@ function ResponsiveBillRow({ bill, onClick }) {
                     />
                 </div>
             </HoverCardTrigger>
-            <HoverCardContent className="z-[401]">
+            <HoverCardContent>
                 <Content bill={bill} />
             </HoverCardContent>
         </HoverCard>
