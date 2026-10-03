@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('bill_id')->constrained()->cascadeOnDelete();
             $table->decimal('amount_paid', 10, 2);
             $table->date('paid_at');
             $table->enum('method', ['cash', 'gcash', 'bank_transfer'])->default('cash');

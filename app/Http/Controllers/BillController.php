@@ -31,7 +31,7 @@ class BillController extends Controller
             'bills'     => $bills,
             'bookings'  => $bookings
         ];
-        return Inertia::render('Bills/BillIndex', $data);
+        return Inertia::render('AdminPages/Bills/BillIndex', $data);
     }
 
     public function store(StoreBillRequest $request)

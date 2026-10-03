@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Bill;
 use App\Models\Booking;
 use App\Models\House;
+use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Tenant;
 use App\Models\User;
@@ -29,7 +30,7 @@ class DatabaseSeeder extends Seeder
             'role'      => 'admin',
         ]);
 
-        $tenant = User::factory()->create([
+        $first_tenant = User::factory()->create([
             // 'id' => Str::uuid(),
             'name'      => 'Jhuvel Colina',
             'email'     => 'jhuvel@email.com',
@@ -64,7 +65,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $tenant = Tenant::create([
-            'user_id'           => $tenant->id,
+            'user_id'           => $first_tenant->id,
             'phone'             => "09123456789",
             'address'           => "Cavite",
             'emergency_contact' => "Mother",
@@ -133,13 +134,17 @@ class DatabaseSeeder extends Seeder
             'notes'            => null,
         ]);
 
-        $electric_bill->payments()->create([
+        $electric_payment = Payment::create([
             'amount_paid'      => 250.00,
             'paid_at'          => '2025-01-03 10:00:00',
             'method'           => 'cash',
             'reference_number' => null,
             'proof_photo'      => null,
             'status'           => 'confirmed',
+        ]);
+
+        $electric_bill->payments()->attach($electric_payment->id, [
+            'amount'      => 250.00
         ]);
 
         $electric_bill->update([

@@ -17,7 +17,7 @@ class HouseController extends Controller
 
         $auth_id = Auth::id();
         $houses = House::ownedBy($auth_id)->withCount('rooms')->orderBy('name')->get();
-        return Inertia::render('Houses/HouseIndex', ['houses' => $houses]);
+        return Inertia::render('AdminPages/Houses/HouseIndex', ['houses' => $houses]);
     }
 
     public function store(StoreHouseRequest $request)

@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class TenantDashboardController extends Controller
+class TenantBillPaymentController extends Controller
 {
-    public function index()
-    {
-       try {
-            $tenant = auth()->user()->tenant()
+    public function index(){
+        $tenant = auth()->user()->tenant()
                 ->with([
-                    'booking.room.house',
+                    'booking.room.house.owner',
                     'booking.unpaid_bills',
                     'booking.bills.payments',
                     'booking.deposits'
@@ -24,10 +22,6 @@ class TenantDashboardController extends Controller
             })->values();
 
             $tenant->booking->setRelation('bills', $sorted_bills);
-
-            return Inertia::render('TenantPages/Dashboards/Dashboard', ['tenant' => $tenant]);
-       } catch (\Throwable $th) {
-            return redirect()->route('register.tenant.index');
-       }
+        return Inertia::render("TenantPages/Bills/BillPayment", ['tenant' => $tenant]);
     }
 }

@@ -11,4 +11,5 @@
 # TODO: what to do in deposit when ended or canceled
 
 // SEPT 19
-# TODO: Implement the ActionDropdown
+# TODO: Implement the ActionDropdown DONE
+# TODO: Add amenities

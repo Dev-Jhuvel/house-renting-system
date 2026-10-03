@@ -13,7 +13,6 @@ class Payment extends Model
     use HasUuidAndSoftDeletes, HasActivityLog, OwnedByUser, HasFactory;
 
     protected $fillable = [
-        'bill_id',
         'amount_paid',
         'paid_at',
         'method',
@@ -32,7 +31,9 @@ class Payment extends Model
     }
 
     public function bill(){
-        return $this->belongsTo(Bill::class);
+        return $this->belongsToMany(Bill::class, 'bill_payment')
+        ->withPivot('amount')
+        ->withTimestamps();
     }
 
     protected function ownershipPath(): string{

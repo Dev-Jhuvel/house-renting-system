@@ -47,7 +47,7 @@ class BookingController extends Controller
             'rooms' => $rooms,
         ];
 
-        return Inertia::render('Bookings/BookingIndex', $data);
+        return Inertia::render('AdminPages/Bookings/BookingIndex', $data);
     }
 
     public function store(StoreBookingRequest $request)

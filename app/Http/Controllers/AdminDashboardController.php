@@ -61,6 +61,6 @@ class AdminDashboardController extends Controller
             'total_revenue' => number_format($total_revenue, 2),
         ];
 
-        return Inertia::render('Dashboards/AdminDashboard', ['data' => $data]);
+        return Inertia::render('AdminPages/Dashboards/Dashboard', ['data' => $data]);
     }
 }

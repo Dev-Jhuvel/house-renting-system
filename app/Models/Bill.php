@@ -44,7 +44,9 @@ class Bill extends Model
 
     public function payments()
     {
-        return $this->hasMany(Payment::class);
+        return $this->belongsToMany(Payment::class, 'bill_payment')
+        ->withPivot('amount')
+        ->withTimestamps();
     }
 
     public function getRemainingBalanceAttribute(){

@@ -12,13 +12,12 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { pesoFormatter, toOrdinal, toTitleCase } from "@/utils/general";
-export default function TenantBooking({ tenant }) {
+export default function Booking({ tenant }) {
     const booking = tenant?.booking;
     return (
         <div className="py-12 space-y-4">
             <BookingCard booking={booking}/>
             <HouseRoomCard booking={booking}/>
-            <ColorTest />
         </div>
     );
 }
@@ -52,11 +51,11 @@ function BookingCard({booking}){
             <Card className="col-span-8 sm:col-span-2 h-[180px] sm:h-full p-0 w-full bg-primary">
                 <CardContent className="flex py-4 h-full flex-col justify-center gap-4">
                     <div className="w-full space-y-1">
-                        <p className="text-xs text-white opacity-70">Next Payment Due</p>
-                        <p className="text-2xl text-white font-extrabold">{pesoFormatter(booking.balance ?? 0)}</p>
-                        <p className="text-md text-white">Due on Feb 2026</p>
+                        <p className="text-xs text-white opacity-70">Remaining Deposit</p>
+                        <p className="text-2xl text-white font-extrabold">{pesoFormatter(booking.total_deposit ?? 0)}</p>
+                        <p className="text-md text-white">as of today</p>
                     </div>
-                    <Button variant="outline" className="w-full">Pay Bill Now</Button>
+                    <Button variant="outline" className="w-full">View Deposit Transaction</Button>
                 </CardContent>
             </Card>
         </div>
@@ -125,8 +124,8 @@ function HouseRoomCard({booking}){
                             <p className="text-xs text-gray-500">{landlord?.number ?? "Sample Number"}</p>
                         </div>
                         <div className="flex gap-4">
-                            <Button className="p-2 shadow-sm rounded-full"><Phone /></Button>
-                            <Button className="p-2 shadow-sm rounded-full"><MessageSquareText /></Button>
+                            <Button className="py-2 px-3 shadow-sm rounded-full"><Phone /></Button>
+                            <Button className="py-2 px-3 shadow-sm rounded-full"><MessageSquareText /></Button>
                         </div>
                     </div>
                     <div className="flex border-t border-gray-400 py-2">
@@ -149,8 +148,8 @@ function HouseRoomCard({booking}){
                 <CardContent className="grid grid-cols-8 gap-4 flex-1">
                     {room_details.map((d, key) =>(
                         <div className="col-span-4" key={key}>
-                            <h3 className="text-xs text-gray-500 font-semibold">{d.label}</h3>
-                            <p className="text-primary text-md font-bold">{d.value}</p>
+                            <h3 className="text-sm text-gray-500 font-semibold">{d.label}</h3>
+                            <p className="text-primary text-lg font-bold">{d.value}</p>
                         </div>
                     ))}
                 </CardContent>
@@ -160,7 +159,7 @@ function HouseRoomCard({booking}){
                         {room_amenities.map((a)=>{
                             const Icon = a.icon;
                             return (
-                            <Badge variant='outline' className="text-[9px]" key={a.label}>
+                            <Badge variant='outline' className="text-sm" key={a.label}>
                                 <Icon size={15} className="mr-1" />
                                 {a.label}
                             </Badge>
@@ -169,32 +168,6 @@ function HouseRoomCard({booking}){
                     </div>
                 </CardFooter>
             </Card>
-        </div>
-    );
-}
-
-function ColorTest() {
-    return (
-        <div className="p-10 space-y-4">
-            <div className="bg-primary text-primary-foreground p-5 rounded-lg">
-                PRIMARY
-            </div>
-
-            <div className="bg-destructive text-destructive-foreground p-5 rounded-lg">
-                DESTRUCTIVE
-            </div>
-
-            <div className="bg-secondary text-secondary-foreground p-5 rounded-lg">
-                SECONDARY
-            </div>
-
-            <div className="bg-muted text-muted-foreground p-5 rounded-lg">
-                MUTED
-            </div>
-
-            <div className="bg-accent text-accent-foreground p-5 rounded-lg">
-                ACCENT
-            </div>
         </div>
     );
 }

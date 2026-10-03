@@ -3,21 +3,24 @@
 namespace App\Services;
 
 use App\Models\Bill;
+use App\Repositories\BillRepository;
 use Illuminate\Support\Facades\DB;
 
 class BillService
 {
-    public function create( array $data) :Bill
+
+    public function __construct(
+        private BillRepository $billRepository
+    )
+    {}
+    public function create(array $data) :Bill
     {
-        return Bill::create($data);
+        return $this->billRepository->createBill($data);
     }
 
     public function delete(Bill $bill) :void
     {
-        if($bill->payments()->exists()) {
-            return;
-        }
-        $bill->delete();
+        $this->billRepository->deleteBill($bill);
     }
 
     public function syncBillStatus(Bill $bill): void
@@ -29,6 +32,7 @@ class BillService
             $total_paid > 0                 => 'partial',
             default                         => 'unpaid',
         };
-        $bill->update(['status' => $bill_status]);
+
+        $this->billRepository->updateBill($bill, ['status' => $bill_status]);
     }
 }

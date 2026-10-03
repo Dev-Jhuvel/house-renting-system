@@ -21,7 +21,7 @@ class TenantController extends Controller
         ->get()
         ->sortBy('user.name')
         ->values();
-        return Inertia::render('Tenants/TenantIndex', ['tenants' => $tenants]);
+        return Inertia::render('AdminPages/Tenants/TenantIndex', ['tenants' => $tenants]);
     }
 
     public function store(StoreTenantRequest $request)

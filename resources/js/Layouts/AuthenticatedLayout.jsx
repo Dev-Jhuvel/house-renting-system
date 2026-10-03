@@ -52,8 +52,7 @@ export default function AuthenticatedLayout({ header, children }) {
         // Tenant
         { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard, auth: ['tenant'] },
         { routeLink: "tenant.booking", label: "My Booking", icon: NotepadText, auth: ['tenant'] },
-        { routeLink: "bills.index", label: "Bills", icon: ReceiptIcon, auth: ['tenant'] },
-        { routeLink: "bills.index", label: "Payment", icon: HandCoins, auth: ['tenant'] },
+        { routeLink: "tenant.bills.payments", label: "Bills & Payments", icon: ReceiptIcon, auth: ['tenant'] },
     ];
 
     useEffect(() => {

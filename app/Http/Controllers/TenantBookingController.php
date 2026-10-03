@@ -22,6 +22,6 @@ class TenantBookingController extends Controller
             })->values();
 
             $tenant->booking->setRelation('bills', $sorted_bills);
-        return Inertia::render("Tenant/TenantBooking", ['tenant' => $tenant]);
+        return Inertia::render("TenantPages/Bookings/Booking", ['tenant' => $tenant]);
     }
 }

@@ -33,7 +33,7 @@ class RoomController extends Controller
     {
         $this->authorize('view', $room);
 
-        return Inertia::render('Rooms/RoomShow', ['room' => $room->load('booking')]);
+        return Inertia::render('AdminPages/Rooms/RoomShow', ['room' => $room->load('booking')]);
     }
 
     public function update(UpdateRoomRequest $request, Room $room)

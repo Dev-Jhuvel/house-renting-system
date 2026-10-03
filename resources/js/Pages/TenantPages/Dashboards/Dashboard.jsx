@@ -31,14 +31,9 @@ import {
 import MapView from "@/Components/Maps/MapView";
 import PaymentDialog from "@/Components/Dialogs/PaymentDialog";
 import { useState } from "react";
-import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from "@/Components/ui/hover-card";
-import { useIsMobile } from "@/hooks/use-mobile";
+import ResponsiveBillRow from "@/Components/ResponsiveBillRows";
 
-export default function TenantDashboard({ tenant }) {
+export default function Dashboard({ tenant }) {
     const today = new Date();
     const {
         data: paymentData,
@@ -65,11 +60,16 @@ export default function TenantDashboard({ tenant }) {
     const bills = tenant?.booking?.bills;
     const room = tenant?.booking?.room;
     const house = tenant?.booking?.room?.house;
+    const unpaid_bills_count = booking.unpaid_bills.length || 0;
+    const unpaid_bills_keyword = unpaid_bills_count > 1 ? 'bills' : 'bill';
+    const deposit_count = booking.deposits.length || 0;
+    const deposit_keyword = deposit_count > 1 ? 'deposits' : 'deposit';
+
     const cards = [
         {
             color: "blue",
             icon: House,
-            badge: house.status,
+            badge: booking.status,
             label: "CURRENT BOARDING HOUSE",
             title: house?.name,
             footer: `Room# ${room?.room_number}`,
@@ -77,18 +77,18 @@ export default function TenantDashboard({ tenant }) {
         {
             color: "red",
             icon: Wallet,
-            badge: house.status,
+            badge: booking.status,
             label: "OUTSTANDING BALANCE",
             title: pesoFormatter(booking?.balance),
-            footer: `Room# ${room?.room_number}`,
+            footer: unpaid_bills_count > 0 ? `${unpaid_bills_count} unpaid ${unpaid_bills_keyword}` : 'No Unpaid Bill',
         },
         {
             color: "green",
             icon: PiggyBank,
-            badge: house.status,
+            badge: booking.status,
             label: "REMAINING DEPOSIT",
             title: pesoFormatter(booking?.total_deposit),
-            footer: `Room# ${room?.room_number}`,
+            footer: deposit_count > 0 ? `${deposit_count} ${deposit_keyword}` : 'No Deposit',
         },
     ];
 
@@ -244,110 +244,6 @@ function QuickActionCard() {
     );
 }
 
-function BillRow({ bill, onClick }) {
-    let Icon;
-    let color;
-    switch (bill.type) {
-        case "rent":
-            Icon = House;
-            color = "green";
-            break;
-        case "water":
-            Icon = Droplets;
-            color = "blue";
-            break;
-        case "electric":
-            Icon = Zap;
-            color = "yellow";
-            break;
-        case "repair":
-            Icon = Hammer;
-            color = "gray";
-            break;
-        case "other":
-            Icon = Scroll;
-            color = "orange";
-            break;
-    }
-    const bgColor = `bg-${color}-200`;
-    const textColor = `text-${color}-500`;
-    const statusTextColor = statusColor(bill.status, true);
-    return (
-        <Card className="col-span-2 border cursor-pointer" onClick={onClick}>
-            <CardContent className="flex flex-row items-center p-2 pr-12 gap-2">
-                <div className={`${bgColor} ${textColor} rounded-full p-2`}>
-                    <Icon />
-                </div>
-                <div className="flex-1">
-                    <h3 className="text-base font-bold">{bill.title}</h3>
-                    <p className="text-gray-500">{bill.due_date}</p>
-                </div>
-                <div>
-                    <h3 className="text-lg font-bold">{pesoFormatter(bill.amount)}</h3>
-                    <p className={`text-xs font-semibold text-right ${statusTextColor}`} >
-                        {bill.status.toUpperCase()}
-                    </p>
-                     <p className={`text-xs font-semibold text-right text-green-500`} >
-                        Payments: {bill.payments.length}
-                    </p>
-                </div>
-            </CardContent>
-        </Card>
-    );
-}
 
-function ResponsiveBillRow({ bill, onClick }) {
-    const isMobile = useIsMobile();
 
-    const Content = ({bill}) => (
-        <div>
-            <div>
-                <h2 className="text-center font-bold">{bill.title}</h2>
-            </div>
-            {bill.payments.length > 0 && (
-                <div>
-                    <h3 className="font-bold">Payments</h3>
-                    <ul>
-                        {bill.payments.map((payment) => (
-                            <li key={payment.id}>
-                                {toTitleCase(
-                                    `${payment.method} - ₱${payment.amount_paid} `,
-                                )}
-                                {toTitleCase(payment.status)}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </div>
-    );
-    return isMobile ? (
-        <Popover>
-            <PopoverTrigger asChild>
-                <div>
-                    <BillRow
-                        bill={bill}
-                        onClick={onClick}
-                    />
-                </div>
-            </PopoverTrigger>
-            <PopoverContent>
-                <Content bill={bill} />
-            </PopoverContent>
-        </Popover>
-    ) : (
-        <HoverCard key={bill.id}>
-            <HoverCardTrigger asChild>
-                <div>
-                    <BillRow
-                        bill={bill}
-                        onClick={onClick}
-                    />
-                </div>
-            </HoverCardTrigger>
-            <HoverCardContent>
-                <Content bill={bill} />
-            </HoverCardContent>
-        </HoverCard>
-    );
-}
+

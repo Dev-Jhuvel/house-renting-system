@@ -3,43 +3,72 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Repositories\BillRepository;
+use App\Repositories\BookingRepository;
+use App\Repositories\DbRepository;
+use App\Repositories\RoomRepository;
+use App\Repositories\TenantRepository;
 use Illuminate\Support\Facades\DB;
 
 class BookingService
 {
+
+    public function __construct(
+       private BookingRepository $bookingRepository,
+       private BillRepository $billRepository,
+       private RoomRepository $roomRepository,
+       private TenantRepository $tenantRepository,
+       private DbRepository $dbRepository,
+    )
+    {}
     public function create(array $data): Booking
     {
-        return DB::transaction(function () use ($data) {
+        try {
+            $this->dbRepository->beginTrans();
 
-            $booking = Booking::create($data);
+            $booking = $this->bookingRepository->createBooking($data);
 
             $booking->refresh();
-
             $this->syncRoom($booking);
             $this->syncTenant($booking);
 
+            $this->dbRepository->commit();
+
             return $booking;
-        });
+        } catch (\Throwable $th) {
+            $this->dbRepository->rollback();
+
+            throw $th;
+        }
     }
 
     public function update(Booking $booking, array $data): Booking
     {
-        return DB::transaction(function () use ($booking, $data) {
-
-            $booking->update($data);
+        try {
+            $this->dbRepository->beginTrans();
+            
+            $this->bookingRepository->updateBooking($booking, $data);
+           
+            $this->dbRepository->commit();
 
             return $booking->refresh();
-        });
+        } catch (\Throwable $th) {
+            $this->dbRepository->rollback();
+
+            throw $th;
+        }
     }
 
     public  function activate(Booking $booking): void
     {
-        DB::transaction(function () use ($booking) {
+        try {
+
             if ($booking->status !== 'pending') {
                 return;
             }
-
-            $booking->update(['status' => 'active']);
+            $this->dbRepository->beginTrans();
+            
+            $this->bookingRepository->updateBooking($booking, ['status' => 'active']);
 
             $this->syncRoom($booking);
             $this->syncTenant($booking);
@@ -47,7 +76,8 @@ class BookingService
             if ($booking->bills()->doesntExist()) {
                 $today = now();
 
-                $booking->bills()->create([
+                $this->billRepository->createBill([
+                    'booking_id'=> $booking->id,
                     'type'      => 'rent',
                     'title'     => $booking->tenant->user->name . " Rent Bill " . now()->format('F Y'),
                     'amount'    => $booking->room->monthly_rent,
@@ -55,44 +85,73 @@ class BookingService
                     'due_date'  => $today->copy()->addDays(10)->toDateString(),
                 ]);
             }
-        });
+           
+            $this->dbRepository->commit();
+        } catch (\Throwable $th) {
+            $this->dbRepository->rollback();
+
+            throw $th;
+        }
     }
 
     public  function end(Booking $booking): void
     {
-        DB::transaction(function () use ($booking) {
-
-            $booking->update([
+        try {
+            $this->dbRepository->beginTrans();
+            
+            $this->bookingRepository->updateBooking($booking, [
                 'status'        => 'ended',
                 'move_out_date' =>  now()->toDateString()
             ]);
 
             $this->syncRoom($booking);
             $this->syncTenant($booking);
-        });
+           
+            $this->dbRepository->commit();
+
+        } catch (\Throwable $th) {
+            $this->dbRepository->rollback();
+
+            throw $th;
+        }
     }
 
     public  function cancel(Booking $booking): void
     {
-        DB::transaction(function () use ($booking) {
-
-            $booking->update([
+        try {
+            $this->dbRepository->beginTrans();
+            
+            $this->bookingRepository->updateBooking($booking, [
                 'status'        => 'canceled',
             ]);
 
             $this->syncRoom($booking);
             $this->syncTenant($booking);
-        });
+           
+            $this->dbRepository->commit();
+
+        } catch (\Throwable $th) {
+            $this->dbRepository->rollback();
+
+            throw $th;
+        }
     }
 
     public function delete(Booking $booking) :void
     {
-        DB::transaction(function () use ($booking) {
+        try {
+            $this->dbRepository->beginTrans();
+            
             $this->cancel($booking);
-            $this->syncRoom($booking);
-            $this->syncTenant($booking);
-            $booking->delete();
-        });
+            $this->bookingRepository->deleteBooking($booking);
+           
+            $this->dbRepository->commit();
+
+        } catch (\Throwable $th) {
+            $this->dbRepository->rollback();
+
+            throw $th;
+        }
     }
 
     private function syncRoom(Booking $booking)
@@ -102,7 +161,7 @@ class BookingService
             'ended', 'canceled' => 'available',
             'pending'           => 'reserved',
         };
-        $booking->room()->update(['status' => $room_status]);
+        $this->roomRepository->updateRoom($booking->room, ['status' => $room_status]);
     }
 
     private function syncTenant(Booking $booking)
@@ -113,6 +172,6 @@ class BookingService
             'pending'           => 'pending',
         };
 
-        $booking->tenant()->update(['status' => $tenant_status]);
+        $this->tenantRepository->updateTenant($booking->tenant, ['status' => $tenant_status]);
     }
 }

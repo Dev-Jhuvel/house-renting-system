@@ -34,7 +34,7 @@ import {
     Users,
 } from "lucide-react";
 
-export default function AdminDashboard({data}) {
+export default function Dashboard({data}) {
     const cards_data = [
         {
             title: "Occupied Rooms",
