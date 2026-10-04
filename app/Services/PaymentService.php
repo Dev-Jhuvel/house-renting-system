@@ -6,6 +6,7 @@ use App\Models\Bill;
 use App\Models\Payment;
 use App\Repositories\DbRepository;
 use App\Repositories\PaymentRepository;
+use Illuminate\Support\Collection;
 
 class PaymentService
 {
@@ -15,14 +16,16 @@ class PaymentService
         private DbRepository $dbRepository
     )
     {}
-    public function record(array $data, Bill $bill): void
+    public function record(array $data, Collection $bills): void
     {
         try {
             $this->dbRepository->beginTrans();
 
             $payment = $this->paymentRepository->createPayment($data, 'confirmed');
 
-            $this->paymentRepository->attachBill($payment, $bill, $data['amount_paid']);
+            foreach($bills as $bill){
+                $this->paymentRepository->attachBill($payment, $bill, $data['amount_paid']);
+            }
 
             $this->billService->syncBillStatus($bill);
 
@@ -34,15 +37,21 @@ class PaymentService
         }
     }
 
-    public function submit(array $data, Bill $bill): void
+    public function submit(array $data, Collection $bills): void
     {
         try {
             $this->dbRepository->beginTrans();
+            
+            $total_amount = $bills->sum('amount');
+
+            $data['amount_paid'] = $total_amount;
 
             $payment = $this->paymentRepository->createPayment($data, 'pending');
-                
-            $this->paymentRepository->attachBill($payment, $bill, $data['amount_paid']);
 
+            foreach($bills as $bill){
+                $this->paymentRepository->attachBill($payment, $bill, $bill['amount']);
+            }
+                
             $this->dbRepository->commit();
         } catch (\Throwable $th) {
             $this->dbRepository->rollback();
@@ -58,7 +67,11 @@ class PaymentService
             
             $this->paymentRepository->updatePaymentStatus($payment, 'confirmed');
 
-            $this->billService->syncBillStatus($payment->bill);
+            $payment->load('bills');
+
+            foreach($payment->bills as $bill){
+                $this->billService->syncBillStatus($bill);
+            }
 
             $this->dbRepository->commit();
         } catch (\Throwable $th) {

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { pesoFormatter, toOrdinal, toTitleCase } from "@/utils/general";
 import ResponsiveBillRow from "@/Components/ResponsiveBillRows";
+import { router } from "@inertiajs/react";
 export default function BillPayment({ tenant }) {
     const booking = tenant?.booking;
     return (
@@ -26,6 +27,12 @@ export default function BillPayment({ tenant }) {
 function BookingCard({booking}){
     const unpaid_bills_count = booking.unpaid_bills.length || 0;
     const unpaid_bills_keyword = unpaid_bills_count > 1 ? 'bills' : 'bill';
+
+    console.log(booking.balance === 0);
+    function handleSubmitPayAll(booking){
+        router.post(route("tenant.bills.payments.pay-all", booking));
+    }
+
     return (
         <div className="grid grid-cols-6 gap-4 px-6 h-full sm:h-[180px]">
             <Card className="col-span-8 sm:col-span-2 h-[180px] sm:h-full p-0 w-full">
@@ -41,7 +48,7 @@ function BookingCard({booking}){
                 <CardContent className="flex py-4 h-full flex-col justify-center gap-4">
                     <div className="w-full space-y-1">
                         <h3 className="text-md text-gray-500 font-semibold">NEXT DUE DATE</h3>
-                        <p className="text-primary text-3xl font-bold">{booking.unpaid_bills[0].due_date || ""}</p>
+                        <p className="text-primary text-3xl font-bold">{booking.unpaid_bills[0]?.due_date || "None"}</p>
                         <p className="text-primary text-md font-bold">Rent & Utilities</p>
                     </div>
                 </CardContent>
@@ -52,7 +59,7 @@ function BookingCard({booking}){
                         <p className="text-2xl font-bold text-white">Clear Balance</p>
                         <p className="text-lg text-white">Pay All outstanding balance in one click</p>
                     </div>
-                    <Button variant="outline" className="w-full">Pay All {pesoFormatter(booking.balance)}</Button>
+                    <Button variant="outline" className="w-full" disabled={booking.balance === 0} onClick={()=>handleSubmitPayAll(booking)}>{booking.balance > 0 ? `Pay All ${pesoFormatter(booking.balance)}` : 'All cleared up!'}</Button>
                 </CardContent>
             </Card>
         </div>

@@ -60,4 +60,6 @@ class PaymentController extends Controller
         return redirect()->back()->with('success', 'Payment deleted.');
     }
 
+
+
 }

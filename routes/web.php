@@ -45,6 +45,7 @@ Route::middleware(['auth', 'role:tenant'])->group(function(){
 
     Route::get('/tenant/booking', [TenantBookingController::class, 'index'])->name('tenant.booking');
     Route::get('/tenant/bills/payments', [TenantBillPaymentController::class, 'index'])->name('tenant.bills.payments');
+    Route::post('/tenant/bills/payments/{booking}/pay-all', [TenantBillPaymentController::class, 'payAll'])->name('tenant.bills.payments.pay-all');
 
 });
 

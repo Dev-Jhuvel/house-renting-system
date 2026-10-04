@@ -30,13 +30,13 @@ class Payment extends Model
         ];
     }
 
-    public function bill(){
+    public function bills(){
         return $this->belongsToMany(Bill::class, 'bill_payment')
         ->withPivot('amount')
         ->withTimestamps();
     }
 
     protected function ownershipPath(): string{
-        return 'bill.booking.room.house';
+        return 'bills.booking.room.house';
     }
 }

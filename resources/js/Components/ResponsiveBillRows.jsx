@@ -68,7 +68,7 @@ export default function ResponsiveBillRow({ bill, onClick }) {
                     />
                 </div>
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent className="">
                 <Content bill={bill} />
             </PopoverContent>
         </Popover>

@@ -51,7 +51,7 @@ class Booking extends Model
 
     public function getTotalPaidAttribute()
     {
-        return $this->bills->flatMap->payments->where('status', 'confirmed')->sum('amount_paid');
+        return $this->bills->flatMap->payments->where('status', 'confirmed')->sum(fn ($payment) => $payment->pivot->amount);
     }
 
     public function getBalanceAttribute()

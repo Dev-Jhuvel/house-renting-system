@@ -45,6 +45,7 @@ export default function ActionDropDown({ label = "Actions", actions = [] }) {
                         return (
                             <DeleteAlert
                                 handleDelete={action.onClick}
+                                key={action.label}
                                 message={
                                     action.deleteMessage ??
                                     "Are you sure you want to delete this?"
