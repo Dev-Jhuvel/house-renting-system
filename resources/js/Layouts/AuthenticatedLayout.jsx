@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/Components/ui/sonner";
 import { Link, router, usePage } from "@inertiajs/react";
-import { Banknote, EllipsisVertical, HandCoins, House, HousePlus, Layers2, LayoutDashboard, NotepadText, ReceiptIcon, Settings, Users } from "lucide-react";
+import { Banknote, EllipsisVertical, HandCoins, House, HousePlus, Layers2, LayoutDashboard, NotepadText, ReceiptIcon, Settings, Users, UserPenIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import NavButton from "@/Components/NavButton";
@@ -53,6 +53,7 @@ export default function AuthenticatedLayout({ header, children }) {
         { routeLink: "dashboard", label: "Dashboard", icon: LayoutDashboard, auth: ['tenant'] },
         { routeLink: "tenant.booking", label: "My Booking", icon: NotepadText, auth: ['tenant'] },
         { routeLink: "tenant.bills.payments", label: "Bills & Payments", icon: ReceiptIcon, auth: ['tenant'] },
+        { routeLink: "tenant.booking", label: "Manage Profile", icon: UserPenIcon, auth: ['tenant'] },
     ];
 
     useEffect(() => {
@@ -158,11 +159,14 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className="sticky top-0 z-10 ">
                     <SidebarTrigger />
                 </div>
-                <main className="w-full h-screen overflow-auto">
+                <main className="w-full h-screen overflow-auto pr-6 sm:pr-auto">
                     {children}
                     <Toaster richColors />
                 </main>
             </SidebarProvider>
+            <div className="hidden">
+                <div className="bg-red-500 bg-green-500 bg-yellow-500 bg-blue-500 bg-gray-500 bg-red-300 bg-green-300 bg-yellow-300 bg-blue-300 bg-gray-300 text-red-500 text-green-500 text-yellow-500 text-blue-500"></div>
+            </div>
         </div>
     );
 }

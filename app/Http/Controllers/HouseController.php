@@ -46,7 +46,7 @@ class HouseController extends Controller
             ])
             ->load('rooms.booking');
         
-        return Inertia::render('Houses/HouseShow', ['house' => $house]);
+        return Inertia::render('AdminPages/Houses/HouseShow', ['house' => $house]);
     }
 
     public function update(UpdateHouseRequest $request, House $house)

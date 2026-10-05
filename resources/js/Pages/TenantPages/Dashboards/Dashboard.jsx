@@ -140,7 +140,7 @@ export default function Dashboard({ tenant }) {
                 bill={selectedBillForPayment}
                 method="Submit"
             />
-            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="mx-auto">
                 <div className="overflow-hidden shadow-sm sm:rounded-lg mb-4">
                     <h1 className="text-3xl font-bold">
                         {getTimeOfDay()}, {user.name}!
@@ -158,12 +158,12 @@ export default function Dashboard({ tenant }) {
                     ))}
                     <QuickActionCard />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-8 my-4 gap-5 md:h-[400px]">
+                <div className="grid grid-cols-1 md:grid-cols-8 my-4 gap-5 h-full md:h-[400px]">
                     <div className="col-span-5 h-full min-h-0">
                         <div className="flex justify-between items-center">
                             <h3 className="text-xl font-bold py-1">Recent Bills</h3>
                         </div>
-                        <div className="grid grid-cols-1 gap-4 h-[400px] md:h-[calc(100%-10px)] overflow-y-scroll">
+                        <div className="grid grid-cols-1 gap-4 content-start min-h-10 max-h-[400px] md:h-[calc(100%-10px)] overflow-y-scroll">
                             {bills.map((bill) => (
                                 <ResponsiveBillRow
                                     bill={bill}

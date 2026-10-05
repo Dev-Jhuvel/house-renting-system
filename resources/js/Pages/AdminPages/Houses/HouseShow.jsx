@@ -1,9 +1,4 @@
-import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
-
-import { Form } from "@/Components/ui/form";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
 import { Link, useForm, router } from "@inertiajs/react";
 import {
     DropdownMenu,
@@ -15,25 +10,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
     ArrowLeft,
-    ArrowRight,
     Building2,
     DoorClosed,
     Droplets,
     Ellipsis,
-    Layers,
     Layers2,
     MapPin,
-    PlusCircleIcon,
-    PlusIcon,
     Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HouseDialog from "@/Components/Dialogs/HouseDialog";
-import InputWithLabel from "@/Components/InputWithLabel";
 import DeleteAlert from "@/Components/DeleteAlert";
-import RoomDialog from "@/Components/Dialogs/RoomDialog";
-import RoomSection from "../Rooms/RoomSection";
 import { StatusBadge } from "@/Components/StatusBadge";
+import RoomSection from "../Rooms/RoomSection";
 
 export default function HouseShow({ house }) {
     const { data, setData, patch, processing, errors } = useForm(house);

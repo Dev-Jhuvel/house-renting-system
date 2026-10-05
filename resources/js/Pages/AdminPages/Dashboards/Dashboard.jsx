@@ -138,7 +138,7 @@ export default function Dashboard({data}) {
                         ))}
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>
     );
 }

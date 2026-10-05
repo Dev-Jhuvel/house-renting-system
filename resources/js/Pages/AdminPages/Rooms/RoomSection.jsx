@@ -10,11 +10,11 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import { toOrdinal } from "../../utils/general.js";
 import { Link, useForm } from "@inertiajs/react";
 import { ArrowRight, DoorClosed, Layers2, PlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { StatusBadge } from "@/Components/StatusBadge.jsx";
+import { toOrdinal } from "@/utils/general";
 export default function RoomSection({ rooms, house }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         house_id: house.id,

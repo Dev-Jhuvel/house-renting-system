@@ -24,10 +24,10 @@ export default function Booking({ tenant }) {
 
 function BookingCard({booking}){
     return (
-        <div className="grid grid-cols-8 gap-4 px-6 h-full sm:h-[180px]">
-            <Card className="col-span-8 sm:col-span-6 h-full shadow-md">
+        <div className="grid grid-cols-8 gap-4 h-full md:h-[180px]">
+            <Card className="col-span-8 md:col-span-6 h-full shadow-md">
                         <CardContent className="grid p-2 grid-cols-8 h-full">
-                            <div className="col-span-8 sm:col-span-3 flex justify-center items-center gap-4 h-full  border-r-2">
+                            <div className="col-span-8 md:col-span-3 flex justify-center items-center gap-4 h-full border-b-2 md:border-b-0 md:border-r-2 p-2 md:p-0">
                                 <div className="rounded-full bg-primary/20 p-2">
                                     <Verified className="text-primary" />
                                 </div>
@@ -36,26 +36,26 @@ function BookingCard({booking}){
                                     <p className="text-primary text-lg font-bold">{booking.status.toUpperCase()}</p>
                                 </div>
                             </div>
-                            <div className="col-span-8 sm:col-span-5 w-full flex justify-center items-center px-4">
-                                <div className="w-[40%] px-4">
+                            <div className="col-span-8 md:col-span-5 w-full flex justify-center items-center px-4 p-2 md:p-0">
+                                <div className="w-[40%] px-4 text-center md:text-left">
                                     <h3 className="text-xs text-gray-500 font-semibold">MOVE-IN DATE</h3>
                                     <p className="text-primary text-lg font-bold">{booking.move_in_date ?? '-'}</p>
                                 </div>
-                                <div className="w-[40%] px-4">
+                                <div className="w-[40%] px-4 text-center md:text-left">
                                     <h3 className="text-xs text-gray-500 font-semibold">MOVE-OUT DATE</h3>
                                     <p className="text-primary text-lg font-bold">{booking.move_out_date ?? '-'}</p>
                                 </div>
                             </div>
                         </CardContent>
             </Card>
-            <Card className="col-span-8 sm:col-span-2 h-[180px] sm:h-full p-0 w-full bg-primary">
+            <Card className="col-span-8 md:col-span-2 h-[180px] lg:h-full p-0 w-full bg-primary">
                 <CardContent className="flex py-4 h-full flex-col justify-center gap-4">
                     <div className="w-full space-y-1">
                         <p className="text-xs text-white opacity-70">Remaining Deposit</p>
                         <p className="text-2xl text-white font-extrabold">{pesoFormatter(booking.total_deposit ?? 0)}</p>
                         <p className="text-md text-white">as of today</p>
                     </div>
-                    <Button variant="outline" className="w-full">View Deposit Transaction</Button>
+                    <Button variant="outline" className="w-full break-words">View Deposit Transaction</Button>
                 </CardContent>
             </Card>
         </div>
@@ -102,7 +102,7 @@ function HouseRoomCard({booking}){
     ];
     const landlord = booking.room.house.owner;
     return (
-        <div className="grid grid-cols-8 gap-4 px-6 h-[370px]">
+        <div className="grid grid-cols-8 gap-4 h-[370px]">
             <Card className="col-span-8 sm:col-span-4 h-[370px] sm:h-full pt-0 w-full flex flex-col overflow-hidden">
                 <div className="relative h-48 shrink-0">
                     <div className="absolute inset-0 z-30 bg-gradient-to-t from-black/70 to-transparent"/>

@@ -28,14 +28,13 @@ function BookingCard({booking}){
     const unpaid_bills_count = booking.unpaid_bills.length || 0;
     const unpaid_bills_keyword = unpaid_bills_count > 1 ? 'bills' : 'bill';
 
-    console.log(booking.balance === 0);
     function handleSubmitPayAll(booking){
         router.post(route("tenant.bills.payments.pay-all", booking));
     }
 
     return (
-        <div className="grid grid-cols-6 gap-4 px-6 h-full sm:h-[180px]">
-            <Card className="col-span-8 sm:col-span-2 h-[180px] sm:h-full p-0 w-full">
+        <div className="w-full grid grid-cols-6 gap-4 sm:gap-x-4 h-full md:h-[180px]">
+            <Card className="col-span-3 sm:col-span-2 h-[180px] sm:h-full p-0 w-full">
                 <CardContent className="flex py-4 h-full flex-col justify-center gap-4">
                     <div className="w-full space-y-1">
                         <h3 className="text-md text-gray-500 font-semibold">TOTAL OUTSTANDING</h3>
@@ -44,7 +43,7 @@ function BookingCard({booking}){
                     </div>
                 </CardContent>
             </Card>
-            <Card className="col-span-8 sm:col-span-2 h-[180px] sm:h-full p-0 w-full">
+            <Card className="col-span-3 sm:col-span-2 h-[180px] sm:h-full p-0 w-full">
                 <CardContent className="flex py-4 h-full flex-col justify-center gap-4">
                     <div className="w-full space-y-1">
                         <h3 className="text-md text-gray-500 font-semibold">NEXT DUE DATE</h3>
@@ -53,7 +52,7 @@ function BookingCard({booking}){
                     </div>
                 </CardContent>
             </Card>
-            <Card className="col-span-8 sm:col-span-2 h-[180px] sm:h-full p-0 w-full bg-primary">
+            <Card className="col-span-6 sm:col-span-2 h-[180px] sm:h-full p-0 w-full bg-primary">
                 <CardContent className="flex py-4 h-full flex-col justify-center gap-4">
                     <div className="w-full space-y-1 text-center">
                         <p className="text-2xl font-bold text-white">Clear Balance</p>
@@ -68,12 +67,12 @@ function BookingCard({booking}){
 
 function BillList({booking}){
     return (
-        <div className="my-4 gap-5 md:h-[400px]">
+        <div className="w-full my-4 gap-5 md:h-[400px]">
             <div className="col-span-5 h-full min-h-0">
                 <div className="flex justify-between items-center">
                     <h3 className="text-xl font-bold py-1">Recent Bills</h3>
                 </div>
-                <div className="grid grid-cols-1 gap-4 h-[400px] md:h-[calc(100%-10px)] overflow-y-scroll">
+                <div className="grid grid-cols-1 gap-4 content-start h-[400px] md:h-[calc(100%-10px)] overflow-y-scroll">
                     {booking.bills.map((bill) => (
                         <ResponsiveBillRow
                             bill={bill}

@@ -99,7 +99,7 @@ export default function RoomShow({ room }) {
                         <ArrowLeft /> Back to Portfolio
                     </Button>
                 </Link>
-                <div className="p-4 bg-gray-100 rounded-md border">
+                <div className="p-4 rounded-md border">
                     <div className="">
                         <div className="flex justify-between items-center mb-2">
                             <div className="flex justify-between items-center gap-3">
